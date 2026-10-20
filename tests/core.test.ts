@@ -1,0 +1,97 @@
+import { describe, expect, it } from 'vitest';
+import { SEED_FOODS, SEED_RECIPES } from '../src/lib/seed';
+import { itemMacros, recipeMacros, gramsOf } from '../src/lib/nutrition';
+import { buildGroceries } from '../src/lib/grocery';
+import { addDays, weekStart, weekday } from '../src/lib/date';
+import { changeOver, progress, rollingAverage } from '../src/lib/weight';
+import { startSession, tick, pause, resume, strengthWorkout, bikeIntervals, isDone, skip } from '../src/lib/workouts';
+import type { DayPlan } from '../src/lib/types';
+
+const foods = Object.fromEntries(SEED_FOODS.map((f) => [f.id, f]));
+const recipes = Object.fromEntries(SEED_RECIPES.map((r) => [r.id, r]));
+
+describe('nutrition', () => {
+  it('seed recipes land near the stated estimates', () => {
+    const expect_: Record<string, [number, number]> = {
+      'b-eggs': [400, 29], 'b-oats': [370, 28], 'l-chicken': [440, 42], 'l-turkey': [455, 40],
+      'd-salmon': [510, 39], 'd-shrimp': [485, 43], 'd-beef': [545, 44], 's-yogurt': [100, 16],
+      'x-strawberries': [180, 2], 'x-pudding': [175, 19], 'x-froyo': [150, 4], 'x-cookies': [150, 1.5]
+    };
+    for (const [id, [cal, p]] of Object.entries(expect_)) {
+      const m = recipeMacros(foods, recipes[id]);
+      expect(Math.abs(m.cal - cal) / cal, `${id} cal ${m.cal}`).toBeLessThan(0.15);
+      expect(Math.abs(m.protein - p), `${id} protein ${m.protein}`).toBeLessThan(10);
+    }
+  });
+  it('portions scale nutrition linearly', () => {
+    const a = itemMacros({ id: 'x', recipeId: 'l-chicken', servings: 1 }, recipes, foods);
+    const b = itemMacros({ id: 'x', recipeId: 'l-chicken', servings: 1.5 }, recipes, foods);
+    expect(b.cal).toBeCloseTo(a.cal * 1.5, 5);
+  });
+  it('unit conversion', () => {
+    expect(gramsOf(foods['chicken-cooked'], 4, 'oz')).toBeCloseTo(113.4, 1);
+    expect(gramsOf(foods['olive-oil'], 1, 'tsp')).toBeCloseTo(4.5, 1);
+    expect(gramsOf(foods['greek-yogurt'], 1, 'tbsp')).toBe(15);
+  });
+});
+
+describe('dates', () => {
+  it('weeks start Monday', () => {
+    expect(weekStart('2026-10-20')).toBe('2026-10-19');
+    expect(weekStart('2026-10-25')).toBe('2026-10-19');
+    expect(weekday('2026-10-25')).toBe(0);
+    expect(addDays('2026-11-01', 1)).toBe('2026-11-02'); // across DST
+  });
+});
+
+describe('groceries', () => {
+  it('combines duplicate ingredients and converts cooked → raw', () => {
+    const day = (l: string): DayPlan => ({ breakfast: [], lunch: [{ id: l, recipeId: l, servings: 1 }], dinner: [], snack: [], dessert: [] });
+    const list = buildGroceries([day('l-chicken'), day('l-chicken'), day('l-chicken'), day('l-turkey')], recipes, foods, []);
+    const chicken = list.find((i) => i.key === 'chicken-raw')!;
+    expect(chicken.qty).toBe(1); // 12 oz cooked ≈ 1 lb raw
+    const rice = list.filter((i) => i.key === 'rice');
+    expect(rice.length).toBe(1);
+    const owned = buildGroceries([day('l-chicken')], recipes, foods, ['rice']);
+    expect(owned.find((i) => i.key === 'rice')).toBeUndefined();
+  });
+});
+
+describe('weight', () => {
+  it('progress & changes', () => {
+    expect(progress(178, 150, 171).lost).toBe(7);
+    expect(progress(178, 150, 171).pct).toBe(25);
+    const w = [{ id: '1', date: '2026-10-01', lbs: 178 }, { id: '2', date: '2026-10-13', lbs: 176 }, { id: '3', date: '2026-10-20', lbs: 175 }];
+    expect(changeOver(w, 7, '2026-10-20')).toBe(-1);
+    expect(changeOver(w, 90, '2026-10-20')).toBe(null);
+    expect(rollingAverage(w)[2].avg).toBe(175);
+    expect(rollingAverage([...w, { id: '4', date: '2026-10-18', lbs: 176 }])[3].avg).toBe(175.5);
+  });
+});
+
+describe('timer engine', () => {
+  it('catches up after backgrounding using timestamps', () => {
+    const def = bikeIntervals();
+    let s = startSession(def, '2026-10-20', 0);
+    // phone locked for 6 minutes: 4 min warmup + 1 min push + 1 min into recovery
+    s = tick(s, 6 * 60 * 1000).s;
+    expect(s.index).toBe(2);
+    s = pause(s, 6 * 60 * 1000);
+    s = resume(s, 10 * 60 * 1000); // 4 min pause doesn't count
+    s = tick(s, 11 * 60 * 1000 + 1).s;
+    expect(s.index).toBe(3);
+    s = tick(s, 60 * 60 * 1000).s;
+    expect(isDone(s)).toBe(true);
+  });
+  it('strength cooldown fills the remaining time', () => {
+    const def = strengthWorkout(20);
+    expect(def.phases.filter((p) => p.kind === 'reps').length).toBe(8);
+    let s = startSession(def, '2026-10-20', 0);
+    // skip through every phase in 10 minutes total
+    const fillIdx = s.phases.findIndex((p) => p.fill);
+    for (let i = 0; i < fillIdx; i++) s = skip(s, ((i + 1) / fillIdx) * 10 * 60 * 1000);
+    expect(s.index).toBe(fillIdx);
+    expect(s.phases[fillIdx].seconds).toBe(600);
+    expect(s.phases.some((p) => p.fill)).toBe(true);
+  });
+});

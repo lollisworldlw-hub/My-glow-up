@@ -1,0 +1,88 @@
+@import '@fontsource/cormorant-garamond/latin-500.css';
+@import '@fontsource/cormorant-garamond/latin-600.css';
+@import '@fontsource/cormorant-garamond/latin-700.css';
+@import '@fontsource/dm-sans/latin-400.css';
+@import '@fontsource/dm-sans/latin-500.css';
+@import '@fontsource/dm-sans/latin-600.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #FFF9F7;
+  --card: #FFFFFF;
+  --ink: #392C36;
+  --muted: #7C6F78;
+  --rose: #C87893;
+  --rose-deep: #A6567A;
+  --petal: #F9E8EF;
+  --blush: #E8B7C8;
+  --line: #F0DFE5;
+  --sage: #A4B9A0;
+  --sage-deep: #5F7A5B;
+  color-scheme: light;
+}
+.dark {
+  --bg: #1D171C;
+  --card: #29212A;
+  --ink: #F7EBF1;
+  --muted: #BBA9B4;
+  --rose: #E09AB2;
+  --rose-deep: #E8A8BE;
+  --petal: #3A2C36;
+  --blush: #6E4A5C;
+  --line: #3F323C;
+  --sage: #9DB899;
+  --sage-deep: #B5CFB1;
+  color-scheme: dark;
+}
+.dark .btn-primary { color: #2A1E26; }
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+input, select, textarea, button { font: inherit; color: inherit; }
+input, select, textarea { font-size: 16px; } /* prevents iOS zoom */
+
+@layer components {
+  .card { @apply bg-card rounded-3xl border border-line shadow-soft; }
+  .h-serif { @apply font-serif font-semibold tracking-tight; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-5 min-h-[46px] font-medium transition active:scale-[0.97] disabled:opacity-50; }
+  .btn-primary { @apply btn bg-deep text-white; }
+  .btn-soft { @apply btn bg-petal text-deep; }
+  .btn-ghost { @apply btn border border-line text-ink bg-card; }
+  .btn-sm { @apply min-h-[38px] px-4 text-[15px]; }
+  .chip { @apply inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[14px] font-medium border border-line bg-card; }
+  .chip-on { @apply bg-deep text-white border-deep; }
+  .field { @apply w-full rounded-2xl border border-line bg-card px-4 min-h-[48px] outline-none focus:border-rose focus:ring-2 focus:ring-petal; }
+  .label { @apply block text-[14px] font-medium text-muted mb-1.5; }
+  .eyebrow { @apply text-[13px] font-semibold uppercase tracking-[0.14em] text-muted; }
+}
+
+.safe-top { padding-top: max(env(safe-area-inset-top), 16px); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.pb-nav { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise .35s ease both; }
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+.sheet { animation: sheetUp .32s cubic-bezier(.2,.8,.2,1) both; }
+.fade { animation: fade .2s ease both; }
+@keyframes floatHeart { 0% { opacity: 0; transform: translateY(0) scale(.6); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-120px) scale(1.1); } }
+.float-heart { animation: floatHeart 2.2s ease-out forwards; }
+@keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+.pop { animation: pop .3s ease; }
+.ring-anim { transition: stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1); }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
