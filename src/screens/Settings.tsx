@@ -8,6 +8,7 @@ import { clearPhotos, downloadText, exportData, parseBackup, restorePhotos } fro
 import { kgToLb, latest, lbToKg } from '../lib/weight';
 import { Card, Field, Header, NumberInput, SectionTitle, Segmented, Sheet, toast } from '../components/ui';
 import { WeightSheet } from '../components/WeightSheet';
+import { CloudCard } from '../components/CloudCard';
 
 export default function Settings() {
   const s = useStore();
@@ -62,6 +63,15 @@ export default function Settings() {
         <button className="btn-soft w-full mb-3" onClick={() => setSheet('schedule')}>Edit exercise schedule</button>
         <Toggle label="Timer sounds" on={st.sound} onChange={(v) => set({ sound: v })} />
         <Toggle label="Vibration (where supported)" on={st.vibration} onChange={(v) => set({ vibration: v })} />
+        <Field label="Daily step goal"><NumberInput value={st.stepsGoal} onChange={(v) => v && set({ stepsGoal: Math.round(v) })} /></Field>
+        <Toggle label="Hourly stand & stretch nudges (weekdays)" on={st.moveNudge.on} onChange={(v) => set({ moveNudge: { ...st.moveNudge, on: v } })} />
+        {st.moveNudge.on && (
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            <Field label="From"><input type="time" className="field" value={st.moveNudge.start} onChange={(e) => set({ moveNudge: { ...st.moveNudge, start: e.target.value } })} /></Field>
+            <Field label="Until"><input type="time" className="field" value={st.moveNudge.end} onChange={(e) => set({ moveNudge: { ...st.moveNudge, end: e.target.value } })} /></Field>
+          </div>
+        )}
+        <Toggle label="Show cycle info on Home" on={st.cycleOnHome} onChange={(v) => set({ cycleOnHome: v })} />
       </Card>
 
       <SectionTitle>Meals</SectionTitle>
@@ -301,6 +311,7 @@ function DataSection({ onDelete }: { onDelete: () => void }) {
   return (
     <>
       <SectionTitle>Your data</SectionTitle>
+      <div className="mb-4"><CloudCard /></div>
       <Card>
         <div className="flex items-start gap-3 mb-3"><Database className="text-deep shrink-0 mt-0.5" size={20} />
           <p className="text-[14px]">Everything is saved privately on this device (IndexedDB). It can be lost if you clear Safari’s website data, delete the Home Screen app, or switch phones — so download a backup now and then and keep it in Files or iCloud Drive.</p>
@@ -331,11 +342,13 @@ function DeleteAll({ onClose }: { onClose: () => void }) {
   const keep = (fn: (x: any) => void, msg: string) => { s.set(fn); toast(msg); onClose(); };
   return (
     <Sheet open onClose={onClose} title="Delete data">
-      <p className="text-muted text-[15px] mb-4">These can’t be undone. Export a backup first if you might want this later.</p>
+      <p className="text-muted text-[15px] mb-4">These can’t be undone. If cloud backup is on, the cloud copy updates too. Export a backup first if you might want this later.</p>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.logs = []; }, 'Food log cleared')}>Clear food log</button>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.weights = []; x.measures = []; }, 'Weight & measurements cleared')}>Clear weight & measurements</button>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.workouts = []; }, 'Workout history cleared')}>Clear workout history</button>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.habitChecks = {}; x.water = {}; x.notes = {}; }, 'Habits cleared')}>Clear habit history</button>
+      <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.periods = []; x.cycleDays = {}; }, 'Cycle data cleared')}>Clear cycle data</button>
+      <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.checkins = []; x.steps = {}; }, 'Check-ins & steps cleared')}>Clear check-ins & steps</button>
       <button className="btn-ghost w-full mb-5" onClick={async () => { await clearPhotos(); keep((x) => { x.photos = []; }, 'Photos deleted'); }}>Delete all photos</button>
       <div className="rounded-2xl border border-blush p-4">
         <div className="font-medium mb-2">Start completely fresh</div>

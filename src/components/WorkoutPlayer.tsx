@@ -92,7 +92,7 @@ export function WorkoutPlayer() {
   const finish = (completed: boolean) => {
     const actualMin = Math.max(1, Math.round(active / 60));
     s.set((st) => {
-      st.workouts.push({ id: uid(), date: session.date, type: session.workoutId, name, plannedMin: Math.round(session.plannedSec / 60), actualMin, completed, difficulty: diff, at: Date.now() });
+      st.workouts.push({ id: uid(), date: session.date, type: session.workoutId, name, plannedMin: Math.round(session.plannedSec / 60), actualMin, completed, difficulty: diff, reps: session.repLog, levels: session.workoutId === 'strength' ? { ...st.exerciseLevels } : undefined, at: Date.now() });
       st.session = null;
     });
     if (completed) { celebrate(); toast('Workout saved — so proud of you ♡'); } else toast('Saved as a partial workout');

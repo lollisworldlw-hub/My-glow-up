@@ -10,6 +10,7 @@ import { Bar, Card, CheckRow, Ring, SectionTitle, toast } from '../components/ui
 import { LogFoodSheet, MealCard, SwapSheet } from '../components/MealParts';
 import { WeightSheet, showW } from '../components/WeightSheet';
 import { useUI } from '../lib/ui';
+import { CheckReminders, CheckinCard, CycleChip, DessertBudget, LogDayButton, ProteinFixer } from '../components/HomeExtras';
 
 export const HOME_LABEL: Record<string, string> = { strength: 'Full-body strength', bike: 'Stationary bike', 'bike-easy': 'Easy bike (optional)', rest: 'Rest & recover' };
 
@@ -47,6 +48,9 @@ export default function Home() {
         <div className="text-muted mt-1">{fmtLong(today)}</div>
         <p className="mt-3 font-serif italic text-[20px] text-deep">“{msg}”</p>
       </div>
+
+      <CheckinCard today={today} />
+      <CycleChip today={today} />
 
       {/* weight card */}
       <Card className="rise">
@@ -89,6 +93,7 @@ export default function Home() {
           </div>
         </div>
         <div className="text-[13px] text-muted mt-3">Planned today: ≈ {Math.round(plan.cal)} cal · {Math.round(plan.protein)} g protein (lighter ring). Flexible range {st.calMin}–{st.calMax}.</div>
+        <ProteinFixer today={today} />
       </Card>
 
       {/* water */}
@@ -122,6 +127,7 @@ export default function Home() {
             <div className="text-[14px] text-muted">{s.workouts.some((w) => w.date === today && w.type !== 'walk' && w.completed) ? 'Done ♡' : sched?.home === 'rest' ? 'Enjoy the rest' : `${st.workoutMinutes} minutes at home`}</div></div>
           <span className="text-deep font-medium text-[15px]">Open →</span>
         </div>
+        <div className="mt-3 text-[14px] text-muted">Steps today: <b className="text-ink">{(s.steps[today] ?? 0).toLocaleString()}</b> of {st.stepsGoal.toLocaleString()}</div>
       </Card>
 
       {/* checklist */}
@@ -141,13 +147,17 @@ export default function Home() {
         </div>
       </Card>
 
+      <CheckReminders today={today} />
+
       {/* meals */}
       <SectionTitle right={<button className="text-deep font-medium text-[15px]" onClick={() => go('meals')}>Week →</button>}>Today’s meals</SectionTitle>
       {!day ? (
         <Card><p className="text-muted">No meals planned today yet.</p><button className="btn-primary mt-3" onClick={() => s.generateWeek(weekStart(today), 'rotation')}>Fill this week from my rotation</button></Card>
       ) : (
         <div className="space-y-3">
+          <DessertBudget today={today} />
           {SLOTS.map((slot) => (day[slot] ?? []).map((it) => <MealCard key={it.id} date={today} slot={slot} item={it} />))}
+          <LogDayButton today={today} />
           {!(day.dessert ?? []).length && (
             <Card><div className="font-medium">No dessert planned tonight</div><button className="btn-soft btn-sm mt-2" onClick={() => setSheet('add-dessert')}><Plus size={16} />Choose a dessert</button></Card>
           )}

@@ -34,20 +34,55 @@ export const EXERCISES: Record<string, { name: string; how: string }> = {
 
 const REST = 30;
 
-export function strengthWorkout(minutes = 20): WorkoutDef {
+/** Progression ladders: start at level 0, move up when the current level feels easy. */
+export const LEVELS: Record<string, { name: string; how: string }[]> = {
+  squat: [
+    { name: 'Chair sit-to-stands', how: 'Sit all the way down on a sturdy chair, then stand up without using your hands if you can. Chest tall.' },
+    { name: 'Bodyweight squats', how: 'Feet hip-width, sit hips back and down like reaching for a chair, then stand by pressing through your heels.' },
+    { name: 'Slow squats (3 seconds down)', how: 'Count 3 slow seconds on the way down, then stand up normally. Slower = harder, no equipment needed.' },
+    { name: 'Pause squats', how: 'Lower slowly, hold 2 seconds at the bottom, then stand. Keep your knees tracking over your toes.' },
+    { name: 'Split squats (each leg)', how: 'One foot forward, one back. Lower your back knee toward the floor, then rise. Hold a wall for balance.' }
+  ],
+  pushup: [
+    { name: 'Wall push-ups', how: 'Hands on the wall at shoulder height, step back. Lower your chest toward the wall, then press away.' },
+    { name: 'Counter push-ups', how: 'Hands on a kitchen counter, body in a straight line. Lower your chest to the edge, then press up.' },
+    { name: 'Low-incline push-ups', how: 'Hands on a sturdy couch arm or low table. Keep your core tight and body straight.' },
+    { name: 'Knee push-ups', how: 'Knees on the floor, hands under shoulders. Lower your chest toward the floor, then press up.' },
+    { name: 'Full push-ups', how: 'Toes on the floor, body like a plank. Lower as far as you can with good form.' }
+  ],
+  hinge: [
+    { name: 'Standing hip hinges', how: 'Soft knees, hands on hips. Push hips straight back with a long back, then squeeze your glutes to stand.' },
+    { name: 'Slow hip hinges + squeeze', how: 'Hinge back for 3 seconds, then stand and squeeze your glutes hard for 2 seconds.' },
+    { name: 'Glute bridges', how: 'Lie on your back, knees bent. Press through your heels to lift your hips, squeeze, and lower slowly.' },
+    { name: 'Supported single-leg hinges', how: 'Hold a chair. Hinge forward on one leg as the other lifts behind you. Switch legs halfway.' },
+    { name: 'Single-leg glute bridges', how: 'Bridge with one foot on the floor and the other leg extended. Switch legs halfway.' }
+  ],
+  knee: [
+    { name: 'Standing knee-to-elbow', how: 'Hands behind your head. Bring one knee up to meet the opposite elbow, tightening your core. Alternate.' },
+    { name: 'Slow knee-to-elbow with hold', how: 'Same move, but hold the crunch for 2 seconds each rep.' },
+    { name: 'Standing knee drives', how: 'Arms overhead, pull them down as you drive one knee up quickly. Alternate sides with control.' },
+    { name: 'Dead bugs', how: 'On your back, arms up, knees bent over hips. Lower opposite arm and leg slowly, keeping your low back down.' },
+    { name: 'Mountain climbers (slow)', how: 'Hands on a couch or floor, body straight. Bring one knee toward your chest at a time.' }
+  ]
+};
+export const levelOf = (levels: Record<string, number> | undefined, id: string) => Math.min(LEVELS[id]?.length - 1 || 0, Math.max(0, levels?.[id] ?? 0));
+
+
+export function strengthWorkout(minutes = 20, levels?: Record<string, number>): WorkoutDef {
   const phases: Phase[] = [
     { label: 'Warm-up', cue: EXERCISES.warmup.how, kind: 'timed', seconds: 180, exercise: 'warmup', intensity: 'easy' }
   ];
   for (const round of [1, 2]) {
-    const ex = (id: string, reps: number, label?: string): Phase => ({
-      label: label ?? EXERCISES[id].name, cue: EXERCISES[id].how, kind: 'reps', reps, seconds: 45, exercise: id, round, intensity: 'work'
-    });
+    const ex = (id: string, reps: number, suffix = ''): Phase => {
+      const lv = LEVELS[id]?.[levelOf(levels, id)];
+      return { label: (lv?.name ?? EXERCISES[id].name) + suffix, cue: lv?.how ?? EXERCISES[id].how, kind: 'reps', reps, seconds: 45, exercise: id, round, intensity: 'work' };
+    };
     const rest = (s = REST): Phase => ({ label: 'Rest', cue: EXERCISES.rest.how, kind: 'timed', seconds: s, exercise: 'rest', round, intensity: 'rest' });
     phases.push(
       ex('squat', 12), rest(),
       ex('pushup', 12), rest(),
       ex('hinge', 12), rest(),
-      ex('knee', 24, 'Standing knee-to-elbow (12 each side)'), rest(),
+      ex('knee', 24, ' (12 each side)'), rest(),
       { label: 'Marching in place', cue: EXERCISES.march.how, kind: 'timed', seconds: 60, exercise: 'march', round, intensity: 'moderate' }
     );
     if (round === 1) phases.push(rest(60));
@@ -94,9 +129,9 @@ export function walk(minutes = 20): WorkoutDef {
   };
 }
 
-export function workoutById(id: WorkoutLog['type'], s: { workoutMinutes: number; walkMinutes: number }): WorkoutDef {
+export function workoutById(id: WorkoutLog['type'], s: { workoutMinutes: number; walkMinutes: number }, levels?: Record<string, number>): WorkoutDef {
   switch (id) {
-    case 'strength': return strengthWorkout(s.workoutMinutes);
+    case 'strength': return strengthWorkout(s.workoutMinutes, levels);
     case 'bike-moderate': return bikeModerate(s.workoutMinutes);
     case 'bike-intervals': return bikeIntervals();
     case 'bike-easy': return bikeEasy(s.workoutMinutes);
@@ -118,6 +153,7 @@ export interface Session {
   totalPaused: number;
   plannedSec: number;
   reps: number;
+  repLog?: Record<string, number[]>;
 }
 
 export function startSession(def: WorkoutDef, date: string, now: number): Session {
@@ -163,7 +199,18 @@ export function tick(s: Session, now: number): { s: Session; changed: number } {
 export const isDone = (s: Session) => s.index >= s.phases.length;
 
 export function skip(s: Session, now: number): Session {
-  return enterPhase(s, s.index + 1, now, now);
+  const p = s.phases[s.index];
+  let repLog = s.repLog;
+  if (p?.kind === 'reps' && p.exercise) repLog = { ...(repLog ?? {}), [p.exercise]: [...(repLog?.[p.exercise] ?? []), s.reps] };
+  return { ...enterPhase(s, s.index + 1, now, now), repLog };
+}
+
+/** Suggest moving up a level when the last two strength sessions hit every rep target and didn't feel hard. */
+export function readyToLevelUp(history: WorkoutLog[], id: string, level: number, target: number): boolean {
+  const recent = history.filter((w) => w.type === 'strength' && w.completed && w.reps?.[id]?.length && (w.levels?.[id] ?? 0) === level)
+    .sort((a, b) => b.at - a.at).slice(0, 2);
+  if (recent.length < 2) return false;
+  return recent.every((w) => w.reps![id].every((r) => r >= target) && (w.difficulty == null || w.difficulty <= 3));
 }
 export function pause(s: Session, now: number): Session {
   return s.pausedAt ? s : { ...s, pausedAt: now };

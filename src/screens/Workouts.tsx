@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Bike, Check, Dumbbell, Footprints, Moon, Play, Plus, Trash2 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { useToday } from '../lib/derived';
-import { DOW_NAMES, fmtDow, fmtShort, todayKey, uid, weekday } from '../lib/date';
-import { EXERCISES, startSession, workoutById } from '../lib/workouts';
+import { DOW_NAMES, addDays, fmtDow, fmtShort, todayKey, uid, weekday } from '../lib/date';
+import { EXERCISES, LEVELS, levelOf, readyToLevelUp, startSession, workoutById } from '../lib/workouts';
 import type { WorkoutLog } from '../lib/types';
 import { Card, Empty, Field, Header, NumberInput, SectionTitle, Segmented, Sheet, toast } from '../components/ui';
 import { ExerciseArt } from '../components/Art';
@@ -23,17 +23,17 @@ export default function Workouts() {
 
   const start = (id: WorkoutLog['type']) => {
     unlockAudio();
-    const def = workoutById(id, s.settings);
+    const def = workoutById(id, s.settings, s.exerciseLevels);
     s.set((st) => { st.session = startSession(def, todayKey(), Date.now()) as any; });
   };
   const quickDone = (id: WorkoutLog['type']) => {
-    const def = workoutById(id, s.settings);
+    const def = workoutById(id, s.settings, s.exerciseLevels);
     s.set((st) => { st.workouts.push({ id: uid(), date: today, type: id, name: def.name, plannedMin: def.plannedMin, actualMin: def.plannedMin, completed: true, at: Date.now() }); });
     toast('Marked done ♡');
   };
 
   const homeId: WorkoutLog['type'] | null = sched.home === 'strength' ? 'strength' : sched.home === 'bike' ? bikeMode : sched.home === 'bike-easy' ? 'bike-easy' : null;
-  const homeDef = homeId ? workoutById(homeId, s.settings) : null;
+  const homeDef = homeId ? workoutById(homeId, s.settings, s.exerciseLevels) : null;
 
   return (
     <div>
@@ -92,19 +92,40 @@ export default function Workouts() {
             )}
           </Card>
 
-          {sched.home === 'strength' && (
-            <>
-              <SectionTitle>The moves</SectionTitle>
-              <div className="space-y-2">
-                {['squat', 'pushup', 'hinge', 'knee', 'march'].map((id) => (
-                  <div key={id} className="card p-3 flex gap-3 items-center">
-                    <div className="w-[72px] h-[72px] rounded-2xl bg-petal grid place-items-center shrink-0"><ExerciseArt id={id} size={64} /></div>
-                    <div><div className="font-medium">{EXERCISES[id].name}</div><div className="text-[14px] text-muted">{id === 'march' ? '60 seconds' : id === 'knee' ? '12 each side' : '12 reps'}</div><div className="text-[14px] mt-0.5">{EXERCISES[id].how}</div></div>
+          <SectionTitle>Your strength moves</SectionTitle>
+          <p className="text-[14px] text-muted -mt-1 mb-3">Each move has 5 levels. When you hit every rep and it feels easy for two workouts in a row, I'll suggest the next level — making moves harder over time is what keeps your muscle while you lose fat.</p>
+          <div className="space-y-2">
+            {['squat', 'pushup', 'hinge', 'knee'].map((id) => {
+              const lv = levelOf(s.exerciseLevels, id);
+              const info = LEVELS[id][lv];
+              const target = id === 'knee' ? 24 : 12;
+              const ready = lv < LEVELS[id].length - 1 && readyToLevelUp(s.workouts, id, lv, target);
+              const last = [...s.workouts].filter((w) => w.reps?.[id]).sort((a, b) => b.at - a.at)[0];
+              return (
+                <div key={id} className={`card p-3 ${ready ? 'border-rose' : ''}`}>
+                  <div className="flex gap-3 items-center">
+                    <div className="w-[64px] h-[64px] rounded-2xl bg-petal grid place-items-center shrink-0"><ExerciseArt id={id} size={56} /></div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[12px] eyebrow">Level {lv + 1} of {LEVELS[id].length}</div>
+                      <div className="font-medium">{info.name}</div>
+                      <div className="text-[13px] text-muted">{id === 'knee' ? '12 each side' : '12 reps'} × 2 rounds{last ? ` · last time: ${last.reps![id].join(' / ')}` : ''}</div>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </>
-          )}
+                  <p className="text-[14px] mt-2">{info.how}</p>
+                  {ready && <div className="mt-2 rounded-2xl bg-petal px-3 py-2 text-[14px]">You’ve nailed this twice — ready for <b>{LEVELS[id][lv + 1].name}</b>?</div>}
+                  <div className="flex gap-2 mt-2">
+                    {lv > 0 && <button className="btn-ghost btn-sm flex-1" onClick={() => s.set((st) => { st.exerciseLevels[id] = lv - 1; })}>Easier</button>}
+                    {lv < LEVELS[id].length - 1 && <button className={`${ready ? 'btn-primary' : 'btn-soft'} btn-sm flex-1`} onClick={() => { s.set((st) => { st.exerciseLevels[id] = lv + 1; }); toast(`Level up: ${LEVELS[id][lv + 1].name} ♡`); }}>Level up</button>}
+                  </div>
+                </div>
+              );
+            })}
+            <div className="card p-3 flex gap-3 items-center">
+              <div className="w-[64px] h-[64px] rounded-2xl bg-petal grid place-items-center shrink-0"><ExerciseArt id="march" size={56} /></div>
+              <div><div className="font-medium">{EXERCISES.march.name}</div><div className="text-[13px] text-muted">60 seconds · {EXERCISES.march.how}</div></div>
+            </div>
+          </div>
+          <StepsCard today={today} />
           <p className="text-[14px] text-muted">The timer keeps accurate time even if you lock your phone. iPhone may not play sounds or vibrate while the app is in the background — check back when you’re ready.</p>
         </div>
       )}
@@ -180,5 +201,33 @@ function ManualLog({ onClose }: { onClose: () => void }) {
       <div className="label">How did it feel? (optional)</div>
       <div className="grid grid-cols-5 gap-2">{[1, 2, 3, 4, 5].map((d) => <button key={d} onClick={() => setDiff(d)} className={`rounded-2xl py-3 border ${diff === d ? 'bg-deep text-white border-deep' : 'border-line bg-card'}`}>{d}</button>)}</div>
     </Sheet>
+  );
+}
+
+function StepsCard({ today }: { today: string }) {
+  const s = useStore();
+  const [val, setVal] = useState<number | null>(s.steps[today] ?? null);
+  const days = Array.from({ length: 14 }).map((_, i) => addDays(today, i - 13));
+  const max = Math.max(s.settings.stepsGoal, ...days.map((d) => s.steps[d] ?? 0));
+  return (
+    <>
+      <SectionTitle>Steps</SectionTitle>
+      <Card>
+        <p className="text-[14px] text-muted mb-3">A desk job makes everyday steps extra valuable. Copy today’s count from your iPhone’s Health app.</p>
+        <div className="flex gap-2">
+          <div className="flex-1"><NumberInput value={val} onChange={setVal} placeholder={`Goal ${s.settings.stepsGoal.toLocaleString()}`} ariaLabel="Steps today" /></div>
+          <button className="btn-primary" onClick={() => { if (val == null) return; s.set((st) => { st.steps[today] = Math.round(val); }); toast('Steps saved'); }}>Save</button>
+        </div>
+        <div className="flex items-end gap-1 h-24 mt-4" aria-label="Steps, last 14 days">
+          {days.map((d) => {
+            const v = s.steps[d] ?? 0;
+            return <div key={d} className="flex-1 flex flex-col items-center justify-end h-full">
+              <div className="w-full rounded-t-md" style={{ height: `${(v / max) * 100}%`, minHeight: v ? 4 : 2, background: v >= s.settings.stepsGoal ? 'var(--sage)' : v ? 'var(--rose)' : 'var(--petal)' }} />
+            </div>;
+          })}
+        </div>
+        <div className="flex justify-between text-[12px] text-muted mt-1"><span>{fmtShort(days[0])}</span><span>Today</span></div>
+      </Card>
+    </>
   );
 }

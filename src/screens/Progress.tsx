@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Camera, CalendarDays, Image as ImageIcon, Pencil, Plus, Ruler, Scale, Trash2, Trophy } from 'lucide-react';
 import {
-  CartesianGrid, ComposedChart, Line, LineChart, ReferenceLine, ResponsiveContainer, Scatter, Tooltip, XAxis, YAxis, BarChart, Bar as RBar
+  CartesianGrid, ComposedChart, ReferenceArea, Line, LineChart, ReferenceLine, ResponsiveContainer, Scatter, Tooltip, XAxis, YAxis, BarChart, Bar as RBar
 } from 'recharts';
 import { useStore } from '../lib/store';
 import { MEASURES } from '../lib/types';
@@ -13,8 +13,11 @@ import { Bar, Card, CheckRow, Empty, Field, Header, NumberInput, SectionTitle, S
 import { MILESTONES, WeightSheet, showW, wNum } from '../components/WeightSheet';
 import { deletePhoto, loadPhoto, resizeImage, savePhoto } from '../lib/backup';
 import { useUI } from '../lib/ui';
+import { CycleView } from '../components/CycleView';
+import { CheckinSheet } from '../components/Checkin';
+import { sortPeriods } from '../lib/cycle';
 
-type Sub = 'weight' | 'body' | 'photos' | 'habits' | 'milestones';
+type Sub = 'weight' | 'body' | 'photos' | 'habits' | 'cycle' | 'milestones';
 
 export default function Progress() {
   const sub = (useUI((u) => u.sub.progress) ?? 'weight') as Sub;
@@ -25,12 +28,13 @@ export default function Progress() {
       <div className="mb-5">
         <Segmented small value={sub} onChange={(v) => setSub('progress', v)} options={[
           { value: 'weight', label: 'Weight' }, { value: 'body', label: 'Body' }, { value: 'photos', label: 'Photos' },
-          { value: 'habits', label: 'Habits' }, { value: 'milestones', label: 'Goals' }]} />
+          { value: 'habits', label: 'Habits' }, { value: 'cycle', label: 'Cycle' }, { value: 'milestones', label: 'Goals' }]} />
       </div>
       {sub === 'weight' && <WeightView />}
       {sub === 'body' && <BodyView />}
       {sub === 'photos' && <PhotosView />}
       {sub === 'habits' && <HabitsView />}
+      {sub === 'cycle' && <CycleView />}
       {sub === 'milestones' && <MilestonesView />}
     </div>
   );
@@ -100,6 +104,11 @@ function WeightView() {
                 <YAxis domain={[yMin, yMax]} tick={{ fill: 'var(--muted)', fontSize: 12 }} stroke="var(--line)" width={40} allowDecimals={false} />
                 <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 14 }}
                   labelFormatter={(t) => fmtShort(toKey(new Date(t as number)))} formatter={(v: any, n: any) => [`${v} ${u === 'kg' ? 'kg' : 'lb'}`, n === 'w' ? 'Weigh-in' : '7-day average']} />
+                {sortPeriods(s.periods).map((p) => {
+                  const x1 = fromKey(p.start).getTime(), x2 = fromKey(p.end ?? addDays(p.start, 4)).getTime();
+                  if (!data.length || x2 < data[0].t || x1 > data[data.length - 1].t) return null;
+                  return <ReferenceArea key={p.id} x1={Math.max(x1, data[0].t)} x2={Math.min(x2, data[data.length - 1].t)} fill="var(--blush)" fillOpacity={0.25} strokeOpacity={0} ifOverflow="hidden" />;
+                })}
                 <ReferenceLine y={goal} stroke="var(--sage)" strokeDasharray="5 5" label={{ value: 'Goal', fill: 'var(--sage-deep)', fontSize: 12, position: 'insideBottomRight' }} />
                 <Line dataKey="avg" stroke="var(--rose-deep)" strokeWidth={2.5} dot={false} type="monotone" isAnimationActive />
                 <Scatter dataKey="w" fill="var(--blush)" />
@@ -107,7 +116,7 @@ function WeightView() {
             </ResponsiveContainer>
           </div>
         )}
-        <div className="flex gap-4 text-[13px] text-muted mt-2"><span><span className="inline-block w-2.5 h-2.5 rounded-full bg-blush mr-1" />Weigh-ins</span><span><span className="inline-block w-4 h-0.5 bg-deep align-middle mr-1" />7-day average</span><span><span className="inline-block w-4 border-t border-dashed border-sage align-middle mr-1" />Goal</span></div>
+        <div className="flex gap-4 text-[13px] text-muted mt-2"><span><span className="inline-block w-2.5 h-2.5 rounded-full bg-blush mr-1" />Weigh-ins</span><span><span className="inline-block w-4 h-0.5 bg-deep align-middle mr-1" />7-day average</span><span><span className="inline-block w-4 border-t border-dashed border-sage align-middle mr-1" />Goal</span>{s.periods.length > 0 && <span><span className="inline-block w-3 h-3 rounded-sm bg-blush/50 align-middle mr-1" />Period</span>}</div>
       </Card>
 
       {sorted.length > 0 && (
@@ -453,22 +462,44 @@ function HabitEditor({ onClose }: { onClose: () => void }) {
 
 function MilestonesView() {
   const s = useStore();
+  const today = useToday();
+  const [open, setOpen] = useState<string | null>(null);
   const sorted = sortWeights(s.weights);
   const u = s.settings.weightUnit;
   const ms = MILESTONES.filter((m) => m >= s.settings.goalWeight - 0.01 && m < s.settings.startWeight);
+  const thisWeek = weekStart(today);
+  const checks = [...s.checkins].sort((a, b) => b.weekStart.localeCompare(a.weekStart));
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {ms.map((m) => {
-        const hit = sorted.find((w) => w.lbs <= m);
-        return (
-          <div key={m} className={`card p-4 text-center ${hit ? 'bg-petal border-blush' : ''}`}>
-            <div className={`mx-auto w-12 h-12 rounded-full grid place-items-center mb-2 ${hit ? 'bg-deep text-white' : 'bg-petal text-blush'}`}><Trophy size={20} /></div>
-            <div className="h-serif text-[28px]">{showW(m, u)}</div>
-            <div className="text-[14px] text-muted">{hit ? `Reached ${fmtShort(hit.date)} ♡` : m === s.settings.goalWeight ? 'Your goal' : 'Ahead of you'}</div>
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-3">
+        {ms.map((m) => {
+          const hit = sorted.find((w) => w.lbs <= m);
+          return (
+            <div key={m} className={`card p-4 text-center ${hit ? 'bg-petal border-blush' : ''}`}>
+              <div className={`mx-auto w-12 h-12 rounded-full grid place-items-center mb-2 ${hit ? 'bg-deep text-white' : 'bg-petal text-blush'}`}><Trophy size={20} /></div>
+              <div className="h-serif text-[28px]">{showW(m, u)}</div>
+              <div className="text-[14px] text-muted">{hit ? `Reached ${fmtShort(hit.date)} ♡` : m === s.settings.goalWeight ? 'Your goal' : 'Ahead of you'}</div>
+            </div>
+          );
+        })}
+        <p className="col-span-2 text-[14px] text-muted">No deadlines — milestones arrive when they arrive.</p>
+      </div>
+      <div>
+        <div className="flex items-center justify-between mb-2"><h3 className="h-serif text-[22px]">Weekly check-ins</h3>
+          <button className="btn-soft btn-sm" onClick={() => setOpen(thisWeek)}>This week</button></div>
+        {checks.length === 0 ? <p className="text-[15px] text-muted">Your Sunday check-ins will collect here — a lovely record of how far you’ve come.</p> : (
+          <div className="space-y-2">
+            {checks.map((c) => (
+              <button key={c.weekStart} className="card p-4 w-full text-left" onClick={() => setOpen(c.weekStart)}>
+                <div className="font-medium">Week of {fmtShort(c.weekStart)}</div>
+                {c.wins && <div className="text-[14px]"><span className="text-muted">Wins:</span> {c.wins}</div>}
+                {c.focus && <div className="text-[14px]"><span className="text-muted">Focus:</span> {c.focus}</div>}
+              </button>
+            ))}
           </div>
-        );
-      })}
-      <p className="col-span-2 text-[14px] text-muted">No deadlines — milestones arrive when they arrive.</p>
+        )}
+      </div>
+      {open && <CheckinSheet monday={open} today={today} onClose={() => setOpen(null)} />}
     </div>
   );
 }

@@ -12,6 +12,7 @@
   "dependencies": {
     "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/dm-sans": "^5.3.0",
+    "@supabase/supabase-js": "^2.118.0",
     "idb-keyval": "^6.3.0",
     "immer": "^11.2.3",
     "lucide-react": "^1.60.0",

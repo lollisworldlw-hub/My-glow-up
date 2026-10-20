@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { get as idbGet, set as idbSet, del as idbDel } from 'idb-keyval';
 import type {
-  DayPlan, Food, GroceryItem, Habit, LogEntry, MeasureEntry, PhotoMeta, PlanItem, PrepTask, Recipe,
+  Checkin, CycleDay, DayPlan, Food, Period, GroceryItem, Habit, LogEntry, MeasureEntry, PhotoMeta, PlanItem, PrepTask, Recipe,
   ScheduleDay, Settings, Slot, WeightEntry, WorkoutLog, Macros
 } from './types';
 import { SLOTS } from './types';
@@ -40,6 +40,12 @@ export interface State {
   session: Session | null;
   lastBackup: number | null;
   reminderSeen: Record<string, string[]>;
+  checkins: Checkin[];
+  exerciseLevels: Record<string, number>;
+  steps: Record<string, number>;
+  periods: Period[];
+  cycleDays: Record<string, CycleDay>;
+  snoozes: Record<string, string>;
 }
 
 const byId = <T extends { id: string }>(a: T[]) => Object.fromEntries(a.map((x) => [x.id, x])) as Record<string, T>;
@@ -67,7 +73,13 @@ export const initialState = (): State => ({
   prepChecks: {},
   session: null,
   lastBackup: null,
-  reminderSeen: {}
+  reminderSeen: {},
+  checkins: [],
+  exerciseLevels: {},
+  steps: {},
+  periods: [],
+  cycleDays: {},
+  snoozes: {}
 });
 
 export const emptyDay = (): DayPlan => ({ breakfast: [], lunch: [], dinner: [], snack: [], dessert: [] });

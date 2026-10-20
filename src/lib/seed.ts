@@ -354,5 +354,8 @@ export const defaultSettings = (today: string): Settings => ({
     { id: 'r-weigh', label: 'Morning weigh-in', time: '07:30', on: false },
     { id: 'r-workout', label: 'Home workout', time: '18:00', on: false }
   ],
-  startDate: today
+  startDate: today,
+  moveNudge: { on: false, start: '09:00', end: '17:00' },
+  stepsGoal: 7000,
+  cycleOnHome: true
 });

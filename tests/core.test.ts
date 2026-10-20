@@ -95,3 +95,40 @@ describe('timer engine', () => {
     expect(s.phases.some((p) => p.fill)).toBe(true);
   });
 });
+
+import { avgCycle, cycleStatus, isPeriodDay } from '../src/lib/cycle';
+import { readyToLevelUp } from '../src/lib/workouts';
+
+describe('cycle', () => {
+  const periods = [
+    { id: 'a', start: '2026-08-01', end: '2026-08-05' },
+    { id: 'b', start: '2026-08-30', end: '2026-09-03' },
+    { id: 'c', start: '2026-09-28', end: '2026-10-02' }
+  ];
+  it('averages cycle length and predicts the next period', () => {
+    expect(avgCycle(periods).length).toBe(29);
+    const st = cycleStatus(periods, '2026-10-20')!;
+    expect(st.day).toBe(23);
+    expect(st.nextStart).toBe('2026-10-27');
+    expect(st.until).toBe(7);
+    expect(st.phase).toBe('Luteal');
+    expect(isPeriodDay(periods, '2026-09-29', '2026-10-20')).toBe(true);
+    expect(isPeriodDay(periods, '2026-10-10', '2026-10-20')).toBe(false);
+  });
+  it('defaults to 28 days with one period', () => {
+    const st = cycleStatus([{ id: 'x', start: '2026-10-18' }], '2026-10-20')!;
+    expect(st.onPeriod).toBe(true);
+    expect(st.phase).toBe('Period');
+    expect(avgCycle([{ id: 'x', start: '2026-10-18' }]).fromData).toBe(false);
+  });
+});
+
+describe('strength progression', () => {
+  const w = (at: number, reps: number[], difficulty?: number) => ({ id: String(at), date: '2026-10-01', type: 'strength' as const, name: '', plannedMin: 20, actualMin: 20, completed: true, difficulty, reps: { squat: reps }, levels: { squat: 0 }, at });
+  it('suggests level up after two easy, complete sessions', () => {
+    expect(readyToLevelUp([w(1, [12, 12], 3), w(2, [12, 13], 2)], 'squat', 0, 12)).toBe(true);
+    expect(readyToLevelUp([w(1, [12, 12], 3), w(2, [12, 10], 2)], 'squat', 0, 12)).toBe(false);
+    expect(readyToLevelUp([w(1, [12, 12], 4), w(2, [12, 12], 2)], 'squat', 0, 12)).toBe(false);
+    expect(readyToLevelUp([w(2, [12, 12])], 'squat', 0, 12)).toBe(false);
+  });
+});

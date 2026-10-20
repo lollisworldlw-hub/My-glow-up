@@ -119,6 +119,8 @@ export interface WorkoutLog {
   actualMin: number;
   completed: boolean;
   difficulty?: number;
+  reps?: Record<string, number[]>;
+  levels?: Record<string, number>;
   at: number;
 }
 
@@ -175,4 +177,19 @@ export interface Settings {
   vibration: boolean;
   reminders: { id: string; label: string; time: string; on: boolean }[];
   startDate: string;
+  moveNudge: { on: boolean; start: string; end: string };
+  stepsGoal: number;
+  cycleOnHome: boolean;
 }
+
+export interface Checkin {
+  weekStart: string;
+  wins: string;
+  challenge: string;
+  focus: string;
+  at: number;
+}
+
+export type Flow = 'spotting' | 'light' | 'medium' | 'heavy';
+export interface Period { id: string; start: string; end?: string }
+export interface CycleDay { flow?: Flow; symptoms: string[] }

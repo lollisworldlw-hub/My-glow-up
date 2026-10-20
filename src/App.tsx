@@ -11,6 +11,7 @@ import Groceries from './screens/Groceries';
 import Settings from './screens/Settings';
 import { Celebration, Toaster, toast } from './components/ui';
 import { WorkoutPlayer } from './components/WorkoutPlayer';
+import { startSync } from './lib/sync';
 
 const NAV: { id: Tab; label: string; icon: typeof HomeIcon }[] = [
   { id: 'home', label: 'Home', icon: HomeIcon },
@@ -53,7 +54,16 @@ function useReminders() {
       const today = todayKey();
       const now = new Date();
       const hm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      const seen = s.reminderSeen[today] ?? [];
+      const mn = s.settings.moveNudge;
+      const wd = now.getDay();
+      if (mn?.on && wd >= 1 && wd <= 5 && hm >= mn.start && hm <= mn.end && now.getMinutes() < 10) {
+        const key = `move-${now.getHours()}`;
+        if (!(s.reminderSeen[today] ?? []).includes(key)) {
+          s.set((st) => { st.reminderSeen = { [today]: [...(st.reminderSeen[today] ?? []), key] }; });
+          toast('Stand up & stretch for 2 minutes ♡');
+        }
+      }
+      const seen = useStore.getState().reminderSeen[today] ?? [];
       const due = s.settings.reminders.filter((r) => r.on && r.time <= hm && !seen.includes(r.id));
       if (!due.length) return;
       // only remind for things within the last 3 hours so old ones don't pile up
@@ -87,6 +97,7 @@ export default function App() {
   useEffect(() => {
     if (!hydrated) return;
     navigator.storage?.persist?.().catch(() => {});
+    startSync();
   }, [hydrated]);
 
   if (!hydrated) {
