@@ -13,6 +13,8 @@ import { kgToLb, latest, lbToKg } from '../lib/weight';
 import { Card, Field, Header, NumberInput, SectionTitle, Segmented, Sheet, toast } from '../components/ui';
 import { WeightSheet } from '../components/WeightSheet';
 import { CloudCard } from '../components/CloudCard';
+import { useSync } from '../lib/sync';
+import { disablePush, enablePush, isIOS, isStandaloneApp, sendTest } from '../lib/push';
 
 export default function Settings() {
   const s = useStore();
@@ -129,9 +131,9 @@ export default function Settings() {
 
       <SectionTitle>Reminders</SectionTitle>
       <Card>
-        <p className="text-[13px] text-muted mb-3">Gentle reminders appear while the app is open. iPhone only allows web apps to send background notifications through a push server, which this private app doesn’t use.</p>
         <button className="btn-soft w-full" onClick={() => setSheet('reminders')}><Bell size={16} />Set reminders</button>
       </Card>
+      <div className="mt-2"><NotificationsCard /></div>
 
       <DataSection onDelete={() => setSheet('delete')} />
 
@@ -293,22 +295,65 @@ function FoodEditor({ id, onClose }: { id?: string; onClose: () => void }) {
 
 function Reminders({ onClose }: { onClose: () => void }) {
   const s = useStore();
-  const [perm, setPerm] = useState(typeof Notification !== 'undefined' ? Notification.permission : 'unsupported');
+  const order = [1, 2, 3, 4, 5, 6, 0];
+  const upd = (id: string, fn: (r: any) => void) => s.set((st) => { const r = st.settings.reminders.find((x) => x.id === id); if (r) fn(r); });
   return (
     <Sheet open onClose={onClose} title="Reminders">
+      <p className="text-[13px] text-muted mb-3">With notifications on, these arrive even when the app is closed. Pick days for weekly things like meal prep.</p>
       {s.settings.reminders.map((r) => (
-        <div key={r.id} className="card p-3 mb-2 flex items-center gap-2">
-          <input className="field flex-1" value={r.label} aria-label="Reminder name" onChange={(e) => s.set((st) => { st.settings.reminders.find((x) => x.id === r.id)!.label = e.target.value; })} />
-          <input type="time" className="field w-[120px]" value={r.time} aria-label="Time" onChange={(e) => s.set((st) => { st.settings.reminders.find((x) => x.id === r.id)!.time = e.target.value; })} />
-          <button role="switch" aria-checked={r.on} aria-label="On" className={`w-[52px] h-[32px] rounded-full p-1 shrink-0 ${r.on ? 'bg-deep' : 'bg-line'}`} onClick={() => s.set((st) => { const x = st.settings.reminders.find((y) => y.id === r.id)!; x.on = !x.on; })}><span className={`block w-6 h-6 rounded-full bg-white transition ${r.on ? 'translate-x-5' : ''}`} /></button>
+        <div key={r.id} className="card p-2.5 mb-2">
+          <div className="flex items-center gap-2">
+            <input className="field flex-1" value={r.label} aria-label="Reminder name" onChange={(e) => upd(r.id, (x) => { x.label = e.target.value; })} />
+            <input type="time" className="field w-[110px]" value={r.time} aria-label="Time" onChange={(e) => upd(r.id, (x) => { x.time = e.target.value; })} />
+            <button role="switch" aria-checked={r.on} aria-label="On" className={`w-[46px] h-[28px] rounded-full p-1 shrink-0 ${r.on ? 'bg-deep' : 'bg-line'}`} onClick={() => upd(r.id, (x) => { x.on = !x.on; })}><span className={`block w-5 h-5 rounded-full bg-white transition ${r.on ? 'translate-x-[18px]' : ''}`} /></button>
+          </div>
+          <div className="flex items-center gap-1 mt-2">
+            {order.map((d) => {
+              const days: number[] = r.days ?? [];
+              const on = !days.length || days.includes(d);
+              return <button key={d} aria-label={`${DOW_NAMES[d]} ${on ? 'on' : 'off'}`} onClick={() => upd(r.id, (x) => { const cur: number[] = x.days?.length ? x.days : [0, 1, 2, 3, 4, 5, 6]; const next = cur.includes(d) ? cur.filter((y: number) => y !== d) : [...cur, d]; x.days = next.length === 7 ? undefined : next; })}
+                className={`flex-1 rounded-lg py-1 text-[11px] font-medium ${on ? 'bg-petal text-deep' : 'text-muted border border-line'}`}>{DOW_NAMES[d].slice(0, 2)}</button>;
+            })}
+            <button aria-label="Delete reminder" className="w-8 h-8 grid place-items-center text-muted" onClick={() => s.set((st) => { st.settings.reminders = st.settings.reminders.filter((x) => x.id !== r.id); })}><Trash2 size={15} /></button>
+          </div>
         </div>
       ))}
       <button className="btn-ghost btn-sm w-full mb-3" onClick={() => s.set((st) => { st.settings.reminders.push({ id: uid(), label: 'New reminder', time: '20:00', on: true }); })}><Plus size={16} />Add reminder</button>
-      {perm !== 'unsupported' && perm !== 'granted' && (
-        <button className="btn-soft w-full" onClick={async () => { const p = await Notification.requestPermission(); setPerm(p); }}>Allow notifications while the app is open</button>
-      )}
-      <p className="text-[13px] text-muted mt-3">{perm === 'unsupported' ? 'Notifications aren’t available here — on iPhone, add the app to your Home Screen first. Reminders will still appear inside the app.' : 'Reminders show when you open or are using the app after their time.'}</p>
+      <button className="btn-ghost btn-sm w-full" onClick={() => s.set((st) => { st.settings.reminders.push({ id: uid(), label: 'Meal prep day! 🥗', time: '10:00', on: true, days: [st.settings.prepDays?.sunday ?? 0, st.settings.prepDays?.wednesday ?? 3] }); })}><Plus size={16} />Add meal prep reminder</button>
     </Sheet>
+  );
+}
+
+export function NotificationsCard() {
+  const s = useStore();
+  const { member } = useSync();
+  const [busy, setBusy] = useState(false);
+  const on = !!s.settings.pushOn && typeof Notification !== 'undefined' && Notification.permission === 'granted';
+  const standalone = isStandaloneApp();
+  return (
+    <Card>
+      <div className="flex items-start gap-2.5 mb-2">
+        <Bell size={18} className={on ? 'text-deep shrink-0 mt-0.5' : 'text-muted shrink-0 mt-0.5'} />
+        <div className="text-[13px]">
+          {on ? <><b>Notifications are on.</b> Reminders and friend activity arrive even when the app is closed.</>
+            : !member ? 'Sign in (Social tab) to get notifications even when the app is closed.'
+            : !standalone && isIOS() ? 'Open My Glow-Up from your Home Screen icon, then turn notifications on here.'
+            : 'Get reminders and friend activity even when the app is closed.'}
+        </div>
+      </div>
+      {!on ? (
+        <button className="btn-primary w-full" disabled={busy || !member} onClick={async () => { setBusy(true); try { await enablePush(); toast('Notifications on ♡'); } catch (e: any) { toast(e?.message ?? 'Couldn’t turn on notifications'); } setBusy(false); }}><Bell size={16} />Turn on notifications</button>
+      ) : (
+        <div className="grid grid-cols-2 gap-2">
+          <button className="btn-soft btn-sm" onClick={async () => { try { const n = await sendTest(); toast(n ? 'Test sent — check your notifications' : 'No devices found — try turning notifications off and on'); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); } }}>Send a test</button>
+          <button className="btn-ghost btn-sm" onClick={async () => { await disablePush(); toast('Notifications off on this phone'); }}>Turn off</button>
+        </div>
+      )}
+      <div className="mt-2">
+        <Toggle label="Friend messages" on={s.settings.notifyMessages !== false} onChange={(v) => s.set((x) => { x.settings.notifyMessages = v; })} />
+        <Toggle label="Reactions to my posts" on={s.settings.notifyReactions !== false} onChange={(v) => s.set((x) => { x.settings.notifyReactions = v; })} />
+      </div>
+    </Card>
   );
 }
 

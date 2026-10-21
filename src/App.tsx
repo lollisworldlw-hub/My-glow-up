@@ -57,7 +57,7 @@ function useReminders() {
       const hm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       const mn = s.settings.moveNudge;
       const wd = now.getDay();
-      if (mn?.on && wd >= 1 && wd <= 5 && hm >= mn.start && hm <= mn.end && now.getMinutes() < 10) {
+      if (!(s.settings.pushOn && typeof Notification !== 'undefined' && Notification.permission === 'granted') && mn?.on && wd >= 1 && wd <= 5 && hm >= mn.start && hm <= mn.end && now.getMinutes() < 10) {
         const key = `move-${now.getHours()}`;
         if (!(s.reminderSeen[today] ?? []).includes(key)) {
           s.set((st) => { st.reminderSeen = { [today]: [...(st.reminderSeen[today] ?? []), key] }; });
@@ -65,7 +65,8 @@ function useReminders() {
         }
       }
       const seen = useStore.getState().reminderSeen[today] ?? [];
-      const due = s.settings.reminders.filter((r) => r.on && r.time <= hm && !seen.includes(r.id));
+      const pushing = !!s.settings.pushOn && typeof Notification !== 'undefined' && Notification.permission === 'granted';
+      const due = pushing ? [] : s.settings.reminders.filter((r) => r.on && r.time <= hm && !seen.includes(r.id) && (!r.days?.length || r.days.includes(now.getDay())));
       if (!due.length) return;
       // only remind for things within the last 3 hours so old ones don't pile up
       const fresh = due.filter((r) => { const [h, m] = r.time.split(':').map(Number); return now.getHours() * 60 + now.getMinutes() - (h * 60 + m) < 180; });
@@ -98,6 +99,14 @@ export default function App() {
   useSocial((s) => s.messages.length + Object.keys(s.lastRead).length); // re-render on new messages
   const unread = member ? unreadCount(userId) : 0;
   useEffect(() => { if (member) { loadSocial(); startLive(); } }, [member]);
+  useEffect(() => {
+    const open = (url: string) => { try { const t = new URL(url, location.origin).searchParams.get('tab'); if (t) go(t as any); } catch { /* */ } };
+    open(location.href);
+    if (location.search.includes('tab=')) history.replaceState(null, '', '/');
+    const h = (e: MessageEvent) => { if (e.data?.type === 'open') open(e.data.url); };
+    navigator.serviceWorker?.addEventListener('message', h);
+    return () => navigator.serviceWorker?.removeEventListener('message', h);
+  }, []);
   useEffect(() => { try { if (sessionStorage.getItem('glowup-updated')) { sessionStorage.removeItem('glowup-updated'); setTimeout(() => toast('Updated to the newest version ♡'), 800); } } catch { /* */ } }, []);
   useTheme();
   useReminders();

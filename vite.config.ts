@@ -39,7 +39,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,woff,woff2}'],
         navigateFallback: '/index.html',
-        cleanupOutdatedCaches: true
+        cleanupOutdatedCaches: true,
+        importScripts: ['push-sw.js']
       }
     })
   ],

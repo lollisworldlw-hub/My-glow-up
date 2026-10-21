@@ -196,7 +196,10 @@ export interface Settings {
   autoFillWeeks: boolean;
   sound: boolean;
   vibration: boolean;
-  reminders: { id: string; label: string; time: string; on: boolean }[];
+  reminders: { id: string; label: string; time: string; on: boolean; days?: number[] }[];
+  pushOn?: boolean;
+  notifyMessages?: boolean;
+  notifyReactions?: boolean;
   startDate: string;
   moveNudge: { on: boolean; start: string; end: string };
   stepsGoal: number;
