@@ -15,7 +15,7 @@ export default function Clean() {
   return (
     <div>
       <Header eyebrow="A calm, cared-for home" title="Cleaning" />
-      <div className="mb-5"><Segmented value={tab} onChange={setTab} options={[{ value: 'today', label: 'Today' }, { value: 'week', label: 'This week' }, { value: 'all', label: 'All tasks' }]} /></div>
+      <div className="mb-3"><Segmented value={tab} onChange={setTab} options={[{ value: 'today', label: 'Today' }, { value: 'week', label: 'This week' }, { value: 'all', label: 'All tasks' }]} /></div>
       {tab === 'today' && <Today />}
       {tab === 'week' && <Week />}
       {tab === 'all' && <AllTasks />}
@@ -40,7 +40,7 @@ function Today() {
   });
   const rooms = [...new Set(list.map((t) => t.room))];
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <Card>
         <div className="flex justify-between items-center mb-2">
           <div><div className="font-semibold">{done.filter((d) => list.some((t) => t.id === d)).length} of {list.length} done</div><div className="text-[13px] text-muted">{mins ? `About ${mins} minutes left` : list.length ? 'All done — enjoy your space ♡' : 'Nothing scheduled today'}</div></div>
@@ -56,7 +56,7 @@ function Today() {
               const on = done.includes(t.id);
               const overdue = (t.freq === 'every' || t.freq === 'monthly') && !on;
               return (
-                <div key={t.id} className="flex items-center gap-3 px-4 py-3 cursor-pointer" onClick={() => toggle(t.id)}>
+                <div key={t.id} className="flex items-center gap-2 px-3 py-2 cursor-pointer" onClick={() => toggle(t.id)}>
                   <CheckCircle on={on} onToggle={() => toggle(t.id)} label={t.name} />
                   <div className="flex-1 min-w-0"><div className={on ? 'line-through text-muted decoration-blush' : ''}>{t.name}</div>
                     <div className="text-[13px] text-muted">{t.minutes} min · {freqLabel(t)}{overdue ? ' · due' : ''}</div></div>
@@ -75,12 +75,12 @@ function Week() {
   const today = useToday();
   const days = weekDays(weekStart(today));
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {days.map((d) => {
         const list = s.cleanTasks.filter((t) => t.freq === 'weekly' ? (t.days ?? []).includes(new Date(d + 'T12:00').getDay()) : false);
         const done = s.cleanDone[d] ?? [];
         return (
-          <div key={d} className={`card p-4 ${d === today ? 'border-rose' : ''}`}>
+          <div key={d} className={`card p-3 ${d === today ? 'border-rose' : ''}`}>
             <div className="flex justify-between mb-1"><div className="font-semibold">{fmtDow(d)} {fmtShort(d)}{d === today && <span className="text-deep text-[13px] ml-2">Today</span>}</div><div className="text-[13px] text-muted">{list.reduce((a, t) => a + t.minutes, 0)} min</div></div>
             {list.length ? list.map((t) => <div key={t.id} className={`text-[14px] ${done.includes(t.id) ? 'line-through text-muted' : ''}`}>• {t.name}</div>) : <div className="text-[13px] text-muted">Just the daily basics</div>}
           </div>
@@ -96,7 +96,7 @@ function AllTasks() {
   const [edit, setEdit] = useState<CleanTask | 'new' | null>(null);
   const [rooms, setRooms] = useState(false);
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <div className="grid grid-cols-2 gap-2">
         <button className="btn-primary btn-sm" onClick={() => setEdit('new')}><Plus size={16} />New task</button>
         <button className="btn-soft btn-sm" onClick={() => setRooms(true)}>Edit rooms</button>
@@ -109,7 +109,7 @@ function AllTasks() {
             <h3 className="eyebrow mb-2 px-1">{r}</h3>
             <div className="card divide-y divide-line !rounded-2xl">
               {list.map((t) => (
-                <button key={t.id} className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => setEdit(t)}>
+                <button key={t.id} className="w-full flex items-center gap-2 px-3 py-2 text-left" onClick={() => setEdit(t)}>
                   <div className="flex-1 min-w-0"><div>{t.name}</div><div className="text-[13px] text-muted">{freqLabel(t)} · {t.minutes} min</div></div>
                   <Pencil size={15} className="text-muted" />
                 </button>
@@ -136,16 +136,16 @@ function TaskEditor({ task, onClose }: { task: CleanTask | null; onClose: () => 
         toast('Saved'); onClose();
       }}>Save</button></div>}>
       <Field label="Task"><input className="field" value={t.name} onChange={(e) => setT({ ...t, name: e.target.value })} placeholder="e.g. Water the plants" /></Field>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <Field label="Room"><select className="field" value={t.room} onChange={(e) => setT({ ...t, room: e.target.value })}>{s.rooms.map((r) => <option key={r}>{r}</option>)}</select></Field>
         <Field label="Minutes"><NumberInput value={t.minutes} onChange={(v) => v && setT({ ...t, minutes: Math.round(v) })} /></Field>
       </div>
       <Field label="How often"><select className="field" value={t.freq} onChange={(e) => setT({ ...t, freq: e.target.value as any })}>
         <option value="daily">Every day</option><option value="weekly">On certain weekdays</option><option value="every">Every few days</option><option value="monthly">Once a month</option></select></Field>
       {t.freq === 'weekly' && (
-        <div className="grid grid-cols-7 gap-1.5 mb-4">{order.map((d) => {
+        <div className="grid grid-cols-7 gap-1.5 mb-3">{order.map((d) => {
           const on = (t.days ?? []).includes(d);
-          return <button key={d} onClick={() => setT({ ...t, days: on ? (t.days ?? []).filter((x) => x !== d) : [...(t.days ?? []), d] })} className={`rounded-xl py-2.5 text-[13px] font-medium ${on ? 'bg-deep text-white' : 'bg-petal'}`}>{DOW_NAMES[d].slice(0, 3)}</button>;
+          return <button key={d} onClick={() => setT({ ...t, days: on ? (t.days ?? []).filter((x) => x !== d) : [...(t.days ?? []), d] })} className={`rounded-xl py-2 text-[13px] font-medium ${on ? 'bg-deep text-white' : 'bg-petal'}`}>{DOW_NAMES[d].slice(0, 3)}</button>;
         })}</div>
       )}
       {t.freq === 'every' && <Field label="Every how many days?"><NumberInput value={t.every ?? 7} onChange={(v) => v && setT({ ...t, every: Math.max(1, Math.round(v)) })} /></Field>}

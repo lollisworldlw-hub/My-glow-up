@@ -14,11 +14,11 @@ export default function More() {
   return (
     <div>
       <Header eyebrow="Everything else" title="More" />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         {rest.map((n) => {
           const Icon = n.icon;
           return (
-            <button key={n.id} className="card p-4 text-left" onClick={() => go(n.id)}>
+            <button key={n.id} className="card p-3 text-left" onClick={() => go(n.id)}>
               <span className="w-10 h-10 rounded-2xl bg-petal text-deep grid place-items-center mb-3"><Icon size={21} /></span>
               <div className="font-semibold">{n.label}</div>
               <div className="text-[13px] text-muted">{n.blurb}</div>
@@ -26,7 +26,7 @@ export default function More() {
           );
         })}
       </div>
-      <button className="btn-soft w-full mt-5" onClick={() => setEdit(true)}>Customize the bottom bar</button>
+      <button className="btn-soft w-full mt-3" onClick={() => setEdit(true)}>Customize the bottom bar</button>
       {edit && <NavEditor onClose={() => setEdit(false)} />}
     </div>
   );

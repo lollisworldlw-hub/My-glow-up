@@ -16,7 +16,7 @@ export default function Groceries() {
   return (
     <div>
       <Header eyebrow="Shop once, eat well" title="Groceries" />
-      <div className="mb-5"><Segmented value={sub} onChange={(v) => setSub('groceries', v)} options={[{ value: 'list', label: 'Shopping list' }, { value: 'prep', label: 'Meal prep' }]} /></div>
+      <div className="mb-3"><Segmented value={sub} onChange={(v) => setSub('groceries', v)} options={[{ value: 'list', label: 'Shopping list' }, { value: 'prep', label: 'Meal prep' }]} /></div>
       {sub === 'list' ? <GroceryList /> : <MealPrep />}
     </div>
   );
@@ -50,13 +50,13 @@ function GroceryList() {
 
   return (
     <>
-      <Card className="mb-4">
+      <Card className="mb-3">
         <div className="flex justify-between items-center mb-2">
           <div><div className="font-semibold">{done} of {items.length} in the basket</div>{total > 0 && <div className="text-[13px] text-muted">Estimated ${total.toFixed(2)}</div>}</div>
           <ShoppingBasket className="text-rose" />
         </div>
         <Bar pct={items.length ? (done / items.length) * 100 : 0} color="var(--sage)" />
-        <div className="grid grid-cols-2 gap-2 mt-4">
+        <div className="grid grid-cols-2 gap-2 mt-3">
           <button className="btn-primary btn-sm" onClick={() => setGen(true)}><Sparkles size={16} />From meal plan</button>
           <button className="btn-soft btn-sm" onClick={() => setEdit('new')}><Plus size={16} />Add item</button>
           <button className="btn-soft btn-sm" onClick={share}><Share2 size={16} />Share / copy</button>
@@ -70,11 +70,11 @@ function GroceryList() {
         const list = items.filter((i) => i.category === c && (!hideDone || !i.checked));
         if (!list.length) return null;
         return (
-          <div key={c} className="mb-4">
+          <div key={c} className="mb-3">
             <h3 className="eyebrow mb-2 px-1">{c}</h3>
             <div className="card divide-y divide-line !rounded-2xl">
               {list.map((i) => (
-                <div key={i.id} className="flex items-center gap-3 px-4 py-3">
+                <div key={i.id} className="flex items-center gap-2 px-3 py-2">
                   <CheckCircle on={i.checked} label={i.name} onToggle={() => s.set((st) => { const g = st.groceries.find((x) => x.id === i.id); if (g) g.checked = !g.checked; })} />
                   <button className="flex-1 text-left min-w-0" onClick={() => setEdit(i)}>
                     <div className={`text-[14px] ${i.checked ? 'line-through text-muted decoration-blush' : ''}`}>{i.name}</div>
@@ -103,9 +103,9 @@ function GroceryList() {
 
       {gen && (
         <Sheet open onClose={() => setGen(false)} title="Build from my meal plan">
-          <p className="text-muted text-[14px] mb-4">Combines matching ingredients and converts cooked amounts to what to buy raw. Your custom items and checks are kept.</p>
+          <p className="text-muted text-[14px] mb-3">Combines matching ingredients and converts cooked amounts to what to buy raw. Your custom items and checks are kept.</p>
           {ranges.map((r) => (
-            <button key={r.label} className="w-full card p-4 mb-2 text-left flex items-center justify-between" onClick={() => {
+            <button key={r.label} className="w-full card p-3 mb-2 text-left flex items-center justify-between" onClick={() => {
               r.days.forEach((d) => s.ensureWeek(weekStart(d)));
               s.generateGroceries(r.days);
               toast('Grocery list updated from your plan');
@@ -139,7 +139,7 @@ function GroceryEditor({ item, onClose }: { item: GroceryItem | null; onClose: (
       {item && <button className="btn-ghost flex-1" onClick={() => { s.set((st) => { st.groceries = st.groceries.filter((x) => x.id !== g.id); }); toast('Item deleted'); onClose(); }}>Delete</button>}
       <button className="btn-primary flex-[2]" disabled={!g.name.trim()} onClick={save}>Save</button></div>}>
       <Field label="Item"><input className="field" value={g.name} onChange={(e) => setG({ ...g, name: e.target.value })} placeholder="e.g. Bananas" /></Field>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <Field label="Quantity"><NumberInput value={g.qty} onChange={(v) => setG({ ...g, qty: v })} /></Field>
         <Field label="Unit"><input className="field" value={g.unit} onChange={(e) => setG({ ...g, unit: e.target.value })} placeholder="lb, bag, jar…" /></Field>
         <Field label="Category"><select className="field" value={g.category} onChange={(e) => setG({ ...g, category: e.target.value as GroceryCategory })}>{GROCERY_CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></Field>
@@ -179,21 +179,21 @@ function MealPrep() {
   });
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <Segmented value={which} onChange={setWhich} options={[{ value: 'sunday', label: `${DOW_NAMES[pd.sunday]} prep` }, { value: 'wednesday', label: `${DOW_NAMES[pd.wednesday]} prep` }]} />
       <Card>
         <div className="flex justify-between items-center"><div className="eyebrow">{which === 'sunday' ? 'First prep of the week' : 'Second prep of the week'}</div><button className="text-[13px] text-deep font-medium" onClick={() => setDayPick(true)}>Change day</button></div>
-        <div className="h-serif text-[19px] mt-1">{fmtLong(prepDate)}</div>
+        <div className="h-serif text-[17px] mt-1">{fmtLong(prepDate)}</div>
         <div className="text-[13px] text-muted mb-3 flex items-center gap-1.5"><Clock size={14} />About {mins} min total{left && left < mins ? ` · ${left} min left` : ''} — some steps overlap</div>
         <Bar pct={(checks.length / tasks.length) * 100} color="var(--sage)" />
         <div className="text-[13px] text-muted mt-1.5">{checks.length} of {tasks.length} steps done{checks.length === tasks.length ? ' — your week is ready ♡' : ''}</div>
       </Card>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {tasks.map((t, i) => {
           const on = checks.includes(t.id);
           return (
-            <div key={t.id} className={`card p-4 ${on ? 'opacity-75' : ''}`}>
-              <div className="flex items-start gap-3">
+            <div key={t.id} className={`card p-3 ${on ? 'opacity-75' : ''}`}>
+              <div className="flex items-start gap-2">
                 <CheckCircle on={on} onToggle={() => toggle(t.id)} label={t.title} />
                 <div className="flex-1 min-w-0" onClick={() => toggle(t.id)}>
                   <div className="flex justify-between gap-2"><div className={`font-medium ${on ? 'line-through decoration-blush' : ''}`}>{i + 1}. {t.title}</div><span className="text-[13px] text-muted whitespace-nowrap">{t.minutes} min <button aria-label={`Edit ${t.title}`} className="ml-1 text-deep" onClick={(e) => { e.stopPropagation(); setEditing(t); }}>Edit</button></span></div>
@@ -241,7 +241,7 @@ function PrepEditor({ which, task, onClose }: { which: 'sunday' | 'wednesday'; t
       <button className="btn-primary flex-[2]" disabled={!t.title.trim()} onClick={() => { save(); toast('Saved'); onClose(); }}>Save</button></div>}>
       <Field label="Step"><input className="field" value={t.title} onChange={(e) => setT({ ...t, title: e.target.value })} /></Field>
       <Field label="Minutes"><NumberInput value={t.minutes} onChange={(v) => v && setT({ ...t, minutes: Math.round(v) })} /></Field>
-      <Field label="Instructions"><textarea className="field py-3 min-h-[80px]" value={t.instructions} onChange={(e) => setT({ ...t, instructions: e.target.value })} /></Field>
+      <Field label="Instructions"><textarea className="field py-2 min-h-[80px]" value={t.instructions} onChange={(e) => setT({ ...t, instructions: e.target.value })} /></Field>
       <Field label="Ingredients / supplies (comma separated)"><input className="field" value={ing} onChange={(e) => setIng(e.target.value)} /></Field>
       {task && <div className="flex gap-2"><button className="btn-ghost btn-sm flex-1" onClick={() => move(-1)}>Move earlier</button><button className="btn-ghost btn-sm flex-1" onClick={() => move(1)}>Move later</button></div>}
     </Sheet>

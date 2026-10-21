@@ -54,7 +54,7 @@ export function CheckinSheet({ monday, today, onClose }: { monday: string; today
     onClose();
   };
 
-  const Stat = ({ l, v }: { l: string; v: string }) => <div className="rounded-2xl bg-petal px-3 py-2.5"><div className="text-[12px] text-muted">{l}</div><div className="font-semibold tabular-nums">{v}</div></div>;
+  const Stat = ({ l, v }: { l: string; v: string }) => <div className="rounded-2xl bg-petal px-3 py-2"><div className="text-[12px] text-muted">{l}</div><div className="font-semibold tabular-nums">{v}</div></div>;
   return (
     <Sheet open onClose={onClose} title={`Week of ${fmtShort(monday)}`} footer={<button className="btn-primary w-full" onClick={save}>Save check-in</button>}>
       <div className="grid grid-cols-2 gap-2 mb-3">
@@ -67,10 +67,10 @@ export function CheckinSheet({ monday, today, onClose }: { monday: string; today
         {w.waistChange != null && <Stat l="Waist since start" v={`${w.waistChange > 0 ? '+' : ''}${w.waistChange} in`} />}
         <Stat l="Days logged" v={`${w.loggedDays}`} />
       </div>
-      {w.pace && <div className={`rounded-2xl px-4 py-3 mb-3 text-[14px] ${w.pace.tone === 'good' ? 'bg-sage/20' : 'bg-petal'}`}>{w.pace.label}</div>}
-      {w.avgPro != null && w.avgPro < st.proteinMin && <div className="rounded-2xl bg-petal px-4 py-3 mb-3 text-[14px]">Protein averaged {w.avgPro} g. Getting closer to {st.proteinMin} g helps you keep muscle and stay full — a yogurt cup or 2 eggs closes most of the gap.</div>}
+      {w.pace && <div className={`rounded-2xl px-3 py-2 mb-3 text-[14px] ${w.pace.tone === 'good' ? 'bg-sage/20' : 'bg-petal'}`}>{w.pace.label}</div>}
+      {w.avgPro != null && w.avgPro < st.proteinMin && <div className="rounded-2xl bg-petal px-3 py-2 mb-3 text-[14px]">Protein averaged {w.avgPro} g. Getting closer to {st.proteinMin} g helps you keep muscle and stay full — a yogurt cup or 2 eggs closes most of the gap.</div>}
       {w.plateau && (
-        <div className="rounded-2xl border border-blush px-4 py-3 mb-3 text-[14px]">
+        <div className="rounded-2xl border border-blush px-3 py-2 mb-3 text-[14px]">
           <div className="font-semibold mb-1">Your 3-week trend is flat</div>
           <p className="mb-1.5">That’s normal at times. A few things worth looking at, in order:</p>
           <ol className="list-decimal pl-5 space-y-1">
@@ -82,8 +82,8 @@ export function CheckinSheet({ monday, today, onClose }: { monday: string; today
           </ol>
         </div>
       )}
-      <Field label="Wins this week"><textarea className="field py-3 min-h-[70px]" value={wins} onChange={(e) => setWins(e.target.value)} placeholder="Walked every workday, tried a new dessert…" /></Field>
-      <Field label="What felt hard?"><textarea className="field py-3 min-h-[70px]" value={challenge} onChange={(e) => setChallenge(e.target.value)} /></Field>
+      <Field label="Wins this week"><textarea className="field py-2 min-h-[70px]" value={wins} onChange={(e) => setWins(e.target.value)} placeholder="Walked every workday, tried a new dessert…" /></Field>
+      <Field label="What felt hard?"><textarea className="field py-2 min-h-[70px]" value={challenge} onChange={(e) => setChallenge(e.target.value)} /></Field>
       <Field label="One focus for next week"><input className="field" value={focus} onChange={(e) => setFocus(e.target.value)} placeholder="Hit protein 5 of 7 days" /></Field>
     </Sheet>
   );

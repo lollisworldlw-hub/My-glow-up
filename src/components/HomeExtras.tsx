@@ -18,7 +18,7 @@ export function CycleChip({ today }: { today: string }) {
   if (!st) return null;
   const when = st.onPeriod ? `Period day ${st.day}` : st.until > 0 ? `Period expected in ~${st.until} day${st.until === 1 ? '' : 's'}` : st.until === 0 ? 'Period expected today' : `Period expected ~${-st.until} day${st.until === -1 ? '' : 's'} ago`;
   return (
-    <button className="w-full card p-4 text-left flex gap-3 items-start" onClick={() => go('progress', 'cycle')}>
+    <button className="w-full card p-3 text-left flex gap-2 items-start" onClick={() => go('progress', 'cycle')}>
       <span className="w-10 h-10 rounded-full bg-petal text-deep grid place-items-center shrink-0"><CalendarHeart size={19} /></span>
       <span className="min-w-0">
         <span className="block font-medium">Cycle day {st.day} · {st.phase}</span>
@@ -42,7 +42,7 @@ export function CheckinCard({ today }: { today: string }) {
     <>
       {needs ? (
         <Card className="bg-petal border-blush">
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-2">
             <span className="w-10 h-10 rounded-full bg-card text-deep grid place-items-center shrink-0"><ClipboardCheck size={19} /></span>
             <div className="flex-1">
               <div className="font-semibold">Your weekly check-in</div>
@@ -52,7 +52,7 @@ export function CheckinCard({ today }: { today: string }) {
           </div>
         </Card>
       ) : (
-        <div className="rounded-2xl bg-petal px-4 py-3 text-[14px]"><b>This week’s focus:</b> {last!.focus}</div>
+        <div className="rounded-2xl bg-petal px-3 py-2 text-[14px]"><b>This week’s focus:</b> {last!.focus}</div>
       )}
       {open && monday && <CheckinSheet monday={monday} today={today} onClose={() => setOpen(false)} />}
     </>
@@ -79,7 +79,7 @@ export function ProteinFixer({ today }: { today: string }) {
     return { ...q, m: round(macrosForGrams(f, gramsOf(f, q.amount, q.unit))) };
   }).filter(Boolean) as (typeof QUICK[number] & { m: ReturnType<typeof round> })[];
   return (
-    <div className="mt-4 pt-4 border-t border-line">
+    <div className="mt-3 pt-4 border-t border-line">
       <div className="text-[13px] font-medium mb-2">{Math.round(gap)} g protein to go — quick adds:</div>
       <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
         {opts.map((o) => (
@@ -111,7 +111,7 @@ export function DessertBudget({ today }: { today: string }) {
   else if (room + (s.settings.calMax - s.settings.calTarget) >= dCal) msg = `Your ${name} (${dCal}) still fits within your flexible range tonight. Enjoy it ♡`;
   else msg = `Tonight a half portion of your ${name} (about ${Math.round(dCal / 2)} cal) keeps you near your range — or enjoy it fully; one day doesn’t change your trend.`;
   return (
-    <div className="rounded-3xl border border-blush bg-petal px-4 py-3 flex gap-3 items-start">
+    <div className="rounded-3xl border border-blush bg-petal px-3 py-2 flex gap-2 items-start">
       <Sparkles size={18} className="text-deep mt-0.5 shrink-0" />
       <p className="text-[14px]">{msg}</p>
     </div>
@@ -137,7 +137,7 @@ export function LogDayButton({ today }: { today: string }) {
           <p className="text-muted text-[14px] mb-3">These will be logged at their planned portions. Ate something differently? Close this and log that one meal instead.</p>
           {pending.map((p) => {
             const m = round(itemMacros(p.it, s.recipes, s.foods));
-            return <div key={p.it.id} className="flex justify-between py-2.5 border-b border-line"><span>{itemName(p.it, s.recipes)}</span><span className="text-muted tabular-nums">{m.cal} cal</span></div>;
+            return <div key={p.it.id} className="flex justify-between py-2 border-b border-line"><span>{itemName(p.it, s.recipes)}</span><span className="text-muted tabular-nums">{m.cal} cal</span></div>;
           })}
         </Sheet>
       )}
@@ -161,7 +161,7 @@ export function CheckReminders({ today }: { today: string }) {
   return (
     <div className="space-y-2">
       {visible.map((i) => (
-        <div key={i.key} className="card p-4 flex gap-3 items-start">
+        <div key={i.key} className="card p-3 flex gap-2 items-start">
           <span className="w-10 h-10 rounded-full bg-petal text-deep grid place-items-center shrink-0">{i.icon}</span>
           <div className="flex-1 min-w-0">
             <div className="font-medium">{i.title}</div>

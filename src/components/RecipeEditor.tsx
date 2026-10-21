@@ -40,11 +40,11 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
         <button className="btn-primary flex-[2]" onClick={save}>Save recipe</button>
       </div>}>
       <Field label="Name"><input className="field" value={r.name} onChange={(e) => setR({ ...r, name: e.target.value })} placeholder="e.g. Chocolate banana bites" /></Field>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <Field label="Meal type"><select className="field" value={r.slot} onChange={(e) => setR({ ...r, slot: e.target.value as Slot })}>{SLOTS.map((x) => <option key={x} value={x}>{SLOT_LABEL[x]}</option>)}</select></Field>
         <Field label="Portion label"><input className="field" value={r.servingLabel} onChange={(e) => setR({ ...r, servingLabel: e.target.value })} /></Field>
       </div>
-      <div className="rounded-2xl bg-petal p-3 mb-4 text-[14px]">Per portion: <b>≈ {mac.cal} cal</b> · {mac.protein} g protein · {mac.carbs} g carbs · {mac.fat} g fat</div>
+      <div className="rounded-2xl bg-petal p-3 mb-3 text-[14px]">Per portion: <b>≈ {mac.cal} cal</b> · {mac.protein} g protein · {mac.carbs} g carbs · {mac.fat} g fat</div>
 
       <div className="label">Ingredients</div>
       <div className="space-y-2 mb-3">
@@ -67,7 +67,7 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
           );
         })}
       </div>
-      <div className="flex gap-2 mb-5">
+      <div className="flex gap-2 mb-3">
         <select className="field flex-1" value={addFood} onChange={(e) => { if (e.target.value === '__new') { setNewIng(true); setAddFood(''); } else setAddFood(e.target.value); }} aria-label="Food to add">
           <option value="">Add an ingredient…</option>
           <option value="__new">＋ New ingredient (not on the list)</option>
@@ -81,17 +81,17 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
         }}><Plus size={18} /></button>
       </div>
       {!newIng ? (
-        <button className="text-[13px] text-deep font-medium -mt-3 mb-5 block" onClick={() => setNewIng(true)}>＋ Ingredient not on the list? Add your own</button>
+        <button className="text-[13px] text-deep font-medium -mt-3 mb-3 block" onClick={() => setNewIng(true)}>＋ Ingredient not on the list? Add your own</button>
       ) : (
         <NewIngredient onCancel={() => setNewIng(false)} onAdd={(foodId, amount, unit) => { setR({ ...r, ingredients: [...r.ingredients, { foodId, amount, unit }] }); setNewIng(false); }} />
       )}
 
       <div className="label">Steps</div>
       {r.instructions.map((t, i) => (
-        <textarea key={i} className="field py-3 mb-2 min-h-[64px]" value={t} placeholder={`Step ${i + 1}`}
+        <textarea key={i} className="field py-2 mb-2 min-h-[64px]" value={t} placeholder={`Step ${i + 1}`}
           onChange={(e) => setR({ ...r, instructions: r.instructions.map((x, j) => (j === i ? e.target.value : x)) })} />
       ))}
-      <button className="btn-ghost btn-sm mb-4" onClick={() => setR({ ...r, instructions: [...r.instructions, ''] })}><Plus size={16} />Add step</button>
+      <button className="btn-ghost btn-sm mb-3" onClick={() => setR({ ...r, instructions: [...r.instructions, ''] })}><Plus size={16} />Add step</button>
       <Field label="Note (optional)"><input className="field" value={r.note ?? ''} onChange={(e) => setR({ ...r, note: e.target.value })} /></Field>
       {sharing && <ShareRecipeSheet recipe={r} onClose={() => setSharing(false)} />}
     </Sheet>
@@ -129,7 +129,7 @@ function NewIngredient({ onAdd, onCancel }: { onAdd: (foodId: string, amount: nu
     onAdd(id, mode === 'each' ? 1 : grams!, mode === 'each' ? 'each' : 'g');
   };
   return (
-    <div className="rounded-2xl border border-blush bg-petal/40 p-3 mb-5">
+    <div className="rounded-2xl border border-blush bg-petal/40 p-3 mb-3">
       <div className="font-medium mb-2">New ingredient</div>
       <Field label="Name"><input className="field" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Chipotle mayo" /></Field>
       <div className="label">Nutrition from the label is for…</div>

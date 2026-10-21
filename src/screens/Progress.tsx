@@ -25,7 +25,7 @@ export default function Progress() {
   return (
     <div>
       <Header eyebrow="Gentle, honest tracking" title="Progress" />
-      <div className="mb-5">
+      <div className="mb-3">
         <Segmented small value={sub} onChange={(v) => setSub('progress', v)} options={[
           { value: 'weight', label: 'Weight' }, { value: 'body', label: 'Body' }, { value: 'photos', label: 'Photos' },
           { value: 'habits', label: 'Habits' }, { value: 'cycle', label: 'Cycle' }, { value: 'milestones', label: 'Goals' }]} />
@@ -70,15 +70,15 @@ function WeightView() {
   const yMax = Math.ceil(Math.max(start, ...vals) + 2);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <Card>
         <div className="flex justify-between items-start">
-          <div><div className="eyebrow">Current</div><div className="h-serif text-[30px] leading-none mt-1">{showW(cur, u)}</div></div>
+          <div><div className="eyebrow">Current</div><div className="h-serif text-[24px] leading-none mt-1">{showW(cur, u)}</div></div>
           <button className="btn-primary btn-sm" onClick={() => setSheet('new')}><Plus size={16} />Weigh-in</button>
         </div>
-        <div className="mt-4"><Bar pct={p.pct} h={12} /></div>
+        <div className="mt-3"><Bar pct={p.pct} h={12} /></div>
         <div className="text-[13px] text-muted mt-1.5">{Math.round(p.pct)}% of the way to {showW(st.goalWeight, u)}</div>
-        <div className="grid grid-cols-3 gap-2 mt-4 text-center">
+        <div className="grid grid-cols-3 gap-1.5 mt-2.5 text-center">
           <Mini label="Lost" value={showW(Math.max(0, p.lost), u)} />
           <Mini label="To go" value={showW(p.remaining, u)} />
           <Mini label="Weigh-ins" value={String(s.weights.length)} />
@@ -95,7 +95,7 @@ function WeightView() {
         <div className="flex items-center justify-between mb-3"><div className="eyebrow">Trend</div></div>
         <Segmented small value={range} onChange={setRange} options={[{ value: '7', label: '7 days' }, { value: '30', label: '30 days' }, { value: '90', label: '90 days' }, { value: 'all', label: 'All' }]} />
         {data.length === 0 ? <Empty icon={<Scale />} title="No weigh-ins here yet" sub="Your chart fills in as you log. Weekly averages smooth out daily ups and downs." /> : (
-          <div className="h-[260px] mt-4 -ml-3">
+          <div className="h-[260px] mt-3 -ml-3">
             <ResponsiveContainer>
               <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
                 <CartesianGrid stroke="var(--line)" vertical={false} />
@@ -121,9 +121,9 @@ function WeightView() {
 
       {sorted.length > 0 && (
         <Card className="!p-0 overflow-hidden">
-          <div className="px-5 pt-4 pb-2 eyebrow">History</div>
+          <div className="px-4 pt-4 pb-2 eyebrow">History</div>
           {[...sorted].reverse().map((w) => (
-            <button key={w.id} className="w-full flex justify-between items-center px-5 py-3 border-t border-line text-left" onClick={() => setSheet(w.id)}>
+            <button key={w.id} className="w-full flex justify-between items-center px-4 py-2 border-t border-line text-left" onClick={() => setSheet(w.id)}>
               <span>{fmtDow(w.date)} {fmtShort(w.date)}</span><span className="font-medium tabular-nums flex items-center gap-2">{showW(w.lbs, u)}<Pencil size={14} className="text-muted" /></span>
             </button>
           ))}
@@ -135,7 +135,7 @@ function WeightView() {
 }
 
 const Mini = ({ label, value }: { label: string; value: string }) => (
-  <div className="rounded-2xl bg-petal px-2 py-2.5"><div className="text-[12px] text-muted">{label}</div><div className="font-semibold text-[14px] tabular-nums">{value}</div></div>
+  <div className="rounded-xl bg-petal px-1.5 py-1"><div className="text-[10.5px] text-muted leading-tight">{label}</div><div className="font-semibold text-[13px] tabular-nums leading-snug">{value}</div></div>
 );
 
 const toLen = (inch: number, u: 'in' | 'cm') => (u === 'cm' ? +(inch * 2.54).toFixed(1) : +inch.toFixed(2));
@@ -149,7 +149,7 @@ function BodyView() {
   const series = sorted.filter((m) => m.values[key] != null).map((m) => ({ t: fromKey(m.date).getTime(), v: toLen(m.values[key]!, u) }));
   const first = series[0]?.v, last = series[series.length - 1]?.v;
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <button className="btn-primary w-full" onClick={() => setSheet('new')}><Ruler size={18} />Add measurements</button>
       <Card>
         <Field label="Show">
@@ -157,7 +157,7 @@ function BodyView() {
         </Field>
         {series.length === 0 ? <Empty icon={<Ruler />} title="No measurements yet" sub="Measure every 2–4 weeks, same time of day. Your waistline often changes even when the scale doesn’t." /> : (
           <>
-            <div className="flex gap-3 mb-2">
+            <div className="flex gap-2 mb-2">
               <Mini label="Latest" value={`${last} ${u}`} />
               <Mini label="Change since first" value={series.length > 1 ? `${(last! - first!) > 0 ? '+' : ''}${(last! - first!).toFixed(1)} ${u}` : '—'} />
             </div>
@@ -178,7 +178,7 @@ function BodyView() {
       {sorted.length > 0 && (
         <div className="space-y-2">
           {[...sorted].reverse().map((m) => (
-            <button key={m.id} className="card p-4 w-full text-left" onClick={() => setSheet(m.id)}>
+            <button key={m.id} className="card p-3 w-full text-left" onClick={() => setSheet(m.id)}>
               <div className="font-medium mb-1 flex justify-between">{fmtDow(m.date)} {fmtShort(m.date)}<Pencil size={14} className="text-muted" /></div>
               <div className="text-[13px] text-muted">{MEASURES.filter((x) => m.values[x.key] != null).map((x) => `${x.label.replace(' (optional)', '')} ${toLen(m.values[x.key]!, u)}`).join(' · ')}</div>
             </button>
@@ -264,7 +264,7 @@ function PhotosView() {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <Card>
         <div className="text-[13px] text-muted mb-3">Photos stay on this iPhone only — never uploaded anywhere. Include them in backups if you want to keep them.</div>
         <Segmented small value={pose} onChange={setPose} options={POSES} />
@@ -353,7 +353,7 @@ function HabitsView() {
   const lead = (first.getDay() + 6) % 7;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <div className="grid grid-cols-3 gap-2">
         <Mini label="Today" value={`${stats.done}/${stats.total}`} />
         <Mini label="This week" value={`${weekPct}%`} />
@@ -367,7 +367,7 @@ function HabitsView() {
           {stats.habits.map((h) => <CheckRow key={h.id} on={habitDone(s, h, today)} onToggle={() => toggle(h.id, today)} title={h.name} sub={h.optional ? 'Optional' : undefined} />)}
         </div>
         <SectionTitle>Reflection</SectionTitle>
-        <textarea className="field py-3 min-h-[90px]" placeholder="How are you feeling today? What went well?" value={s.notes[today] ?? ''} onChange={(e) => s.set((x) => { x.notes[today] = e.target.value; })} />
+        <textarea className="field py-2 min-h-[90px]" placeholder="How are you feeling today? What went well?" value={s.notes[today] ?? ''} onChange={(e) => s.set((x) => { x.notes[today] = e.target.value; })} />
       </Card>
 
       <Card className="!px-3">
@@ -438,7 +438,7 @@ function HabitEditor({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState('');
   return (
     <Sheet open onClose={onClose} title="Edit habits">
-      <div className="space-y-2 mb-5">
+      <div className="space-y-2 mb-3">
         {s.habits.map((h) => (
           <div key={h.id} className="card p-3">
             <div className="flex gap-2 items-center">
@@ -471,13 +471,13 @@ function MilestonesView() {
   const checks = [...s.checkins].sort((a, b) => b.weekStart.localeCompare(a.weekStart));
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         {ms.map((m) => {
           const hit = sorted.find((w) => w.lbs <= m);
           return (
-            <div key={m} className={`card p-4 text-center ${hit ? 'bg-petal border-blush' : ''}`}>
+            <div key={m} className={`card p-3 text-center ${hit ? 'bg-petal border-blush' : ''}`}>
               <div className={`mx-auto w-12 h-12 rounded-full grid place-items-center mb-2 ${hit ? 'bg-deep text-white' : 'bg-petal text-blush'}`}><Trophy size={20} /></div>
-              <div className="h-serif text-[21px]">{showW(m, u)}</div>
+              <div className="h-serif text-[18px]">{showW(m, u)}</div>
               <div className="text-[13px] text-muted">{hit ? `Reached ${fmtShort(hit.date)} ♡` : m === s.settings.goalWeight ? 'Your goal' : 'Ahead of you'}</div>
             </div>
           );
@@ -485,12 +485,12 @@ function MilestonesView() {
         <p className="col-span-2 text-[13px] text-muted">No deadlines — milestones arrive when they arrive.</p>
       </div>
       <div>
-        <div className="flex items-center justify-between mb-2"><h3 className="h-serif text-[17px]">Weekly check-ins</h3>
+        <div className="flex items-center justify-between mb-2"><h3 className="h-serif text-[15px]">Weekly check-ins</h3>
           <button className="btn-soft btn-sm" onClick={() => setOpen(thisWeek)}>This week</button></div>
         {checks.length === 0 ? <p className="text-[14px] text-muted">Your Sunday check-ins will collect here — a lovely record of how far you’ve come.</p> : (
           <div className="space-y-2">
             {checks.map((c) => (
-              <button key={c.weekStart} className="card p-4 w-full text-left" onClick={() => setOpen(c.weekStart)}>
+              <button key={c.weekStart} className="card p-3 w-full text-left" onClick={() => setOpen(c.weekStart)}>
                 <div className="font-medium">Week of {fmtShort(c.weekStart)}</div>
                 {c.wins && <div className="text-[13px]"><span className="text-muted">Wins:</span> {c.wins}</div>}
                 {c.focus && <div className="text-[13px]"><span className="text-muted">Focus:</span> {c.focus}</div>}

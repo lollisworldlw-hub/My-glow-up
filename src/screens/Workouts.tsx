@@ -38,21 +38,21 @@ export default function Workouts() {
   return (
     <div>
       <Header eyebrow={DOW_NAMES[weekday(today)]} title="Workouts" />
-      <div className="mb-5"><Segmented value={tab} onChange={setTab} options={[{ value: 'today', label: 'Today' }, { value: 'week', label: 'Schedule' }, { value: 'history', label: 'History' }]} /></div>
+      <div className="mb-3"><Segmented value={tab} onChange={setTab} options={[{ value: 'today', label: 'Today' }, { value: 'week', label: 'Schedule' }, { value: 'history', label: 'History' }]} /></div>
 
       {tab === 'today' && (
-        <div className="space-y-3">
+        <div className="space-y-2">
           <Card>
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2">
               <div className="w-12 h-12 rounded-2xl bg-petal text-deep grid place-items-center"><Footprints /></div>
               <div className="flex-1">
                 <div className="eyebrow">Lunch</div>
-                <div className="h-serif text-[18px] leading-tight">{sched.walk === 'walk' ? `${s.settings.walkMinutes}-minute brisk walk` : WALK_LABEL[sched.walk]}</div>
+                <div className="h-serif text-[16px] leading-tight">{sched.walk === 'walk' ? `${s.settings.walkMinutes}-minute brisk walk` : WALK_LABEL[sched.walk]}</div>
                 <div className="text-[13px] text-muted">{sched.walk === 'recovery' ? 'Rest is part of the plan. A gentle stroll is welcome.' : 'Brisk enough to warm up, easy enough to chat.'}</div>
               </div>
             </div>
-            {doneToday(true) ? <div className="mt-4 rounded-2xl bg-sage/20 text-sagedeep font-medium px-4 py-3 flex items-center gap-2"><Check size={18} />Walk done today</div> : (
-              <div className="flex gap-2 mt-4">
+            {doneToday(true) ? <div className="mt-3 rounded-2xl bg-sage/20 text-sagedeep font-medium px-3 py-2 flex items-center gap-2"><Check size={18} />Walk done today</div> : (
+              <div className="flex gap-2 mt-3">
                 <button className="btn-primary flex-1" onClick={() => start('walk')}><Play size={18} />Start timer</button>
                 <button className="btn-soft flex-1" onClick={() => quickDone('walk')}><Check size={18} />Mark done</button>
               </div>
@@ -60,24 +60,24 @@ export default function Workouts() {
           </Card>
 
           <Card>
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2">
               <div className="w-12 h-12 rounded-2xl bg-petal text-deep grid place-items-center">{sched.home === 'strength' ? <Dumbbell /> : sched.home === 'rest' ? <Moon /> : <Bike />}</div>
               <div className="flex-1">
                 <div className="eyebrow">At home</div>
-                <div className="h-serif text-[18px] leading-tight">{homeDef?.name ?? HOME_LABEL.rest}</div>
+                <div className="h-serif text-[16px] leading-tight">{homeDef?.name ?? HOME_LABEL.rest}</div>
                 <div className="text-[13px] text-muted">{homeDef ? `${homeDef.plannedMin} min · ${homeDef.subtitle}` : 'No workout today — recovery helps you come back stronger.'}</div>
               </div>
             </div>
             {sched.home === 'bike' && (
-              <div className="mt-4"><Segmented small value={bikeMode} onChange={setBikeMode} options={[{ value: 'bike-moderate', label: 'Moderate ride' }, { value: 'bike-intervals', label: 'Interval ride' }]} /></div>
+              <div className="mt-3"><Segmented small value={bikeMode} onChange={setBikeMode} options={[{ value: 'bike-moderate', label: 'Moderate ride' }, { value: 'bike-intervals', label: 'Interval ride' }]} /></div>
             )}
             {homeDef && (
               <>
-                <div className="mt-4 rounded-2xl bg-petal p-3 space-y-1">
+                <div className="mt-3 rounded-2xl bg-petal p-3 space-y-1">
                   {summarize(homeDef.id).map((l, i) => <div key={i} className="text-[14px] flex justify-between gap-2"><span>{l[0]}</span><span className="text-muted tabular-nums whitespace-nowrap">{l[1]}</span></div>)}
                 </div>
-                {doneToday(false) ? <div className="mt-4 rounded-2xl bg-sage/20 text-sagedeep font-medium px-4 py-3 flex items-center gap-2"><Check size={18} />Home workout done today</div> : (
-                  <div className="flex gap-2 mt-4">
+                {doneToday(false) ? <div className="mt-3 rounded-2xl bg-sage/20 text-sagedeep font-medium px-3 py-2 flex items-center gap-2"><Check size={18} />Home workout done today</div> : (
+                  <div className="flex gap-2 mt-3">
                     <button className="btn-primary flex-1" onClick={() => start(homeDef.id)}><Play size={18} />Start guided</button>
                     <button className="btn-soft flex-1" onClick={() => quickDone(homeDef.id)}><Check size={18} />Mark done</button>
                   </div>
@@ -85,7 +85,7 @@ export default function Workouts() {
               </>
             )}
             {!homeDef && (
-              <div className="flex gap-2 mt-4">
+              <div className="flex gap-2 mt-3">
                 <button className="btn-soft flex-1" onClick={() => start('bike-easy')}>Easy ride anyway</button>
                 <button className="btn-soft flex-1" onClick={() => start('strength')}>Strength anyway</button>
               </div>
@@ -103,7 +103,7 @@ export default function Workouts() {
               const last = [...s.workouts].filter((w) => w.reps?.[id]).sort((a, b) => b.at - a.at)[0];
               return (
                 <div key={id} className={`card p-3 ${ready ? 'border-rose' : ''}`}>
-                  <div className="flex gap-3 items-center">
+                  <div className="flex gap-2 items-center">
                     <div className="w-[64px] h-[64px] rounded-2xl bg-petal grid place-items-center shrink-0"><ExerciseArt id={id} size={56} /></div>
                     <div className="flex-1 min-w-0">
                       <div className="text-[12px] eyebrow">Level {lv + 1} of {LEVELS[id].length}</div>
@@ -120,7 +120,7 @@ export default function Workouts() {
                 </div>
               );
             })}
-            <div className="card p-3 flex gap-3 items-center">
+            <div className="card p-3 flex gap-2 items-center">
               <div className="w-[64px] h-[64px] rounded-2xl bg-petal grid place-items-center shrink-0"><ExerciseArt id="march" size={56} /></div>
               <div><div className="font-medium">{EXERCISES.march.name}</div><div className="text-[13px] text-muted">60 seconds · {EXERCISES.march.how}</div></div>
             </div>
@@ -134,11 +134,11 @@ export default function Workouts() {
 
       {tab === 'history' && (
         <>
-          <button className="btn-soft w-full mb-4" onClick={() => setManual(true)}><Plus size={18} />Log a workout manually</button>
+          <button className="btn-soft w-full mb-3" onClick={() => setManual(true)}><Plus size={18} />Log a workout manually</button>
           {s.workouts.length === 0 ? <Empty icon={<Dumbbell />} title="No workouts yet" sub="Your first completed walk or workout will show up here." /> : (
             <div className="space-y-2">
               {[...s.workouts].sort((a, b) => b.date.localeCompare(a.date) || b.at - a.at).map((w) => (
-                <div key={w.id} className="card p-4 flex items-center gap-3">
+                <div key={w.id} className="card p-3 flex items-center gap-2">
                   <div className={`w-10 h-10 rounded-full grid place-items-center ${w.completed ? 'bg-sage/25 text-sagedeep' : 'bg-petal text-deep'}`}>{w.type === 'walk' ? <Footprints size={19} /> : w.type === 'strength' ? <Dumbbell size={19} /> : <Bike size={19} />}</div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium">{w.name}</div>
@@ -172,13 +172,13 @@ function ScheduleView({ today }: { today: string }) {
         const sc = s.schedule[d];
         const isToday = weekday(today) === d;
         return (
-          <div key={d} className={`p-4 ${isToday ? 'bg-petal/60' : ''}`}>
+          <div key={d} className={`p-3 ${isToday ? 'bg-petal/60' : ''}`}>
             <div className="flex justify-between"><div className="font-semibold">{DOW_NAMES[d]}{isToday && <span className="text-deep text-[13px] ml-2">Today</span>}</div></div>
             <div className="text-[14px] text-muted mt-0.5">Lunch: {sc.walk === 'walk' ? `${s.settings.walkMinutes}-minute brisk walk` : WALK_LABEL[sc.walk]} · Home: {HOME_LABEL[sc.home]}</div>
           </div>
         );
       })}
-      <p className="p-4 text-[13px] text-muted">Change your schedule anytime in Settings → Exercise schedule.</p>
+      <p className="p-3 text-[13px] text-muted">Change your schedule anytime in Settings → Exercise schedule.</p>
     </div>
   );
 }
@@ -199,7 +199,7 @@ function ManualLog({ onClose }: { onClose: () => void }) {
       <Field label="Date"><input type="date" className="field" value={date} max={todayKey()} onChange={(e) => e.target.value && setDate(e.target.value)} /></Field>
       <Field label="Minutes"><NumberInput value={min} onChange={setMin} /></Field>
       <div className="label">How did it feel? (optional)</div>
-      <div className="grid grid-cols-5 gap-2">{[1, 2, 3, 4, 5].map((d) => <button key={d} onClick={() => setDiff(d)} className={`rounded-2xl py-3 border ${diff === d ? 'bg-deep text-white border-deep' : 'border-line bg-card'}`}>{d}</button>)}</div>
+      <div className="grid grid-cols-5 gap-2">{[1, 2, 3, 4, 5].map((d) => <button key={d} onClick={() => setDiff(d)} className={`rounded-2xl py-2 border ${diff === d ? 'bg-deep text-white border-deep' : 'border-line bg-card'}`}>{d}</button>)}</div>
     </Sheet>
   );
 }
@@ -218,7 +218,7 @@ function StepsCard({ today }: { today: string }) {
           <div className="flex-1"><NumberInput value={val} onChange={setVal} placeholder={`Goal ${s.settings.stepsGoal.toLocaleString()}`} ariaLabel="Steps today" /></div>
           <button className="btn-primary" onClick={() => { if (val == null) return; s.set((st) => { st.steps[today] = Math.round(val); }); toast('Steps saved'); }}>Save</button>
         </div>
-        <div className="flex items-end gap-1 h-24 mt-4" aria-label="Steps, last 14 days">
+        <div className="flex items-end gap-1 h-24 mt-3" aria-label="Steps, last 14 days">
           {days.map((d) => {
             const v = s.steps[d] ?? 0;
             return <div key={d} className="flex-1 flex flex-col items-center justify-end h-full">

@@ -44,7 +44,7 @@ export function WeightSheet({ onClose, entryId }: { onClose: () => void; entryId
           <button className="btn-primary flex-[2]" disabled={val == null || val <= 0} onClick={save}>Save</button>
         </div>
       }>
-      <p className="text-muted text-[14px] mb-4">Weight naturally moves day to day with water, salt, and hormones. The weekly trend is what matters.</p>
+      <p className="text-muted text-[14px] mb-3">Weight naturally moves day to day with water, salt, and hormones. The weekly trend is what matters.</p>
       <Field label={`Weight (${unit === 'kg' ? 'kg' : 'lbs'})`}><NumberInput value={val} onChange={setVal} placeholder={unit === 'kg' ? '80.7' : '178'} ariaLabel="Weight" /></Field>
       <Field label="Date"><input type="date" className="field" value={date} max={todayKey()} onChange={(e) => e.target.value && setDate(e.target.value)} /></Field>
     </Sheet>

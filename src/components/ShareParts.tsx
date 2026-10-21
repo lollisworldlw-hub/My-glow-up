@@ -28,7 +28,7 @@ function PhotoPicker({ file, setFile, label = 'Add a photo (optional)' }: { file
   const [url, setUrl] = useState<string>();
   useEffect(() => { if (!file) { setUrl(undefined); return; } const u = URL.createObjectURL(file); setUrl(u); return () => URL.revokeObjectURL(u); }, [file]);
   return (
-    <div className="mb-4">
+    <div className="mb-3">
       {url ? (
         <div className="relative">
           <img src={url} alt="" className="w-full max-h-72 object-cover rounded-2xl" />
@@ -74,7 +74,7 @@ export function FoodPhotos({ date }: { date: string }) {
   const [pending, setPending] = useState<File | null>(null);
   const [open, setOpen] = useState<string | null>(null);
   return (
-    <div className="card p-4">
+    <div className="card p-3">
       <div className="flex items-center justify-between mb-2">
         <div className="font-medium">Food photos</div>
         <button className="btn-soft btn-sm" onClick={() => ref.current?.click()}><Camera size={16} />Add</button>
@@ -134,7 +134,7 @@ function AddFoodPhoto({ file, date, onClose }: { file: File; date: string; onClo
     <Sheet open onClose={onClose} title="New food photo" footer={<div className="flex gap-2">
       <button className="btn-soft flex-1" disabled={busy} onClick={() => save(false)}>Save</button>
       <button className="btn-primary flex-[1.4]" disabled={busy} onClick={() => save(true)}><Share2 size={16} />{busy ? 'One moment…' : 'Save & share'}</button></div>}>
-      {url && <img src={url} alt="" className="w-full max-h-72 object-cover rounded-2xl mb-4" />}
+      {url && <img src={url} alt="" className="w-full max-h-72 object-cover rounded-2xl mb-3" />}
       <Field label="Meal"><select className="field" value={slot} onChange={(e) => setSlot(e.target.value as Slot)}>{SLOTS.map((x) => <option key={x} value={x}>{SLOT_LABEL[x]}</option>)}</select></Field>
       <Field label="Caption (optional)"><input className="field" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Meal-prepped chicken bowl!" /></Field>
     </Sheet>

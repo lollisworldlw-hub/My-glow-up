@@ -39,9 +39,9 @@ export function MealCard({ date, slot, item, compact }: { date: string; slot: Sl
 
   return (
     <>
-      <div className={`card p-4 ${logged ? 'border-sage/60' : ''}`}>
-        <div className="flex gap-3 items-start">
-          <button className="flex-1 min-w-0 flex gap-3 text-left" onClick={() => setSheet('detail')} aria-label={`Open ${itemName(item, s.recipes)}`}>
+      <div className={`card p-3 ${logged ? 'border-sage/60' : ''}`}>
+        <div className="flex gap-2 items-start">
+          <button className="flex-1 min-w-0 flex gap-2 text-left" onClick={() => setSheet('detail')} aria-label={`Open ${itemName(item, s.recipes)}`}>
             <FoodArt art={recipe?.art ?? 'custom'} size={compact ? 48 : 56} />
             <div className="min-w-0 flex-1">
               <div className="eyebrow !text-[12px]">{SLOT_LABEL[slot]}</div>
@@ -76,8 +76,8 @@ export function LogConfirmSheet({ date, slot, item, onClose }: { date: string; s
   const prelog = s.logs.find((l) => l.planItemId === item.id && l.prelogged);
   return (
     <Sheet open onClose={onClose} title={`Log ${name}?`}>
-      <p className="text-muted text-[14px] mb-4">Only what you actually eat counts toward today. Adjust the portion if it was different.</p>
-      <div className="card p-4 flex items-center justify-between mb-4">
+      <p className="text-muted text-[14px] mb-3">Only what you actually eat counts toward today. Adjust the portion if it was different.</p>
+      <div className="card p-3 flex items-center justify-between mb-3">
         <div>
           <div className="text-[13px] text-muted">Portion</div>
           <div className="font-semibold">{mac.cal} cal · {mac.protein} g protein</div>
@@ -146,8 +146,8 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
           <button className="btn-soft flex-1" onClick={() => setMode('swap')}><ArrowLeftRight size={16} />Swap</button>
         </div>
       }>
-      <div className="text-muted text-[14px] -mt-1 mb-4">{SLOT_LABEL[slot]} · {fmtDow(date)} {fmtShort(date)}</div>
-      <div className="flex items-center gap-4 mb-4">
+      <div className="text-muted text-[14px] -mt-1 mb-3">{SLOT_LABEL[slot]} · {fmtDow(date)} {fmtShort(date)}</div>
+      <div className="flex items-center gap-4 mb-3">
         <FoodArt art={recipe?.art ?? 'custom'} size={72} />
         <div className="grid grid-cols-2 gap-x-5 gap-y-1 flex-1">
           <Stat label="Calories" value={`${mac.cal}`} />
@@ -156,9 +156,9 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
           <Stat label="Fat" value={`${mac.fat} g`} />
         </div>
       </div>
-      {est && <div className="text-[13px] rounded-2xl bg-petal px-3 py-2 mb-4 text-ink">Estimates from generic nutrition data. Edit any food from its package label in Settings → Food library.</div>}
+      {est && <div className="text-[13px] rounded-2xl bg-petal px-3 py-2 mb-3 text-ink">Estimates from generic nutrition data. Edit any food from its package label in Settings → Food library.</div>}
 
-      <div className="card p-4 mb-4 flex items-center justify-between">
+      <div className="card p-3 mb-3 flex items-center justify-between">
         <div>
           <div className="font-medium">Portion</div>
           <div className="text-[13px] text-muted">{recipe?.servingLabel ?? '1 serving'}{fmtServ(item.servings)}</div>
@@ -169,7 +169,7 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
       {!item.quick && (
         <>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="h-serif text-[16px]">Ingredients</h3>
+            <h3 className="h-serif text-[15px]">Ingredients</h3>
             {item.ingredients && (
               <button className="text-[13px] text-deep font-medium inline-flex items-center gap-1" onClick={() => mutate((it) => { delete it.ingredients; })}><RotateCcw size={14} />Reset</button>
             )}
@@ -198,7 +198,7 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
             })}
           </div>
           {item.ingredients && recipe && (
-            <button className="btn-ghost btn-sm w-full mb-4" onClick={() => {
+            <button className="btn-ghost btn-sm w-full mb-3" onClick={() => {
               s.set((st) => { st.recipes[recipe.id].ingredients = (item.ingredients ?? []).map((x) => ({ ...x })); });
               mutate((it) => { delete it.ingredients; });
               toast('Saved as the recipe’s new default');
@@ -209,13 +209,13 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
 
       {recipe && (
         <>
-          <h3 className="h-serif text-[16px] mb-2">How to make it</h3>
+          <h3 className="h-serif text-[15px] mb-2">How to make it</h3>
           <ol className="list-decimal pl-5 space-y-1.5 text-[14px] mb-2">{recipe.instructions.map((t, i) => <li key={i}>{t}</li>)}</ol>
           {recipe.note && <p className="text-[13px] text-muted mb-2">{recipe.note}</p>}
         </>
       )}
 
-      <div className="grid grid-cols-2 gap-2 mt-5">
+      <div className="grid grid-cols-2 gap-2 mt-3">
         {item.recipeId && (
           <button className={`btn-ghost btn-sm ${fav ? 'text-deep' : ''}`} onClick={() => s.set((st) => {
             st.favorites = fav ? st.favorites.filter((x) => x !== item.recipeId) : [...st.favorites, item.recipeId!];
@@ -256,7 +256,7 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
 }
 
 const Stat = ({ label, value }: { label: string; value: string }) => (
-  <div><div className="text-[13px] text-muted">{label}</div><div className="font-semibold text-[15px] tabular-nums">{value}</div></div>
+  <div><div className="text-[13px] text-muted">{label}</div><div className="font-semibold text-[14px] tabular-nums">{value}</div></div>
 );
 
 export function DayPicker({ multi, from, title, onPick, onClose }: { multi: boolean; from: string; title: string; onPick: (d: string[]) => void; onClose: () => void }) {
@@ -267,7 +267,7 @@ export function DayPicker({ multi, from, title, onPick, onClose }: { multi: bool
     <Sheet open onClose={onClose} title={title} footer={multi ? <button className="btn-primary w-full" disabled={!sel.length} onClick={() => onPick(sel)}>Copy to {sel.length || ''} day{sel.length === 1 ? '' : 's'}</button> : undefined}>
       <div className="grid grid-cols-4 gap-2">
         {days.map((d) => (
-          <button key={d} className={`rounded-2xl border px-2 py-3 text-center ${sel.includes(d) ? 'bg-deep text-white border-deep' : 'border-line bg-card'}`}
+          <button key={d} className={`rounded-2xl border px-2 py-2 text-center ${sel.includes(d) ? 'bg-deep text-white border-deep' : 'border-line bg-card'}`}
             onClick={() => multi ? setSel((x) => x.includes(d) ? x.filter((y) => y !== d) : [...x, d]) : onPick([d])}>
             <div className="text-[13px] opacity-80">{fmtDow(d)}</div>
             <div className="font-semibold">{fmtShort(d)}</div>
@@ -301,7 +301,7 @@ export function SwapSheet({ date, slot, itemId, onClose }: { date: string; slot:
         {list.map((r) => {
           const m = round(recipeMacros(s.foods, r));
           return (
-            <button key={r.id} disabled={r.id === current} className={`w-full card p-3 flex items-center gap-3 text-left ${r.id === current ? 'opacity-60' : ''}`}
+            <button key={r.id} disabled={r.id === current} className={`w-full card p-3 flex items-center gap-2 text-left ${r.id === current ? 'opacity-60' : ''}`}
               onClick={() => {
                 s.set((st) => {
                   st.plans[date] ??= emptyDay();
@@ -372,7 +372,7 @@ export function LogFoodSheet({ date, onClose, defaultSlot = 'snack' }: { date: s
           </div>
           <div className="max-h-48 overflow-y-auto rounded-2xl border border-line bg-card mb-3">
             {foods.map((f) => (
-              <button key={f.id} className={`w-full text-left px-4 py-3 border-b border-line last:border-0 ${foodId === f.id ? 'bg-petal' : ''}`}
+              <button key={f.id} className={`w-full text-left px-3 py-2 border-b border-line last:border-0 ${foodId === f.id ? 'bg-petal' : ''}`}
                 onClick={() => { setFoodId(f.id); const u = unitsFor(f)[0]; setUnit(u); setAmt(u === 'each' ? 1 : u === 'g' ? 100 : 1); }}>
                 <div className="text-[14px]">{f.name}{f.state ? <span className="text-muted"> · {f.state}</span> : null}</div>
                 <div className="text-[13px] text-muted">{f.per100g.cal} cal / 100 g{f.estimate ? ' · estimate' : ' · from label'}</div>
@@ -394,7 +394,7 @@ export function LogFoodSheet({ date, onClose, defaultSlot = 'snack' }: { date: s
         <>
           <div className="max-h-64 overflow-y-auto rounded-2xl border border-line bg-card mb-3">
             {Object.values(s.recipes).map((r) => (
-              <button key={r.id} className={`w-full text-left px-4 py-3 border-b border-line last:border-0 ${recipeId === r.id ? 'bg-petal' : ''}`} onClick={() => setRecipeId(r.id)}>
+              <button key={r.id} className={`w-full text-left px-3 py-2 border-b border-line last:border-0 ${recipeId === r.id ? 'bg-petal' : ''}`} onClick={() => setRecipeId(r.id)}>
                 <div className="text-[14px]">{r.name}</div><div className="text-[13px] text-muted">{SLOT_LABEL[r.slot]}</div>
               </button>
             ))}
@@ -405,7 +405,7 @@ export function LogFoodSheet({ date, onClose, defaultSlot = 'snack' }: { date: s
       {tab === 'quick' && (
         <>
           <Field label="What did you have?"><input className="field" value={quick.name} onChange={(e) => setQuick({ ...quick, name: e.target.value })} placeholder="e.g. Latte" /></Field>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             <Field label="Calories"><NumberInput value={quick.cal} onChange={(v) => setQuick({ ...quick, cal: v })} /></Field>
             <Field label="Protein (g)"><NumberInput value={quick.protein} onChange={(v) => setQuick({ ...quick, protein: v })} /></Field>
             <Field label="Carbs (g, optional)"><NumberInput value={quick.carbs} onChange={(v) => setQuick({ ...quick, carbs: v })} /></Field>

@@ -59,14 +59,14 @@ export function CycleView() {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <Card>
         {st ? (
           <>
             <div className="eyebrow">Cycle day {st.day}</div>
-            <div className="h-serif text-[21px] leading-tight mt-1">{st.phase}</div>
+            <div className="h-serif text-[18px] leading-tight mt-1">{st.phase}</div>
             <p className="text-[14px] mt-1">{PHASE_NOTE[st.phase]}</p>
-            <div className="grid grid-cols-3 gap-2 mt-4 text-center">
+            <div className="grid grid-cols-3 gap-2 mt-3 text-center">
               <Mini l="Next period" v={cur ? '—' : st.until >= 0 ? `~${fmtShort(st.nextStart)}` : `${-st.until}d late`} />
               <Mini l="Avg cycle" v={`${length} days`} />
               <Mini l="Avg period" v={`${plen} days`} />
@@ -74,7 +74,7 @@ export function CycleView() {
             {!fromData && <p className="text-[13px] text-muted mt-2">Predictions use a typical 28-day cycle until you’ve logged two periods.</p>}
           </>
         ) : (
-          <div className="flex gap-3 items-start">
+          <div className="flex gap-2 items-start">
             <span className="w-10 h-10 rounded-full bg-petal text-deep grid place-items-center shrink-0"><CalendarHeart size={19} /></span>
             <div><div className="font-semibold">Log your last period to begin</div><p className="text-[13px] text-muted">Set the date below to when it started, then tap “My period started.”</p></div>
           </div>
@@ -84,10 +84,10 @@ export function CycleView() {
       <Card>
         <Field label="Day"><input type="date" className="field" value={date} max={todayKey()} onChange={(e) => e.target.value && setDate(e.target.value)} /></Field>
         {cur && date >= cur.start
-          ? <button className="btn-primary w-full mb-4" onClick={end}>My period ended {date === today ? 'today' : `on ${fmtShort(date)}`}</button>
-          : <button className="btn-primary w-full mb-4" onClick={start}><Droplet size={18} />My period started {date === today ? 'today' : `on ${fmtShort(date)}`}</button>}
+          ? <button className="btn-primary w-full mb-3" onClick={end}>My period ended {date === today ? 'today' : `on ${fmtShort(date)}`}</button>
+          : <button className="btn-primary w-full mb-3" onClick={start}><Droplet size={18} />My period started {date === today ? 'today' : `on ${fmtShort(date)}`}</button>}
         <div className="label">Flow</div>
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-3">
           {FLOWS.map((f) => <button key={f.v} className={`chip ${log.flow === f.v ? 'chip-on' : ''}`} onClick={() => setDay({ flow: log.flow === f.v ? undefined : f.v })}>{f.l}</button>)}
         </div>
         <div className="label">How you feel</div>
@@ -132,7 +132,7 @@ export function CycleView() {
             {[...periods].reverse().map((p, i, arr) => {
               const next = arr[i - 1];
               return (
-                <button key={p.id} className="w-full text-left px-4 py-3 flex justify-between" onClick={() => setEdit(p)}>
+                <button key={p.id} className="w-full text-left px-3 py-2 flex justify-between" onClick={() => setEdit(p)}>
                   <span>{fmtShort(p.start)} – {p.end ? fmtShort(p.end) : 'ongoing'}</span>
                   <span className="text-muted text-[13px]">{p.end ? `${daysBetween(p.start, p.end) + 1}-day period` : ''}{next ? ` · ${daysBetween(p.start, next.start)}-day cycle` : ''}</span>
                 </button>
@@ -147,7 +147,7 @@ export function CycleView() {
   );
 }
 
-const Mini = ({ l, v }: { l: string; v: string }) => <div className="rounded-2xl bg-petal px-2 py-2.5"><div className="text-[12px] text-muted">{l}</div><div className="font-semibold text-[14px]">{v}</div></div>;
+const Mini = ({ l, v }: { l: string; v: string }) => <div className="rounded-2xl bg-petal px-2 py-2"><div className="text-[12px] text-muted">{l}</div><div className="font-semibold text-[14px]">{v}</div></div>;
 
 function EditPeriod({ p, onClose }: { p: Period; onClose: () => void }) {
   const s = useStore();

@@ -63,7 +63,7 @@ export function AccountForm({ compact, onDone }: { compact?: boolean; onDone?: (
   return (
     <div>
       {sent && (
-        <div className="rounded-2xl bg-petal px-4 py-3 mb-4 text-[14px]">
+        <div className="rounded-2xl bg-petal px-3 py-2 mb-3 text-[14px]">
           <b>Almost done!</b> We emailed a confirmation link to {em || 'you'}. Tap it (it may open in Safari — that’s fine), then come back here and sign in with the same email and password. You’ll join the group automatically.
         </div>
       )}
@@ -89,7 +89,7 @@ export function CloudCard() {
   const [newPw, setNewPw] = useState('');
   return (
     <Card>
-      <div className="flex items-start gap-3 mb-3">
+      <div className="flex items-start gap-2 mb-3">
         {email && member ? <Cloud className="text-deep shrink-0" size={22} /> : <CloudOff className="text-muted shrink-0" size={22} />}
         <div>
           <div className="font-semibold">{email && member ? 'Your account & cloud backup' : 'Account & cloud backup'}</div>

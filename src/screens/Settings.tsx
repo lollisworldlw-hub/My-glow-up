@@ -38,7 +38,7 @@ export default function Settings() {
           <Field label="Height (in)"><NumberInput value={st.heightIn} onChange={(v) => v && set({ heightIn: v })} /></Field>
           <Field label="Age"><NumberInput value={st.age} onChange={(v) => v && set({ age: Math.round(v) })} /></Field>
         </div>
-        <div className="flex items-center justify-between rounded-2xl bg-petal px-4 py-3">
+        <div className="flex items-center justify-between rounded-2xl bg-petal px-3 py-2">
           <div><div className="text-[13px] text-muted">Current weight</div><div className="font-semibold">{cur ? `${wIn(cur)} ${kg ? 'kg' : 'lbs'}` : 'Not logged yet'}</div></div>
           <button className="btn-primary btn-sm" onClick={() => setSheet('weight')}>Log weight</button>
         </div>
@@ -70,7 +70,7 @@ export default function Settings() {
         <Field label="Daily step goal"><NumberInput value={st.stepsGoal} onChange={(v) => v && set({ stepsGoal: Math.round(v) })} /></Field>
         <Toggle label="Hourly stand & stretch nudges (weekdays)" on={st.moveNudge.on} onChange={(v) => set({ moveNudge: { ...st.moveNudge, on: v } })} />
         {st.moveNudge.on && (
-          <div className="grid grid-cols-2 gap-3 mt-2">
+          <div className="grid grid-cols-2 gap-2 mt-2">
             <Field label="From"><input type="time" className="field" value={st.moveNudge.start} onChange={(e) => set({ moveNudge: { ...st.moveNudge, start: e.target.value } })} /></Field>
             <Field label="Until"><input type="time" className="field" value={st.moveNudge.end} onChange={(e) => set({ moveNudge: { ...st.moveNudge, end: e.target.value } })} /></Field>
           </div>
@@ -85,12 +85,12 @@ export default function Settings() {
         <div className="flex flex-wrap gap-2 mb-3">
           {DIETS.map((d) => { const on = st.diets.includes(d.v); return <button key={d.v} className={`chip ${on ? 'chip-on' : ''}`} onClick={() => set({ diets: on ? st.diets.filter((x) => x !== d.v) : [...st.diets, d.v] })}>{d.l}</button>; })}
         </div>
-        <button className="btn-ghost btn-sm w-full mb-4" onClick={() => { const today = new Date(); const k = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`; s.generateWeek(weekStart(k), 'rotation'); s.generateWeek(addD(weekStart(k), 7), 'rotation'); toast('This week and next rebuilt to fit'); }}>Rebuild this week & next to fit my diet</button>
+        <button className="btn-ghost btn-sm w-full mb-3" onClick={() => { const today = new Date(); const k = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`; s.generateWeek(weekStart(k), 'rotation'); s.generateWeek(addD(weekStart(k), 7), 'rotation'); toast('This week and next rebuilt to fit'); }}>Rebuild this week & next to fit my diet</button>
         <Toggle label="Auto-fill new weeks from my rotation" on={st.autoFillWeeks} onChange={(v) => set({ autoFillWeeks: v })} />
         <div className="label mt-3">Food dislikes</div>
         <p className="text-[13px] text-muted mb-2">Recipes containing these are skipped when building new weeks.</p>
         <div className="flex flex-wrap gap-2 mb-2">{st.dislikes.map((d) => <button key={d} className="chip" onClick={() => set({ dislikes: st.dislikes.filter((x) => x !== d) })}>{d} ✕</button>)}</div>
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-3">
           <input className="field flex-1" placeholder="e.g. shrimp" value={dislike} onChange={(e) => setDislike(e.target.value)} />
           <button className="btn-soft" disabled={!dislike.trim()} onClick={() => { set({ dislikes: [...st.dislikes, dislike.trim()] }); setDislike(''); }}><Plus size={18} /></button>
         </div>
@@ -103,16 +103,16 @@ export default function Settings() {
       <SectionTitle>Look & units</SectionTitle>
       <Card>
         <div className="label">Theme</div>
-        <div className="mb-4"><Segmented value={st.theme} onChange={(v) => set({ theme: v })} options={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }, { value: 'system', label: 'Auto' }]} /></div>
+        <div className="mb-3"><Segmented value={st.theme} onChange={(v) => set({ theme: v })} options={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }, { value: 'system', label: 'Auto' }]} /></div>
         <div className="label">Weight</div>
-        <div className="mb-4"><Segmented value={st.weightUnit} onChange={(v) => set({ weightUnit: v })} options={[{ value: 'lb', label: 'Pounds' }, { value: 'kg', label: 'Kilograms' }]} /></div>
+        <div className="mb-3"><Segmented value={st.weightUnit} onChange={(v) => set({ weightUnit: v })} options={[{ value: 'lb', label: 'Pounds' }, { value: 'kg', label: 'Kilograms' }]} /></div>
         <div className="label">Measurements</div>
         <Segmented value={st.lengthUnit} onChange={(v) => set({ lengthUnit: v })} options={[{ value: 'in', label: 'Inches' }, { value: 'cm', label: 'Centimeters' }]} />
       </Card>
 
       <SectionTitle>Personal touches</SectionTitle>
       <Card>
-        <button className="btn-soft w-full mb-4" onClick={() => setSheet('nav' as any)}>Customize the bottom bar</button>
+        <button className="btn-soft w-full mb-3" onClick={() => setSheet('nav' as any)}>Customize the bottom bar</button>
         <div className="label">My motivational messages</div>
         <p className="text-[13px] text-muted mb-2">Shown on Home, one per day. Leave empty to use the built-in ones.</p>
         {st.quotes.map((q, i) => (
@@ -150,7 +150,7 @@ export default function Settings() {
 
 export function Toggle({ label, on, onChange }: { label: string; on: boolean; onChange: (v: boolean) => void }) {
   return (
-    <button role="switch" aria-checked={on} className="w-full flex items-center justify-between py-2.5 text-left" onClick={() => onChange(!on)}>
+    <button role="switch" aria-checked={on} className="w-full flex items-center justify-between py-2 text-left" onClick={() => onChange(!on)}>
       <span className="text-[14px] pr-3">{label}</span>
       <span className={`w-[52px] h-[32px] rounded-full p-1 transition shrink-0 ${on ? 'bg-deep' : 'bg-line'}`}><span className={`block w-6 h-6 rounded-full bg-white shadow transition ${on ? 'translate-x-5' : ''}`} /></span>
     </button>
@@ -166,7 +166,7 @@ function ScheduleEditor({ onClose }: { onClose: () => void }) {
       {[1, 2, 3, 4, 5, 6, 0].map((d) => {
         const sc = s.schedule[d];
         return (
-          <div key={d} className="card p-4 mb-2">
+          <div key={d} className="card p-3 mb-2">
             <div className="font-semibold mb-2">{DOW_NAMES[d]}</div>
             <div className="grid grid-cols-2 gap-2">
               <select className="field" aria-label={`${DOW_NAMES[d]} lunch`} value={sc.walk} onChange={(e) => up(d, { walk: e.target.value as any })}>
@@ -190,7 +190,7 @@ function Favorites({ onClose }: { onClose: () => void }) {
       {Object.values(s.recipes).map((r) => {
         const on = s.favorites.includes(r.id);
         return (
-          <button key={r.id} className="w-full flex items-center justify-between py-3 border-b border-line text-left" onClick={() => s.set((st) => { st.favorites = on ? st.favorites.filter((x) => x !== r.id) : [...st.favorites, r.id]; })}>
+          <button key={r.id} className="w-full flex items-center justify-between py-2 border-b border-line text-left" onClick={() => s.set((st) => { st.favorites = on ? st.favorites.filter((x) => x !== r.id) : [...st.favorites, r.id]; })}>
             <span><span className="block">{r.name}</span><span className="text-[13px] text-muted">{SLOT_LABEL[r.slot]}</span></span>
             <Heart size={20} className={on ? 'text-rose' : 'text-line'} fill={on ? 'currentColor' : 'none'} />
           </button>
@@ -211,7 +211,7 @@ function FoodLibrary({ onClose }: { onClose: () => void }) {
       <button className="btn-primary w-full mb-3" onClick={() => setEdit('new')}><Plus size={18} />Add a food</button>
       <div className="relative mb-3"><Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" /><input className="field pl-11" placeholder="Search" value={q} onChange={(e) => setQ(e.target.value)} /></div>
       {foods.map((f) => (
-        <button key={f.id} className="w-full text-left py-3 border-b border-line" onClick={() => setEdit(f.id)}>
+        <button key={f.id} className="w-full text-left py-2 border-b border-line" onClick={() => setEdit(f.id)}>
           <div className="flex justify-between gap-2"><span>{f.name}{f.state ? <span className="text-muted"> · {f.state}</span> : null}</span><span className={`text-[12px] rounded-full px-2 py-0.5 h-fit ${f.estimate ? 'bg-petal text-deep' : 'bg-sage/25 text-sagedeep'}`}>{f.estimate ? 'Estimate' : 'Label'}</span></div>
           <div className="text-[13px] text-muted">{Math.round(f.per100g.cal)} cal · {f.per100g.protein} g protein per 100 g</div>
         </button>
@@ -266,7 +266,7 @@ function FoodEditor({ id, onClose }: { id?: string; onClose: () => void }) {
         <Field label="Weighed as"><select className="field" value={state} onChange={(e) => setState(e.target.value as any)}><option value="">—</option><option value="raw">Raw</option><option value="cooked">Cooked</option><option value="dry">Dry</option><option value="packaged">Packaged</option><option value="prepared">Prepared</option></select></Field>
         <Field label="Grocery category"><select className="field" value={category} onChange={(e) => setCategory(e.target.value as GroceryCategory)}>{GROCERY_CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></Field>
       </div>
-      <div className="rounded-2xl bg-petal p-3 mb-4">
+      <div className="rounded-2xl bg-petal p-3 mb-3">
         <div className="font-medium mb-2">Nutrition per serving (from the label)</div>
         <div className="grid grid-cols-2 gap-x-3">
           <Field label="Serving size (g)"><NumberInput value={serv} onChange={setServ} /></Field>
@@ -303,7 +303,7 @@ function Reminders({ onClose }: { onClose: () => void }) {
           <button role="switch" aria-checked={r.on} aria-label="On" className={`w-[52px] h-[32px] rounded-full p-1 shrink-0 ${r.on ? 'bg-deep' : 'bg-line'}`} onClick={() => s.set((st) => { const x = st.settings.reminders.find((y) => y.id === r.id)!; x.on = !x.on; })}><span className={`block w-6 h-6 rounded-full bg-white transition ${r.on ? 'translate-x-5' : ''}`} /></button>
         </div>
       ))}
-      <button className="btn-ghost btn-sm w-full mb-4" onClick={() => s.set((st) => { st.settings.reminders.push({ id: uid(), label: 'New reminder', time: '20:00', on: true }); })}><Plus size={16} />Add reminder</button>
+      <button className="btn-ghost btn-sm w-full mb-3" onClick={() => s.set((st) => { st.settings.reminders.push({ id: uid(), label: 'New reminder', time: '20:00', on: true }); })}><Plus size={16} />Add reminder</button>
       {perm !== 'unsupported' && perm !== 'granted' && (
         <button className="btn-soft w-full" onClick={async () => { const p = await Notification.requestPermission(); setPerm(p); }}>Allow notifications while the app is open</button>
       )}
@@ -344,9 +344,9 @@ function DataSection({ onDelete }: { onDelete: () => void }) {
   return (
     <>
       <SectionTitle>Your data</SectionTitle>
-      <div className="mb-4"><CloudCard /></div>
+      <div className="mb-3"><CloudCard /></div>
       <Card>
-        <div className="flex items-start gap-3 mb-3"><Database className="text-deep shrink-0 mt-0.5" size={20} />
+        <div className="flex items-start gap-2 mb-3"><Database className="text-deep shrink-0 mt-0.5" size={20} />
           <p className="text-[13px]">Everything is saved privately on this device (IndexedDB). It can be lost if you clear Safari’s website data, delete the Home Screen app, or switch phones — so download a backup now and then and keep it in Files or iCloud Drive.</p>
         </div>
         <div className="text-[13px] text-muted mb-3">
@@ -375,15 +375,15 @@ function DeleteAll({ onClose }: { onClose: () => void }) {
   const keep = (fn: (x: any) => void, msg: string) => { s.set(fn); toast(msg); onClose(); };
   return (
     <Sheet open onClose={onClose} title="Delete data">
-      <p className="text-muted text-[14px] mb-4">These can’t be undone. If cloud backup is on, the cloud copy updates too. Export a backup first if you might want this later.</p>
+      <p className="text-muted text-[14px] mb-3">These can’t be undone. If cloud backup is on, the cloud copy updates too. Export a backup first if you might want this later.</p>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.logs = []; }, 'Food log cleared')}>Clear food log</button>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.weights = []; x.measures = []; }, 'Weight & measurements cleared')}>Clear weight & measurements</button>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.workouts = []; }, 'Workout history cleared')}>Clear workout history</button>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.habitChecks = {}; x.water = {}; x.notes = {}; }, 'Habits cleared')}>Clear habit history</button>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.periods = []; x.cycleDays = {}; }, 'Cycle data cleared')}>Clear cycle data</button>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.checkins = []; x.steps = {}; }, 'Check-ins & steps cleared')}>Clear check-ins & steps</button>
-      <button className="btn-ghost w-full mb-5" onClick={async () => { await clearPhotos(); keep((x) => { x.photos = []; }, 'Photos deleted'); }}>Delete all photos</button>
-      <div className="rounded-2xl border border-blush p-4">
+      <button className="btn-ghost w-full mb-3" onClick={async () => { await clearPhotos(); keep((x) => { x.photos = []; }, 'Photos deleted'); }}>Delete all photos</button>
+      <div className="rounded-2xl border border-blush p-3">
         <div className="font-medium mb-2">Start completely fresh</div>
         <p className="text-[13px] text-muted mb-2">Type DELETE to erase everything and restore the starting recipes.</p>
         <input className="field mb-2" value={txt} onChange={(e) => setTxt(e.target.value)} placeholder="DELETE" />
