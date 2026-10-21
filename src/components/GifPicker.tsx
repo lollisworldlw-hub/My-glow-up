@@ -3,7 +3,7 @@ import { Search } from 'lucide-react';
 import { Sheet } from './ui';
 
 // Free GIPHY API key (designed to live in client apps; only allows GIF search).
-export const GIPHY_KEY = '';
+export const GIPHY_KEY = 'Hk5VPAclYWhlcTpGsuu70usfGsSJjPPz';
 
 interface Gif { id: string; url: string; preview: string; w: number; h: number }
 
