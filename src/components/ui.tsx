@@ -120,7 +120,7 @@ export function Sheet({ open, onClose, title, children, footer }: { open: boolea
   }, [open, onClose]);
   if (!open) return null;
   return createPortal(
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={title}>
+    <div className="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label={title}>
       <div className="absolute inset-0 bg-[#392C36]/30 backdrop-blur-[2px] fade" onClick={onClose} />
       <div className="absolute inset-x-0 bottom-0 max-h-[90vh] flex flex-col bg-bg rounded-t-[28px] sheet mx-auto max-w-[640px]">
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
@@ -178,7 +178,7 @@ export function Toaster() {
   useEffect(() => { if (!msg) return; setVis(true); const t = setTimeout(() => setVis(false), 2400); return () => clearTimeout(t); }, [key, msg]);
   if (!vis || !msg) return null;
   return (
-    <div className="fixed left-0 right-0 z-[60] flex justify-center px-4 pointer-events-none" style={{ bottom: 'calc(68px + env(safe-area-inset-bottom))' }}>
+    <div className="fixed left-0 right-0 z-[75] flex justify-center px-4 pointer-events-none" style={{ bottom: 'calc(68px + env(safe-area-inset-bottom))' }}>
       <div key={key} className="rise rounded-full bg-ink text-bg px-4 py-2 text-[14px] shadow-soft">{msg}</div>
     </div>
   );
