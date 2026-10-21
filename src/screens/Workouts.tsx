@@ -8,7 +8,6 @@ import type { WorkoutLog } from '../lib/types';
 import { Card, Empty, Field, Header, NumberInput, SectionTitle, Segmented, Sheet, toast } from '../components/ui';
 import { ExerciseArt } from '../components/Art';
 import { unlockAudio } from '../components/WorkoutPlayer';
-import { HealthConnectButton } from '../components/HealthConnect';
 import { HOME_LABEL } from './Home';
 
 const WALK_LABEL = { walk: '20-minute brisk walk', optional: 'Optional walk', recovery: 'Recovery' };
@@ -214,7 +213,7 @@ function StepsCard({ today }: { today: string }) {
     <>
       <SectionTitle>Steps</SectionTitle>
       <Card>
-<p className="text-[13px] text-muted mb-2">A desk job makes everyday steps extra valuable. Sync them from Apple Health, or type today’s count.</p>
+<p className="text-[13px] text-muted mb-2">A desk job makes everyday steps extra valuable. Copy today’s count from your iPhone’s Health app.</p>
         <div className="flex gap-2">
           <div className="flex-1"><NumberInput value={val} onChange={setVal} placeholder={`Goal ${s.settings.stepsGoal.toLocaleString()}`} ariaLabel="Steps today" /></div>
           <button className="btn-primary" onClick={() => { if (val == null) return; s.set((st) => { st.steps[today] = Math.round(val); }); toast('Steps saved'); }}>Save</button>
@@ -228,7 +227,6 @@ function StepsCard({ today }: { today: string }) {
           })}
         </div>
         <div className="flex justify-between text-[12px] text-muted mt-1"><span>{fmtShort(days[0])}</span><span>Today</span></div>
-        <HealthConnectButton />
       </Card>
     </>
   );
