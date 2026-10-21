@@ -99,18 +99,16 @@ export default function Home() {
 
       {/* water */}
       <Card className="rise">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2">
           <div className="eyebrow">Water</div>
-          <div className="text-[14px] text-muted tabular-nums">{water} / {st.waterTarget} glasses</div>
+          <div className="text-[14px] text-muted tabular-nums">{water} / {st.waterTarget} oz</div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {Array.from({ length: Math.max(st.waterTarget, water) }).map((_, i) => (
-            <button key={i} aria-label={`Glass ${i + 1}`} onClick={() => s.set((x) => { x.water[today] = i < water ? i : i + 1; })}
-              className={`w-10 h-11 rounded-xl grid place-items-center transition ${i < water ? 'bg-rose text-white' : 'bg-petal text-blush'}`}>
-              <Droplet size={18} fill={i < water ? 'currentColor' : 'none'} />
-            </button>
+        <Bar pct={(water / st.waterTarget) * 100} color="var(--rose)" h={12} />
+        <div className="flex flex-wrap gap-2 mt-3">
+          {[8, 12, 16, 20].map((oz) => (
+            <button key={oz} className="chip !py-2" aria-label={`Add ${oz} ounces`} onClick={() => s.set((x) => { x.water[today] = (x.water[today] ?? 0) + oz; })}><Droplet size={15} className="text-rose" />+{oz} oz</button>
           ))}
-          <button aria-label="Add a glass" className="w-10 h-11 rounded-xl grid place-items-center border border-dashed border-blush text-deep" onClick={() => s.set((x) => { x.water[today] = water + 1; })}><Plus size={18} /></button>
+          {water > 0 && <button className="chip !py-2 text-muted" aria-label="Remove 8 ounces" onClick={() => s.set((x) => { x.water[today] = Math.max(0, (x.water[today] ?? 0) - 8); })}>−8</button>}
         </div>
       </Card>
 
@@ -143,7 +141,7 @@ export default function Home() {
         <div className="divide-y divide-line">
           {habits.habits.map((h) => (
             <CheckRow key={h.id} on={habitDone(s, h, today)} onToggle={() => toggleHabit(h.id)}
-              title={h.name} sub={h.optional ? 'Optional' : h.auto === 'protein' ? `${Math.round(eaten.protein)} of ${st.proteinMin} g` : h.auto === 'water' ? `${water} of ${st.waterTarget} glasses` : undefined} />
+              title={h.name} sub={h.optional ? 'Optional' : h.auto === 'protein' ? `${Math.round(eaten.protein)} of ${st.proteinMin} g` : h.auto === 'water' ? `${water} of ${st.waterTarget} oz` : undefined} />
           ))}
         </div>
       </Card>

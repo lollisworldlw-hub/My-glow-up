@@ -12,9 +12,10 @@ export const NAV: { id: Tab; label: string; icon: typeof Home; blurb: string }[]
   { id: 'groceries', label: 'Groceries', icon: ShoppingBasket, blurb: 'Shopping list & meal prep' },
   { id: 'settings', label: 'Settings', icon: Settings, blurb: 'Goals, diet & customizing' }
 ];
+export const PICKABLE = () => NAV.filter((n) => n.id !== 'home');
 export const MORE = { id: 'more' as Tab, label: 'More', icon: LayoutGrid };
 
 export const bottomTabs = (navTabs: string[] | undefined): Tab[] => {
-  const valid = (navTabs ?? []).filter((t) => NAV.some((n) => n.id === t)) as Tab[];
-  return (valid.length ? valid : ['home', 'meals', 'workouts', 'progress', 'social'] as Tab[]).slice(0, 5);
+  const valid = (navTabs ?? []).filter((t) => t !== 'home' && NAV.some((n) => n.id === t)) as Tab[];
+  return (valid.length ? valid : ['meals', 'workouts', 'progress', 'social', 'groceries'] as Tab[]).slice(0, 5);
 };

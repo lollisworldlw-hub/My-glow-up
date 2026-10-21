@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowDown, ArrowUp, Check } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { useUI } from '../lib/ui';
-import { NAV, bottomTabs } from '../lib/nav';
+import { NAV, PICKABLE, bottomTabs } from '../lib/nav';
 import { Header, Sheet, toast } from '../components/ui';
 
 export default function More() {
@@ -10,7 +10,7 @@ export default function More() {
   const go = useUI((u) => u.go);
   const [edit, setEdit] = useState(false);
   const bottom = bottomTabs(s.settings.navTabs);
-  const rest = NAV.filter((n) => !bottom.includes(n.id));
+  const rest = PICKABLE().filter((n) => !bottom.includes(n.id));
   return (
     <div>
       <Header eyebrow="Everything else" title="More" />
@@ -38,7 +38,7 @@ export function NavEditor({ onClose }: { onClose: () => void }) {
   const move = (i: number, d: number) => { const a = [...sel]; const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; setSel(a); };
   return (
     <Sheet open onClose={onClose} title="Bottom bar" footer={<button className="btn-primary w-full" disabled={!sel.length} onClick={() => { s.set((x) => { x.settings.navTabs = sel; }); toast('Bottom bar updated'); onClose(); }}>Save</button>}>
-      <p className="text-[14px] text-muted mb-3">Pick up to 5 tabs. Everything else lives under “More”.</p>
+      <p className="text-[14px] text-muted mb-3">Pick up to 5 tabs. Tap the logo at the top for Home; everything else lives under “More”.</p>
       <div className="space-y-2">
         {sel.map((id, i) => {
           const n = NAV.find((x) => x.id === id)!;
@@ -51,7 +51,7 @@ export function NavEditor({ onClose }: { onClose: () => void }) {
             </div>
           );
         })}
-        {NAV.filter((n) => !sel.includes(n.id)).map((n) => (
+        {PICKABLE().filter((n) => !sel.includes(n.id)).map((n) => (
           <button key={n.id} disabled={sel.length >= 5} className="w-full card p-3 flex items-center gap-2 text-left disabled:opacity-50" onClick={() => setSel([...sel, n.id])}>
             <span role="checkbox" aria-checked={false} className="w-8 h-8 rounded-full border-2 border-blush" />
             <span className="flex-1">{n.label}</span>

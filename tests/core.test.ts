@@ -173,3 +173,17 @@ describe('targets', () => {
     expect(low.cal).toBeGreaterThanOrEqual(1300);
   });
 });
+
+import { migrate, initialState } from '../src/lib/store';
+describe('migration', () => {
+  it('converts water glasses to ounces and drops Home from the bottom bar', () => {
+    const st: any = initialState();
+    st.settings = { ...st.settings, waterOz: undefined, waterTarget: 8, navTabs: ['home', 'meals', 'workouts', 'progress', 'social'] };
+    st.water = { '2026-10-20': 5 };
+    const m = migrate(st);
+    expect(m.water['2026-10-20']).toBe(40);
+    expect(m.settings.waterTarget).toBe(64);
+    expect(m.settings.navTabs).toEqual(['meals', 'workouts', 'progress', 'social', 'groceries']);
+    expect(migrate(m).water['2026-10-20']).toBe(40); // idempotent
+  });
+});

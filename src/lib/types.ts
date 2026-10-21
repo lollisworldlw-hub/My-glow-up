@@ -185,7 +185,8 @@ export interface Settings {
   calMax: number;
   proteinMin: number;
   proteinMax: number;
-  waterTarget: number; // glasses
+  waterTarget: number; // ounces
+  waterOz?: boolean;
   workoutMinutes: number;
   walkMinutes: number;
   weightUnit: 'lb' | 'kg';

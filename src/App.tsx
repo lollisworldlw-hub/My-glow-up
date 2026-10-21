@@ -12,6 +12,7 @@ import Settings from './screens/Settings';
 import { Celebration, Toaster, toast } from './components/ui';
 import { WorkoutPlayer } from './components/WorkoutPlayer';
 import { startSync, useSync } from './lib/sync';
+import { InstallBanner } from './components/InstallBanner';
 import Social from './screens/Social';
 import Mind from './screens/Mind';
 import Clean from './screens/Clean';
@@ -96,6 +97,7 @@ export default function App() {
   useSocial((s) => s.messages.length + Object.keys(s.lastRead).length); // re-render on new messages
   const unread = member ? unreadCount(userId) : 0;
   useEffect(() => { if (member) { loadSocial(); startLive(); } }, [member]);
+  useEffect(() => { try { if (sessionStorage.getItem('glowup-updated')) { sessionStorage.removeItem('glowup-updated'); setTimeout(() => toast('Updated to the newest version ♡'), 800); } } catch { /* */ } }, []);
   useTheme();
   useReminders();
 
@@ -113,7 +115,16 @@ export default function App() {
 
   return (
     <div className="min-h-full">
-      <main className="mx-auto max-w-[640px] px-4 safe-top pb-nav">
+      <InstallBanner />
+      <header className="sticky top-0 z-30 bg-bg/90 backdrop-blur border-b border-line/60 top-safe">
+        <div className="mx-auto max-w-[640px] px-4 h-14 flex items-center justify-between">
+          <button className="flex items-center gap-2 min-h-[44px]" aria-label="Home" onClick={() => go('home')}>
+            <img src="/icons/icon-192.png" alt="" className={`w-9 h-9 rounded-xl ${tab === 'home' ? 'ring-2 ring-rose' : ''}`} />
+            <span className="h-serif text-[22px] leading-none">My Glow-Up</span>
+          </button>
+        </div>
+      </header>
+      <main className="mx-auto max-w-[640px] px-4 pt-4 pb-nav">
         <div key={tab} className="fade">
           {tab === 'home' && <Home />}
           {tab === 'meals' && <Meals />}

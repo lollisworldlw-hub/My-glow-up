@@ -9,15 +9,19 @@ import { suggestTargets } from '../lib/targets';
 import { kgToLb } from '../lib/weight';
 import { Field, NumberInput, Segmented, toast } from '../components/ui';
 import { AccountForm, inviteFromUrl } from '../components/CloudCard';
+import { InstallBanner } from '../components/InstallBanner';
 
 function Shell({ children, back, title, sub, go }: { children: React.ReactNode; back?: string; title: string; sub?: string; go: (s: string) => void }) {
   return (
+    <>
+    <InstallBanner />
     <div className="min-h-full mx-auto max-w-[560px] px-5 safe-top pb-10">
       {back && <button className="flex items-center gap-1 text-deep font-medium min-h-[44px]" onClick={() => go(back)}><ChevronLeft size={18} />Back</button>}
       <h1 className="h-serif text-[34px] leading-tight mt-2">{title}</h1>
       {sub && <p className="text-muted mt-1 mb-5">{sub}</p>}
       <div className="rise">{children}</div>
     </div>
+    </>
   );
 }
 

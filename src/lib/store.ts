@@ -208,7 +208,7 @@ export const useStore = create<Store>()(
         const gen = buildGroceries(dates.map((d) => st.plans[d] as DayPlan), st.recipes as any, st.foods as any, st.owned);
         st.groceries = mergeGroceries(st.groceries as GroceryItem[], gen);
       }),
-      replaceAll: (ns) => set(() => ({ ...initialState(), ...ns }))
+      replaceAll: (ns) => set(() => migrate({ ...initialState(), ...ns, settings: { ...initialState().settings, ...(ns.settings ?? {}) }, foods: { ...initialState().foods, ...(ns.foods ?? {}) }, recipes: { ...initialState().recipes, ...(ns.recipes ?? {}) } }))
     })),
     {
       name: 'my-glow-up',
@@ -224,7 +224,7 @@ export const useStore = create<Store>()(
         const existing = !!p.settings;
         const foods = { ...init.foods, ...(p.foods ?? {}) };
         for (const id of Object.keys(foods)) if (!foods[id].tags && init.foods[id]?.tags) foods[id] = { ...foods[id], tags: init.foods[id].tags };
-        return {
+        return migrate({
           ...current,
           ...p,
           // people who used the app before onboarding existed are already set up
@@ -232,11 +232,34 @@ export const useStore = create<Store>()(
           // keep newly added seed foods/recipes available after updates
           foods,
           recipes: { ...init.recipes, ...(p.recipes ?? {}) }
-        } as Store;
+        } as Store) as Store;
       }
     }
   )
 );
+
+/** Upgrade data saved by older versions (also applied to cloud copies and imported backups). */
+export function migrate<T extends State>(st: T): T {
+  const settings = { ...st.settings } as any;
+  let water = st.water;
+  if (!settings.waterOz) {
+    // water used to be counted in 8 oz glasses
+    water = Object.fromEntries(Object.entries(st.water ?? {}).map(([d, n]) => [d, (n as number) * 8]));
+    settings.waterTarget = Math.max(8, (settings.waterTarget ?? 8) * 8);
+    settings.waterOz = true;
+  }
+  if (Array.isArray(settings.navTabs) && settings.navTabs.includes('home')) {
+    const t = settings.navTabs.filter((x: string) => x !== 'home');
+    if (!t.includes('groceries') && t.length < 5) t.push('groceries');
+    settings.navTabs = t;
+  }
+  for (const id of Object.keys(st.foods ?? {})) {
+    const seed = SEED_BY_ID[id];
+    if (seed && !st.foods[id].tags) st.foods = { ...st.foods, [id]: { ...st.foods[id], tags: seed.tags } };
+  }
+  return { ...st, settings, water };
+}
+const SEED_BY_ID = Object.fromEntries(SEED_FOODS.map((f) => [f.id, f]));
 
 export const stateOnly = (s: Store): State => {
   const { set: _a, ensureWeek: _b, generateWeek: _c, logItem: _d, unlogItem: _e, syncLog: _f, addLog: _g, generateGroceries: _h, replaceAll: _i, ...rest } = s;

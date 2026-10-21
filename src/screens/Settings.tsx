@@ -53,7 +53,7 @@ export default function Settings() {
           <Field label="Range high"><NumberInput value={st.calMax} onChange={(v) => v && set({ calMax: Math.round(v) })} /></Field>
           <Field label="Protein min (g)"><NumberInput value={st.proteinMin} onChange={(v) => v && set({ proteinMin: Math.round(v) })} /></Field>
           <Field label="Protein max (g)"><NumberInput value={st.proteinMax} onChange={(v) => v && set({ proteinMax: Math.round(v) })} /></Field>
-          <Field label="Water (glasses)"><NumberInput value={st.waterTarget} onChange={(v) => v && set({ waterTarget: Math.round(v) })} /></Field>
+          <Field label="Water (oz)"><NumberInput value={st.waterTarget} onChange={(v) => v && set({ waterTarget: Math.round(v) })} /></Field>
         </div>
         <p className="text-[13px] text-muted">These are your starting estimates. The app never lowers them on its own — adjust only if your real progress over several weeks says so.</p>
       </Card>
