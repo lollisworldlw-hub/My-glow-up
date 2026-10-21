@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Bell, Database, Download, Heart, Moon, Plus, Search, Trash2, Upload, Utensils } from 'lucide-react';
 import { useStore, initialState, stateOnly } from '../lib/store';
 import type { Food, GroceryCategory, HomeWorkoutType, ScheduleDay } from '../lib/types';
-import { GROCERY_CATEGORIES, SLOT_LABEL } from '../lib/types';
+import { GROCERY_CATEGORIES, SLOT_LABEL, DIETS, FOOD_TAGS } from '../lib/types';
+import type { FoodTag } from '../lib/types';
+import { NavEditor } from './More';
+import { MOTIVATION } from '../lib/seed';
+import { weekStart, addDays as addD } from '../lib/date';
 import { DOW_NAMES, todayKey, uid } from '../lib/date';
 import { clearPhotos, downloadText, exportData, parseBackup, restorePhotos } from '../lib/backup';
 import { kgToLb, latest, lbToKg } from '../lib/weight';
@@ -76,6 +80,12 @@ export default function Settings() {
 
       <SectionTitle>Meals</SectionTitle>
       <Card>
+        <div className="label">Dietary needs</div>
+        <p className="text-[13px] text-muted mb-2">Only recipes that fit are used for swaps and new weeks.</p>
+        <div className="flex flex-wrap gap-2 mb-3">
+          {DIETS.map((d) => { const on = st.diets.includes(d.v); return <button key={d.v} className={`chip ${on ? 'chip-on' : ''}`} onClick={() => set({ diets: on ? st.diets.filter((x) => x !== d.v) : [...st.diets, d.v] })}>{d.l}</button>; })}
+        </div>
+        <button className="btn-ghost btn-sm w-full mb-4" onClick={() => { const today = new Date(); const k = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`; s.generateWeek(weekStart(k), 'rotation'); s.generateWeek(addD(weekStart(k), 7), 'rotation'); toast('This week and next rebuilt to fit'); }}>Rebuild this week & next to fit my diet</button>
         <Toggle label="Auto-fill new weeks from my rotation" on={st.autoFillWeeks} onChange={(v) => set({ autoFillWeeks: v })} />
         <div className="label mt-3">Food dislikes</div>
         <p className="text-[13px] text-muted mb-2">Recipes containing these are skipped when building new weeks.</p>
@@ -100,6 +110,23 @@ export default function Settings() {
         <Segmented value={st.lengthUnit} onChange={(v) => set({ lengthUnit: v })} options={[{ value: 'in', label: 'Inches' }, { value: 'cm', label: 'Centimeters' }]} />
       </Card>
 
+      <SectionTitle>Personal touches</SectionTitle>
+      <Card>
+        <button className="btn-soft w-full mb-4" onClick={() => setSheet('nav' as any)}>Customize the bottom bar</button>
+        <div className="label">My motivational messages</div>
+        <p className="text-[13px] text-muted mb-2">Shown on Home, one per day. Leave empty to use the built-in ones.</p>
+        {st.quotes.map((q, i) => (
+          <div key={i} className="flex gap-2 mb-2">
+            <input className="field flex-1" value={q} aria-label="Message" onChange={(e) => set({ quotes: st.quotes.map((x, j) => (j === i ? e.target.value : x)) })} />
+            <button aria-label="Remove" className="w-11 h-11 grid place-items-center text-muted" onClick={() => set({ quotes: st.quotes.filter((_, j) => j !== i) })}><Trash2 size={17} /></button>
+          </div>
+        ))}
+        <div className="flex gap-2">
+          <button className="btn-ghost btn-sm flex-1" onClick={() => set({ quotes: [...st.quotes, ''] })}><Plus size={15} />Add message</button>
+          {!st.quotes.length && <button className="btn-ghost btn-sm flex-1" onClick={() => set({ quotes: [...MOTIVATION] })}>Start from built-ins</button>}
+        </div>
+      </Card>
+
       <SectionTitle>Reminders</SectionTitle>
       <Card>
         <p className="text-[14px] text-muted mb-3">Gentle reminders appear while the app is open. iPhone only allows web apps to send background notifications through a push server, which this private app doesn’t use.</p>
@@ -116,6 +143,7 @@ export default function Settings() {
       {sheet === 'favorites' && <Favorites onClose={() => setSheet(null)} />}
       {sheet === 'reminders' && <Reminders onClose={() => setSheet(null)} />}
       {sheet === 'delete' && <DeleteAll onClose={() => setSheet(null)} />}
+      {(sheet as string) === 'nav' && <NavEditor onClose={() => setSheet(null)} />}
     </div>
   );
 }
@@ -210,6 +238,7 @@ function FoodEditor({ id, onClose }: { id?: string; onClose: () => void }) {
   const [tbsp, setTbsp] = useState<number | null>(ex?.units.tbsp ?? null);
   const [each, setEach] = useState<number | null>(ex?.units.each ?? null);
   const [eachLabel, setEachLabel] = useState(ex?.eachLabel ?? '');
+  const [tags, setTags] = useState<FoodTag[]>(ex?.tags ?? []);
 
   const save = () => {
     if (!name.trim() || !serv || cal == null) { toast('Name, serving size and calories are needed'); return; }
@@ -222,7 +251,7 @@ function FoodEditor({ id, onClose }: { id?: string; onClose: () => void }) {
     s.set((st) => {
       st.foods[nid] = {
         ...(ex ?? { grocery: { key: nid, name: name.trim(), factor: 1, unitLabel: 'servings', gramsPerUnit: serv, round: 'ceil' }, custom: true }),
-        id: nid, name: name.trim(), state: (state || undefined) as any, category, per100g, units, eachLabel: eachLabel || undefined, estimate: false
+        id: nid, name: name.trim(), state: (state || undefined) as any, category, per100g, units, eachLabel: eachLabel || undefined, tags, estimate: false
       } as Food;
     });
     toast('Food saved — recipes updated'); onClose();
@@ -253,6 +282,10 @@ function FoodEditor({ id, onClose }: { id?: string; onClose: () => void }) {
         <Field label="Grams in 1 tbsp"><NumberInput value={tbsp} onChange={setTbsp} /></Field>
         <Field label="Grams in 1 piece"><NumberInput value={each} onChange={setEach} /></Field>
         <Field label="Piece name"><input className="field" value={eachLabel} onChange={(e) => setEachLabel(e.target.value)} placeholder="bar, slice…" /></Field>
+      </div>
+      <div className="font-medium mb-2">Contains (for diet filtering)</div>
+      <div className="flex flex-wrap gap-2">
+        {FOOD_TAGS.map((t) => { const on = tags.includes(t.v); return <button key={t.v} className={`chip ${on ? 'chip-on' : ''}`} onClick={() => setTags(on ? tags.filter((x) => x !== t.v) : [...tags, t.v])}>{t.l}</button>; })}
       </div>
     </Sheet>
   );

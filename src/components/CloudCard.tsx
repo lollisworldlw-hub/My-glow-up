@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Cloud, CloudOff, LogOut, RefreshCcw } from 'lucide-react';
-import { resetPassword, signIn, signOut, signUp, syncNow, updatePassword, useSync } from '../lib/sync';
+import { joinGroup, rememberJoin, resetPassword, signIn, signOut, signUp, syncNow, updatePassword, useSync } from '../lib/sync';
+import { useStore } from '../lib/store';
 import { Card, Field, Sheet, toast } from './ui';
 
 const ago = (t: number | null) => {
@@ -9,54 +10,98 @@ const ago = (t: number | null) => {
   return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago`;
 };
 
-export function CloudCard() {
-  const { status, email, lastSynced, error, recovery } = useSync();
-  const [mode, setMode] = useState<'in' | 'up'>('up');
+export const inviteFromUrl = () => {
+  try { return new URLSearchParams(window.location.search).get('invite')?.toUpperCase() ?? ''; } catch { return ''; }
+};
+
+/** Sign in / create account (invite-only) / join the group. Used in Settings, Social and onboarding. */
+export function AccountForm({ compact, onDone }: { compact?: boolean; onDone?: () => void }) {
+  const name0 = useStore((s) => s.settings.name);
+  const { email, member } = useSync();
+  const [mode, setMode] = useState<'up' | 'in'>(inviteFromUrl() ? 'up' : 'up');
+  const [code, setCode] = useState(inviteFromUrl());
+  const [name, setName] = useState(name0 && name0 !== 'beautiful' ? name0 : '');
   const [em, setEm] = useState('');
   const [pw, setPw] = useState('');
   const [busy, setBusy] = useState(false);
-  const [newPw, setNewPw] = useState('');
+
+  useEffect(() => { if (email && member && onDone) onDone(); }, [email, member]);
+
+  if (email && member === false) {
+    return (
+      <div>
+        <p className="text-[15px] mb-3">You’re signed in as {email}. Enter an invite code from a friend to join the group.</p>
+        <Field label="Your name (friends see this)"><input className="field" value={name} onChange={(e) => setName(e.target.value)} /></Field>
+        <Field label="Invite code"><input className="field uppercase" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="GLOW-XXXXXX" /></Field>
+        <button className="btn-primary w-full" disabled={busy || !code || !name.trim()} onClick={async () => {
+          setBusy(true);
+          try { await joinGroup(code, name.trim()); toast('Welcome to the group ♡'); } catch (e: any) { toast(e?.message ?? 'That code didn’t work'); }
+          setBusy(false);
+        }}>Join</button>
+      </div>
+    );
+  }
+  if (email) return null;
 
   const go = async () => {
     if (!em.includes('@') || pw.length < 8) { toast('Use your email and a password of 8+ characters'); return; }
+    if (mode === 'up' && (!code.trim() || !name.trim())) { toast('Add your name and invite code'); return; }
     setBusy(true);
     try {
       if (mode === 'up') {
+        rememberJoin(code.trim(), name.trim());
         const r = await signUp(em.trim(), pw);
-        toast(r.needsConfirm ? 'Check your email to confirm, then sign in here' : 'Cloud backup is on ♡');
-        if (r.needsConfirm) setMode('in');
-      } else { await signIn(em.trim(), pw); toast('Signed in — syncing your data ♡'); }
+        if (r.needsConfirm) { toast('Check your email to confirm, then sign in here'); setMode('in'); }
+        else toast('Account created ♡');
+      } else { await signIn(em.trim(), pw); toast('Signed in ♡'); }
       setPw('');
     } catch (e: any) { toast(e?.message ?? 'That didn’t work — try again'); }
     setBusy(false);
   };
 
   return (
+    <div>
+      {mode === 'up' && (
+        <>
+          <Field label="Your name (friends see this)"><input className="field" value={name} onChange={(e) => setName(e.target.value)} /></Field>
+          <Field label="Invite code"><input className="field uppercase" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="GLOW-XXXXXX" /></Field>
+        </>
+      )}
+      <Field label="Email"><input className="field" type="email" autoComplete="email" inputMode="email" value={em} onChange={(e) => setEm(e.target.value)} /></Field>
+      <Field label={mode === 'up' ? 'Create a password (8+ characters)' : 'Password'}><input className="field" type="password" autoComplete={mode === 'up' ? 'new-password' : 'current-password'} value={pw} onChange={(e) => setPw(e.target.value)} /></Field>
+      <button className="btn-primary w-full" disabled={busy} onClick={go}>{busy ? 'One moment…' : mode === 'up' ? 'Create my account' : 'Sign in'}</button>
+      <div className={`flex justify-between mt-3 text-[14px] ${compact ? '' : ''}`}>
+        <button className="text-deep font-medium min-h-[40px]" onClick={() => setMode(mode === 'up' ? 'in' : 'up')}>{mode === 'up' ? 'I already have an account' : 'I have an invite code'}</button>
+        {mode === 'in' && <button className="text-muted min-h-[40px]" onClick={async () => { if (!em.includes('@')) { toast('Enter your email first'); return; } try { await resetPassword(em.trim()); toast('Password reset email sent'); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); } }}>Forgot password?</button>}
+      </div>
+    </div>
+  );
+}
+
+export function CloudCard() {
+  const { status, email, lastSynced, error, recovery, member } = useSync();
+  const [newPw, setNewPw] = useState('');
+  return (
     <Card>
       <div className="flex items-start gap-3 mb-3">
-        {email ? <Cloud className="text-deep shrink-0" size={22} /> : <CloudOff className="text-muted shrink-0" size={22} />}
+        {email && member ? <Cloud className="text-deep shrink-0" size={22} /> : <CloudOff className="text-muted shrink-0" size={22} />}
         <div>
-          <div className="font-semibold">{email ? 'Cloud backup is on' : 'Cloud backup & sync'}</div>
-          <p className="text-[14px] text-muted">{email
+          <div className="font-semibold">{email && member ? 'Your account & cloud backup' : 'Account & cloud backup'}</div>
+          <p className="text-[14px] text-muted">{email && member
             ? `Signed in as ${email}. Last synced ${ago(lastSynced)}${status === 'syncing' ? ' · syncing…' : status === 'offline' ? ' · waiting for internet' : status === 'error' ? ' · will retry' : ''}.`
-            : 'Saves everything except photos to your private cloud account, so a lost or new phone never wipes your progress. Sign in on another device to sync.'}</p>
+            : 'Your account backs up everything except photos to a private cloud space only you can open, and unlocks the Social tab. Sign-up needs an invite code.'}</p>
           {status === 'error' && error && <p className="text-[13px] text-deep mt-1">{error}</p>}
         </div>
       </div>
-      {email ? (
+      {email && member ? (
         <div className="grid grid-cols-2 gap-2">
           <button className="btn-soft btn-sm" onClick={async () => { await syncNow(); toast('Synced'); }}><RefreshCcw size={16} />Sync now</button>
           <button className="btn-ghost btn-sm" onClick={async () => { await signOut(); toast('Signed out — data stays on this phone'); }}><LogOut size={16} />Sign out</button>
         </div>
       ) : (
         <>
-          <Field label="Email"><input className="field" type="email" autoComplete="email" inputMode="email" value={em} onChange={(e) => setEm(e.target.value)} /></Field>
-          <Field label={mode === 'up' ? 'Create a password (8+ characters)' : 'Password'}><input className="field" type="password" autoComplete={mode === 'up' ? 'new-password' : 'current-password'} value={pw} onChange={(e) => setPw(e.target.value)} /></Field>
-          <button className="btn-primary w-full" disabled={busy} onClick={go}>{busy ? 'One moment…' : mode === 'up' ? 'Create account & back up' : 'Sign in'}</button>
-          <div className="flex justify-between mt-3 text-[14px]">
-            <button className="text-deep font-medium" onClick={() => setMode(mode === 'up' ? 'in' : 'up')}>{mode === 'up' ? 'I already have an account' : 'Create an account instead'}</button>
-            {mode === 'in' && <button className="text-muted" onClick={async () => { if (!em.includes('@')) { toast('Enter your email first'); return; } try { await resetPassword(em.trim()); toast('Password reset email sent'); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); } }}>Forgot?</button>}
-          </div>
+          <AccountForm />
+          {email && <button className="btn-ghost btn-sm w-full mt-3" onClick={() => signOut()}><LogOut size={16} />Sign out</button>}
         </>
       )}
       {recovery && (

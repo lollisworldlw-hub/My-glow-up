@@ -44,7 +44,27 @@ export interface Food {
     pantry?: boolean;
   };
   custom?: boolean;
+  tags?: FoodTag[];
 }
+
+export type FoodTag = 'meat' | 'poultry' | 'fish' | 'shellfish' | 'dairy' | 'egg' | 'gluten' | 'nuts' | 'soy';
+export const FOOD_TAGS: { v: FoodTag; l: string }[] = [
+  { v: 'meat', l: 'Red meat / pork' }, { v: 'poultry', l: 'Poultry' }, { v: 'fish', l: 'Fish' }, { v: 'shellfish', l: 'Shellfish' },
+  { v: 'dairy', l: 'Dairy' }, { v: 'egg', l: 'Egg' }, { v: 'gluten', l: 'Gluten' }, { v: 'nuts', l: 'Nuts' }, { v: 'soy', l: 'Soy' }
+];
+export type Diet = 'vegetarian' | 'pescatarian' | 'vegan' | 'no-red-meat' | 'gluten-free' | 'dairy-free' | 'egg-free' | 'nut-free' | 'shellfish-free' | 'soy-free';
+export const DIETS: { v: Diet; l: string; avoid: FoodTag[] }[] = [
+  { v: 'vegetarian', l: 'Vegetarian', avoid: ['meat', 'poultry', 'fish', 'shellfish'] },
+  { v: 'pescatarian', l: 'Pescatarian', avoid: ['meat', 'poultry'] },
+  { v: 'vegan', l: 'Vegan', avoid: ['meat', 'poultry', 'fish', 'shellfish', 'dairy', 'egg'] },
+  { v: 'no-red-meat', l: 'No red meat / pork', avoid: ['meat'] },
+  { v: 'gluten-free', l: 'Gluten-free', avoid: ['gluten'] },
+  { v: 'dairy-free', l: 'Dairy-free', avoid: ['dairy'] },
+  { v: 'egg-free', l: 'Egg-free', avoid: ['egg'] },
+  { v: 'nut-free', l: 'Nut-free', avoid: ['nuts'] },
+  { v: 'shellfish-free', l: 'Shellfish-free', avoid: ['shellfish'] },
+  { v: 'soy-free', l: 'Soy-free', avoid: ['soy'] }
+];
 
 export interface Ingredient { foodId: string; amount: number; unit: Unit }
 
@@ -180,6 +200,29 @@ export interface Settings {
   moveNudge: { on: boolean; start: string; end: string };
   stepsGoal: number;
   cycleOnHome: boolean;
+  onboarded: boolean;
+  sex: 'female' | 'male' | 'other';
+  activity: 'sedentary' | 'light' | 'moderate';
+  diets: Diet[];
+  navTabs: string[];
+  quotes: string[];
+  prepDays: { sunday: number; wednesday: number };
+  inviteCode?: string;
+}
+
+export interface MoodEntry { mood: number; tags: string[]; note: string; gratitude: string[] }
+export interface MindGoal { id: string; name: string; perWeek: number; icon: string }
+export type CleanFreq = 'daily' | 'weekly' | 'every' | 'monthly';
+export interface CleanTask {
+  id: string;
+  name: string;
+  room: string;
+  freq: CleanFreq;
+  days?: number[]; // weekly: JS weekdays
+  every?: number; // every N days
+  monthDay?: number;
+  minutes: number;
+  lastDone?: string;
 }
 
 export interface Checkin {

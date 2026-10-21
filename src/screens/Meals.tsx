@@ -11,6 +11,7 @@ import { LogFoodSheet, MealCard, SwapSheet } from '../components/MealParts';
 import { RecipeEditor } from '../components/RecipeEditor';
 import { FoodArt } from '../components/Art';
 import { useUI } from '../lib/ui';
+import { conflicts, dietBadges } from '../lib/diet';
 
 export default function Meals() {
   const sub = (useUI((u) => u.sub.meals) ?? 'week') as 'week' | 'desserts' | 'recipes';
@@ -126,6 +127,16 @@ function WeekPlan() {
             });
             toast(`Copied ${fmtDow(day)} to the whole week`); setTools(false);
           }}><Copy size={16} />Copy {fmtDow(day)} to every day this week</button>
+          <button className="btn-ghost w-full mt-2" onClick={() => {
+            s.set((st) => {
+              for (const d of weekDays(monday)) {
+                const p = st.plans[d]; if (!p) continue;
+                const wd = new Date(d + 'T12:00').getDay();
+                st.rotation[wd] = Object.fromEntries(SLOTS.filter((sl) => p[sl]?.[0]?.recipeId).map((sl) => [sl, p[sl][0].recipeId!]));
+              }
+            });
+            toast('Saved as your rotation for future weeks'); setTools(false);
+          }}><Sparkles size={16} />Use this week as my rotation</button>
         </Sheet>
       )}
     </>
@@ -136,7 +147,7 @@ function Desserts() {
   const s = useStore();
   const today = useToday();
   const [edit, setEdit] = useState<string | null | 'new'>(null);
-  const desserts = Object.values(s.recipes).filter((r) => r.slot === 'dessert')
+  const desserts = Object.values(s.recipes).filter((r) => r.slot === 'dessert' && conflicts(r, s.foods, s.settings.diets).length === 0)
     .sort((a, b) => Number(s.favorites.includes(b.id)) - Number(s.favorites.includes(a.id)));
   const tonight = s.plans[today]?.dessert ?? [];
 
@@ -212,7 +223,8 @@ function Recipes() {
                   <div key={r.id} className="card p-3 flex items-center gap-3">
                     <button className="flex-1 min-w-0 flex items-center gap-3 text-left" onClick={() => setEdit(r.id)}>
                       <FoodArt art={r.art} size={48} />
-                      <div className="min-w-0"><div className="font-medium">{r.name}</div><div className="text-[14px] text-muted">{r.servingLabel} · ≈ {m.cal} cal · {m.protein} g protein</div></div>
+                      <div className="min-w-0"><div className="font-medium">{r.name}</div><div className="text-[14px] text-muted">{r.servingLabel} · ≈ {m.cal} cal · {m.protein} g protein</div>
+                        <div className="flex flex-wrap gap-1 mt-1">{dietBadges(r, s.foods).map((b) => <span key={b} className="text-[11px] rounded-full bg-petal text-deep px-2 py-0.5">{b}</span>)}{conflicts(r, s.foods, s.settings.diets).length > 0 && <span className="text-[11px] rounded-full border border-blush text-muted px-2 py-0.5">Doesn’t fit my diet</span>}</div></div>
                     </button>
                     <button aria-label={fav ? 'Unfavorite' : 'Favorite'} className={`w-11 h-11 rounded-full grid place-items-center ${fav ? 'text-rose' : 'text-muted'}`}
                       onClick={() => s.set((st) => { st.favorites = fav ? st.favorites.filter((x) => x !== r.id) : [...st.favorites, r.id]; })}>

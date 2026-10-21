@@ -32,7 +32,8 @@ export default function Home() {
   const sched = s.schedule[weekday(today)];
   const water = s.water[today] ?? 0;
   const extras = s.logs.filter((l) => l.date === today && !l.planItemId);
-  const msg = MOTIVATION[(daysBetween('2026-01-01', today) % MOTIVATION.length + MOTIVATION.length) % MOTIVATION.length];
+  const quotes = st.quotes.filter((q) => q.trim()).length ? st.quotes.filter((q) => q.trim()) : MOTIVATION;
+  const msg = quotes[(daysBetween('2026-01-01', today) % quotes.length + quotes.length) % quotes.length];
   const proteinLeft = Math.max(0, st.proteinMin - eaten.protein);
 
   const toggleHabit = (id: string) => {
@@ -44,7 +45,7 @@ export default function Home() {
   return (
     <div className="space-y-4">
       <div className="rise pt-1">
-        <h1 className="h-serif text-[34px] leading-[1.1]">{greeting()}, {st.name || 'beautiful'} <span className="text-rose">♡</span></h1>
+        <h1 className="h-serif text-[34px] leading-[1.1]">{greeting()}{st.name ? `, ${st.name}` : ''} <span className="text-rose">♡</span></h1>
         <div className="text-muted mt-1">{fmtLong(today)}</div>
         <p className="mt-3 font-serif italic text-[20px] text-deep">“{msg}”</p>
       </div>

@@ -14,9 +14,9 @@ interface Meta { version: number; lastSynced: number | null; dirtyAt: number | n
 let meta: Meta = { version: 0, lastSynced: null, dirtyAt: null, userId: null };
 const saveMeta = () => idbSet(META_KEY, meta);
 
-export type SyncStatus = 'off' | 'idle' | 'syncing' | 'error' | 'offline';
-export const useSync = create<{ status: SyncStatus; email: string | null; lastSynced: number | null; error: string | null; recovery: boolean }>(() => ({
-  status: 'off', email: null, lastSynced: null, error: null, recovery: false
+export type SyncStatus = 'off' | 'idle' | 'syncing' | 'error' | 'offline' | 'needs-invite';
+export const useSync = create<{ status: SyncStatus; email: string | null; userId: string | null; member: boolean | null; lastSynced: number | null; error: string | null; recovery: boolean }>(() => ({
+  status: 'off', email: null, userId: null, member: null, lastSynced: null, error: null, recovery: false
 }));
 
 const LOCAL_ONLY: (keyof State)[] = ['session', 'photos', 'reminderSeen'];
@@ -50,6 +50,7 @@ export async function syncNow(): Promise<void> {
   busy = true;
   useSync.setState({ status: 'syncing', error: null });
   try {
+    if (!(await ensureMember(uid))) { useSync.setState({ status: 'needs-invite' }); return; }
     if (meta.userId && meta.userId !== uid) meta = { version: 0, lastSynced: null, dirtyAt: Date.now(), userId: uid };
     meta.userId = uid;
     const { data: row, error } = await supabase.from('glowup_state').select('version, data, updated_at').eq('user_id', uid).maybeSingle();
@@ -113,7 +114,8 @@ export async function startSync() {
   });
 
   const onSession = (sess: AuthSession | null) => {
-    useSync.setState({ email: sess?.user.email ?? null, status: sess ? useSync.getState().status === 'off' ? 'idle' : useSync.getState().status : 'off' });
+    const prevUid = useSync.getState().userId;
+    useSync.setState({ email: sess?.user.email ?? null, userId: sess?.user.id ?? null, member: sess && sess.user.id === prevUid ? useSync.getState().member : null, status: sess ? useSync.getState().status === 'off' ? 'idle' : useSync.getState().status : 'off' });
     if (sess) schedule(300);
   };
   const { data } = await supabase.auth.getSession();
@@ -142,7 +144,7 @@ export async function signOut() {
   await supabase.auth.signOut();
   meta = { version: 0, lastSynced: null, dirtyAt: meta.dirtyAt, userId: null };
   await saveMeta();
-  useSync.setState({ status: 'off', email: null, lastSynced: null });
+  useSync.setState({ status: 'off', email: null, userId: null, member: null, lastSynced: null });
 }
 export async function resetPassword(email: string) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
@@ -153,4 +155,30 @@ export async function updatePassword(password: string) {
   const { error } = await supabase.auth.updateUser({ password });
   if (error) throw error;
   useSync.setState({ recovery: false });
+}
+
+const PENDING = 'glowup-pending-join';
+export function rememberJoin(code: string, name: string) { try { localStorage.setItem(PENDING, JSON.stringify({ code, name })); } catch { /* */ } }
+
+/** Is the signed-in person in the group? Redeems a saved invite code if needed. */
+export async function ensureMember(uid: string): Promise<boolean> {
+  if (useSync.getState().member) return true;
+  const { data } = await supabase.from('glowup_members').select('user_id').eq('user_id', uid).maybeSingle();
+  if (data) { useSync.setState({ member: true }); return true; }
+  let pending: { code: string; name: string } | null = null;
+  try { pending = JSON.parse(localStorage.getItem(PENDING) ?? 'null'); } catch { /* */ }
+  if (pending?.code) {
+    const { error } = await supabase.rpc('glowup_join', { p_code: pending.code, p_name: pending.name });
+    if (!error) { localStorage.removeItem(PENDING); useSync.setState({ member: true }); return true; }
+  }
+  useSync.setState({ member: false });
+  return false;
+}
+
+export async function joinGroup(code: string, name: string) {
+  const { error } = await supabase.rpc('glowup_join', { p_code: code, p_name: name });
+  if (error) throw error;
+  useSync.setState({ member: true });
+  try { localStorage.removeItem(PENDING); } catch { /* */ }
+  syncNow();
 }

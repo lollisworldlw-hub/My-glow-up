@@ -6,6 +6,8 @@ import type { Session } from '../lib/workouts';
 import { uid } from '../lib/date';
 import { ExerciseArt } from './Art';
 import { Bar, Ring, Sheet, celebrate, toast } from './ui';
+import { useSync } from '../lib/sync';
+import { send } from '../lib/social';
 
 let ctx: AudioContext | null = null;
 export function unlockAudio() {
@@ -50,6 +52,7 @@ export function WorkoutPlayer() {
   const [diff, setDiff] = useState<number | undefined>();
   const wake = useRef<any>(null);
   const settings = s.settings;
+  const member = useSync((x) => x.member);
 
   const save = (next: Session | null) => s.set((st) => { st.session = next as any; });
 
@@ -118,6 +121,7 @@ export function WorkoutPlayer() {
               </button>))}</div>
           </div>
           <button className="btn-primary w-full mt-6" onClick={() => finish(true)}>Save workout</button>
+          {member && <button className="btn-soft w-full mt-2" onClick={() => { finish(true); send(`Finished my ${name.toLowerCase()}! 💪`, null, 'achievement', { icon: session.workoutId === 'walk' ? '🚶‍♀️' : session.workoutId.startsWith('bike') ? '🚴‍♀️' : '💪' }).then(() => toast('Shared with the group ♡')).catch(() => toast('Saved — couldn’t share right now')); }}>Save & share with friends</button>}
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto px-5 flex flex-col items-center pt-4">

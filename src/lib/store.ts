@@ -3,14 +3,15 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { get as idbGet, set as idbSet, del as idbDel } from 'idb-keyval';
 import type {
-  Checkin, CycleDay, DayPlan, Food, Period, GroceryItem, Habit, LogEntry, MeasureEntry, PhotoMeta, PlanItem, PrepTask, Recipe,
+  Checkin, CleanTask, CycleDay, DayPlan, Food, MindGoal, MoodEntry, Period, GroceryItem, Habit, LogEntry, MeasureEntry, PhotoMeta, PlanItem, PrepTask, Recipe,
   ScheduleDay, Settings, Slot, WeightEntry, WorkoutLog, Macros
 } from './types';
 import { SLOTS } from './types';
 import {
   SEED_FOODS, SEED_RECIPES, SEED_SCHEDULE, SEED_ROTATION, SEED_HABITS, SEED_GROCERIES,
-  PREP_SUNDAY, PREP_WEDNESDAY, defaultSettings
+  PREP_SUNDAY, PREP_WEDNESDAY, defaultSettings, SEED_MIND_GOALS, SEED_MOOD_TAGS, SEED_CLEAN, SEED_ROOMS
 } from './seed';
+import { fitsDiet } from './diet';
 import { addDays, todayKey, uid, weekDays, weekday } from './date';
 import { itemMacros, itemName, round } from './nutrition';
 import { buildGroceries, mergeGroceries } from './grocery';
@@ -46,6 +47,14 @@ export interface State {
   periods: Period[];
   cycleDays: Record<string, CycleDay>;
   snoozes: Record<string, string>;
+  moods: Record<string, MoodEntry>;
+  moodTags: string[];
+  mindGoals: MindGoal[];
+  mindChecks: Record<string, string[]>;
+  cleanTasks: CleanTask[];
+  rooms: string[];
+  cleanDone: Record<string, string[]>;
+  shared: string[];
 }
 
 const byId = <T extends { id: string }>(a: T[]) => Object.fromEntries(a.map((x) => [x.id, x])) as Record<string, T>;
@@ -67,7 +76,7 @@ export const initialState = (): State => ({
   workouts: [],
   schedule: SEED_SCHEDULE,
   rotation: SEED_ROTATION,
-  groceries: SEED_GROCERIES,
+  groceries: [],
   owned: [],
   prepTasks: { sunday: PREP_SUNDAY, wednesday: PREP_WEDNESDAY },
   prepChecks: {},
@@ -79,7 +88,15 @@ export const initialState = (): State => ({
   steps: {},
   periods: [],
   cycleDays: {},
-  snoozes: {}
+  snoozes: {},
+  moods: {},
+  moodTags: SEED_MOOD_TAGS,
+  mindGoals: SEED_MIND_GOALS,
+  mindChecks: {},
+  cleanTasks: SEED_CLEAN,
+  rooms: SEED_ROOMS,
+  cleanDone: {},
+  shared: []
 });
 
 export const emptyDay = (): DayPlan => ({ breakfast: [], lunch: [], dinner: [], snack: [], dessert: [] });
@@ -94,9 +111,9 @@ function disliked(s: State, recipeId: string) {
 }
 
 function pickFor(s: State, slot: Slot, preferred: string | undefined, n: number, useFavorites: boolean) {
-  const ok = (id: string) => s.recipes[id] && s.recipes[id].slot === slot && !disliked(s, id);
+  const ok = (id: string) => s.recipes[id] && s.recipes[id].slot === slot && !disliked(s, id) && fitsDiet(s.recipes[id], s.foods, s.settings.diets ?? []);
   if (!useFavorites && preferred && ok(preferred)) return preferred;
-  const pool = Object.values(s.recipes).filter((r) => r.slot === slot && !disliked(s, r.id)).map((r) => r.id);
+  const pool = Object.values(s.recipes).filter((r) => ok(r.id)).map((r) => r.id);
   const fav = s.favorites.filter((id) => pool.includes(id));
   const list = useFavorites && fav.length ? fav : pool;
   return list.length ? list[n % list.length] : undefined;
@@ -204,12 +221,16 @@ export const useStore = create<Store>()(
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<State>;
         const init = initialState();
+        const existing = !!p.settings;
+        const foods = { ...init.foods, ...(p.foods ?? {}) };
+        for (const id of Object.keys(foods)) if (!foods[id].tags && init.foods[id]?.tags) foods[id] = { ...foods[id], tags: init.foods[id].tags };
         return {
           ...current,
           ...p,
-          settings: { ...init.settings, ...(p.settings ?? {}) },
+          // people who used the app before onboarding existed are already set up
+          settings: { ...init.settings, ...(existing ? { onboarded: true, startWeight: 178, goalWeight: 150, name: 'beautiful' } : {}), ...(p.settings ?? {}) },
           // keep newly added seed foods/recipes available after updates
-          foods: { ...init.foods, ...(p.foods ?? {}) },
+          foods,
           recipes: { ...init.recipes, ...(p.recipes ?? {}) }
         } as Store;
       }

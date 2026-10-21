@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type Tab = 'home' | 'meals' | 'workouts' | 'progress' | 'groceries' | 'settings';
+export type Tab = 'home' | 'meals' | 'workouts' | 'progress' | 'groceries' | 'settings' | 'social' | 'mind' | 'clean' | 'more';
 export const useUI = create<{
   tab: Tab;
   sub: Record<string, string>;

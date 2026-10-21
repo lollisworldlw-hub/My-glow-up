@@ -1,5 +1,5 @@
 import type {
-  Food, Recipe, ScheduleDay, Habit, GroceryItem, PrepTask, Settings, GroceryCategory
+  Food, Recipe, ScheduleDay, Habit, GroceryItem, PrepTask, Settings, GroceryCategory, FoodTag, CleanTask, MindGoal
 } from './types';
 
 // Generic nutrition estimates per 100 g (USDA-style averages). Brands vary —
@@ -107,8 +107,55 @@ export const SEED_FOODS: Food[] = [
     grocery: { key: 'cookies', name: 'Chocolate chip cookies', factor: 1, unitLabel: 'package', gramsPerUnit: 368, round: 'ceil' } }),
   f({ id: 'sweetener', name: 'Zero-calorie sweetener', state: 'packaged', category: 'Desserts', per100g: m(0, 0, 0, 0),
     units: { each: 1, tsp: 0.5 }, eachLabel: 'packet', estimate: false,
-    grocery: { key: 'sweetener', name: 'Zero-calorie sweetener', factor: 1, unitLabel: 'box', gramsPerUnit: 100, round: 'ceil', pantry: true } })
+    grocery: { key: 'sweetener', name: 'Zero-calorie sweetener', factor: 1, unitLabel: 'box', gramsPerUnit: 100, round: 'ceil', pantry: true } }),
+  f({ id: 'tofu', name: 'Extra-firm tofu', state: 'raw', category: 'Protein', per100g: m(144, 17.3, 2.8, 8.7),
+    units: {}, tags: ['soy'],
+    grocery: { key: 'tofu', name: 'Extra-firm tofu (14 oz block)', factor: 1, unitLabel: 'block', gramsPerUnit: 397, round: 'ceil' } }),
+  f({ id: 'lentils', name: 'Lentils', state: 'cooked', category: 'Pantry', per100g: m(116, 9, 20, 0.4),
+    units: { cup: 198 }, note: '1 cup dry makes about 2½ cups cooked.',
+    grocery: { key: 'lentils', name: 'Dry lentils', factor: 0.4, unitLabel: 'cups dry', gramsPerUnit: 192, round: 'half', pantry: true } }),
+  f({ id: 'chickpeas', name: 'Chickpeas (canned, drained)', state: 'prepared', category: 'Pantry', per100g: m(139, 7, 22, 2.5),
+    units: { cup: 164 },
+    grocery: { key: 'chickpeas', name: 'Chickpeas (15 oz can)', factor: 1, unitLabel: 'can', gramsPerUnit: 250, round: 'ceil' } }),
+  f({ id: 'soy-milk', name: 'Unsweetened soy milk', state: 'packaged', category: 'Dairy', per100g: m(33, 3.3, 1.8, 1.6),
+    units: { cup: 243, tbsp: 15 }, tags: ['soy'],
+    grocery: { key: 'soy-milk', name: 'Unsweetened soy milk (half gallon)', factor: 1, unitLabel: 'carton', gramsPerUnit: 1890, round: 'ceil' } }),
+  f({ id: 'soy-yogurt', name: 'Plain soy yogurt', state: 'packaged', category: 'Dairy', per100g: m(60, 4, 4, 3),
+    units: { cup: 245, tbsp: 15 }, tags: ['soy'],
+    grocery: { key: 'soy-yogurt', name: 'Plain soy yogurt (24 oz)', factor: 1, unitLabel: 'tub', gramsPerUnit: 680, round: 'ceil' } }),
+  f({ id: 'tuna', name: 'Tuna in water (drained)', state: 'packaged', category: 'Protein', per100g: m(116, 25.5, 0, 0.8),
+    units: { each: 120 }, eachLabel: 'can', tags: ['fish'],
+    grocery: { key: 'tuna', name: 'Canned tuna in water', factor: 1, unitLabel: 'cans', gramsPerUnit: 120, round: 'ceil' } }),
+  f({ id: 'edamame', name: 'Shelled edamame (frozen)', state: 'cooked', category: 'Vegetables', per100g: m(121, 12, 9, 5),
+    units: { cup: 155 }, tags: ['soy'],
+    grocery: { key: 'edamame', name: 'Frozen shelled edamame (12 oz)', factor: 1, unitLabel: 'bag', gramsPerUnit: 340, round: 'ceil' } }),
+  f({ id: 'chickpea-pasta', name: 'Chickpea pasta', state: 'dry', category: 'Grains', per100g: m(339, 19.6, 57, 6),
+    units: { cup: 85 }, note: 'Naturally gluten-free and higher in protein.',
+    grocery: { key: 'chickpea-pasta', name: 'Chickpea pasta (8 oz box)', factor: 1, unitLabel: 'box', gramsPerUnit: 227, round: 'ceil', pantry: true } }),
+  f({ id: 'banana', name: 'Banana', state: 'raw', category: 'Fruits', per100g: m(89, 1.1, 22.8, 0.3),
+    units: { each: 118 }, eachLabel: 'banana',
+    grocery: { key: 'banana', name: 'Bananas', factor: 1, unitLabel: 'bananas', gramsPerUnit: 118, round: 'ceil' } }),
+  f({ id: 'teriyaki', name: 'Teriyaki sauce', state: 'packaged', category: 'Sauces', per100g: m(89, 5.9, 15.6, 0),
+    units: { tbsp: 18 }, tags: ['gluten', 'soy'], note: 'Use tamari-based sauce if you avoid gluten.',
+    grocery: { key: 'teriyaki', name: 'Teriyaki sauce', factor: 1, unitLabel: 'bottle', gramsPerUnit: 300, round: 'ceil', pantry: true } }),
+  f({ id: 'broccoli', name: 'Broccoli (frozen)', state: 'cooked', category: 'Vegetables', per100g: m(35, 2.4, 7, 0.4),
+    units: { cup: 156 },
+    grocery: { key: 'broccoli', name: 'Frozen broccoli (12 oz bag)', factor: 1, unitLabel: 'bag', gramsPerUnit: 340, round: 'ceil' } })
 ];
+
+const TAGS: Record<string, FoodTag[]> = {
+  egg: ['egg'], 'turkey-sausage': ['poultry'], 'ww-bread': ['gluten'], 'greek-yogurt': ['dairy'], 'milk-2': ['dairy'],
+  'chicken-cooked': ['poultry'], 'turkey-93-cooked': ['poultry'], 'salmon-raw': ['fish'], 'shrimp-cooked': ['shellfish'],
+  penne: ['gluten'], macaroni: ['gluten'], 'beef-93-cooked': ['meat'], mozzarella: ['dairy'], 'protein-yogurt': ['dairy'],
+  'choc-chips': ['dairy'], 'froyo-bar': ['dairy'], cookies: ['gluten', 'dairy', 'egg']
+};
+for (const fd of SEED_FOODS) if (!fd.tags) fd.tags = TAGS[fd.id] ?? [];
+const NOTES: Record<string, string> = {
+  oats: 'Choose certified gluten-free oats if you avoid gluten.',
+  'dark-chocolate': 'Many dark chocolates are dairy-free — check the label for milk.',
+  'taco-seasoning': 'Some blends contain wheat — check the label if you avoid gluten.'
+};
+for (const fd of SEED_FOODS) if (NOTES[fd.id] && !fd.note) fd.note = NOTES[fd.id];
 
 const r = (x: Recipe) => x;
 export const SEED_RECIPES: Recipe[] = [
@@ -197,7 +244,46 @@ export const SEED_RECIPES: Recipe[] = [
     instructions: ['Unwrap and enjoy. Choose a bar labeled about 150 calories.'] }),
   r({ id: 'x-cookies', name: 'Chocolate Chip Cookies', slot: 'dessert', servingLabel: '30 g', art: 'cookies',
     ingredients: [{ foodId: 'cookies', amount: 30, unit: 'g' }],
-    instructions: ['Weigh out 30 g (often 2–3 small cookies). Pair with a glass of milk if you like.'] })
+    instructions: ['Weigh out 30 g (often 2–3 small cookies). Pair with a glass of milk if you like.'] }),
+  r({ id: 'b-tofu', name: 'Tofu Scramble Breakfast Bowl', slot: 'breakfast', servingLabel: '1 bowl', art: 'eggs',
+    ingredients: [{ foodId: 'tofu', amount: 150, unit: 'g' }, { foodId: 'potato-raw', amount: 100, unit: 'g' }, { foodId: 'salsa', amount: 2, unit: 'tbsp' }, { foodId: 'olive-oil', amount: 1, unit: 'tsp' }],
+    instructions: ['Dice and microwave or roast the potato until tender.', 'Crumble tofu into a hot pan with the oil; season with salt, pepper, garlic, and a pinch of turmeric.', 'Serve with the potatoes and salsa.'] }),
+  r({ id: 'b-vegan-oats', name: 'Vegan Overnight Oats', slot: 'breakfast', servingLabel: '1 jar', art: 'oats',
+    ingredients: [{ foodId: 'oats', amount: 0.5, unit: 'cup' }, { foodId: 'soy-milk', amount: 0.75, unit: 'cup' }, { foodId: 'soy-yogurt', amount: 0.5, unit: 'cup' }, { foodId: 'strawberries', amount: 0.5, unit: 'cup' }],
+    instructions: ['Mix oats, soy milk, and soy yogurt in a jar.', 'Refrigerate overnight.', 'Top with strawberries.'] }),
+  r({ id: 'b-parfait', name: 'Greek Yogurt Berry Parfait', slot: 'breakfast', servingLabel: '1 cup', art: 'yogurt',
+    ingredients: [{ foodId: 'greek-yogurt', amount: 1, unit: 'cup' }, { foodId: 'blueberries', amount: 0.5, unit: 'cup' }, { foodId: 'oats', amount: 2, unit: 'tbsp' }],
+    instructions: ['Layer yogurt and blueberries.', 'Sprinkle oats on top for crunch.'] }),
+  r({ id: 'l-chickpea', name: 'Chickpea Avocado Rice Bowl', slot: 'lunch', servingLabel: '1 bowl', art: 'bowl',
+    ingredients: [{ foodId: 'chickpeas', amount: 0.75, unit: 'cup' }, { foodId: 'edamame', amount: 0.5, unit: 'cup' }, { foodId: 'rice-cooked', amount: 0.5, unit: 'cup' }, { foodId: 'avocado', amount: 50, unit: 'g' }, { foodId: 'salsa', amount: 2, unit: 'tbsp' }],
+    instructions: ['Warm chickpeas and edamame.', 'Portion with rice into containers.', 'Add avocado and salsa when serving.'] }),
+  r({ id: 'l-lentil', name: 'Lentil Taco Bowl', slot: 'lunch', servingLabel: '1 bowl', art: 'taco',
+    ingredients: [{ foodId: 'lentils', amount: 1, unit: 'cup' }, { foodId: 'rice-cooked', amount: 0.33, unit: 'cup' }, { foodId: 'avocado', amount: 30, unit: 'g' }, { foodId: 'salsa', amount: 2, unit: 'tbsp' }, { foodId: 'taco-seasoning', amount: 1, unit: 'tsp' }],
+    instructions: ['Simmer cooked lentils with taco seasoning and a splash of water.', 'Portion with rice.', 'Top with avocado and salsa when serving.'] }),
+  r({ id: 'l-tuna', name: 'Tuna Rice Bowl', slot: 'lunch', servingLabel: '1 bowl', art: 'bowl',
+    ingredients: [{ foodId: 'tuna', amount: 1, unit: 'each' }, { foodId: 'rice-cooked', amount: 0.5, unit: 'cup' }, { foodId: 'avocado', amount: 50, unit: 'g' }, { foodId: 'corn', amount: 0.25, unit: 'cup' }, { foodId: 'salsa', amount: 2, unit: 'tbsp' }],
+    instructions: ['Drain the tuna.', 'Layer over rice with corn.', 'Add avocado and salsa when serving.'] }),
+  r({ id: 'l-eggrice', name: 'Veggie Egg Fried Rice', slot: 'lunch', servingLabel: '1 bowl', art: 'skillet',
+    ingredients: [{ foodId: 'egg', amount: 3, unit: 'each' }, { foodId: 'rice-cooked', amount: 0.75, unit: 'cup' }, { foodId: 'broccoli', amount: 1, unit: 'cup' }, { foodId: 'olive-oil', amount: 1, unit: 'tsp' }],
+    instructions: ['Stir-fry cold cooked rice and broccoli in the oil.', 'Push aside, scramble the eggs, then mix everything together. Season with garlic and salt.'] }),
+  r({ id: 'd-tofu', name: 'Teriyaki Tofu & Rice', slot: 'dinner', servingLabel: '1 plate', art: 'bowl',
+    ingredients: [{ foodId: 'tofu', amount: 200, unit: 'g' }, { foodId: 'rice-cooked', amount: 0.75, unit: 'cup' }, { foodId: 'broccoli', amount: 1, unit: 'cup' }, { foodId: 'teriyaki', amount: 1, unit: 'tbsp' }],
+    instructions: ['Press and cube the tofu. Bake at 425°F for 25 min or pan-fry until golden.', 'Toss with teriyaki sauce.', 'Serve with rice and steamed broccoli.'] }),
+  r({ id: 'd-chickpea-pasta', name: 'Chickpea Pasta Marinara', slot: 'dinner', servingLabel: '1 bowl', art: 'pasta',
+    ingredients: [{ foodId: 'chickpea-pasta', amount: 2, unit: 'oz' }, { foodId: 'marinara', amount: 0.5, unit: 'cup' }, { foodId: 'edamame', amount: 0.5, unit: 'cup' }, { foodId: 'olive-oil', amount: 1, unit: 'tsp' }],
+    instructions: ['Boil the pasta per the package.', 'Warm marinara with edamame and a drizzle of oil.', 'Toss together.'] }),
+  r({ id: 's-edamame', name: 'Salted Edamame', slot: 'snack', servingLabel: '1 cup', art: 'bowl',
+    ingredients: [{ foodId: 'edamame', amount: 1, unit: 'cup' }],
+    instructions: ['Microwave frozen edamame 2–3 min. Sprinkle with salt.'] }),
+  r({ id: 's-soyyogurt', name: 'Soy Yogurt & Blueberries', slot: 'snack', servingLabel: '1 cup', art: 'yogurt',
+    ingredients: [{ foodId: 'soy-yogurt', amount: 1, unit: 'cup' }, { foodId: 'blueberries', amount: 0.5, unit: 'cup' }],
+    instructions: ['Top yogurt with berries.'] }),
+  r({ id: 'x-nicecream', name: 'Chocolate Banana Nice Cream', slot: 'dessert', servingLabel: '1 bowl', art: 'pudding',
+    ingredients: [{ foodId: 'banana', amount: 1, unit: 'each' }, { foodId: 'cocoa', amount: 1, unit: 'tbsp' }, { foodId: 'soy-milk', amount: 2, unit: 'tbsp' }],
+    instructions: ['Slice and freeze a ripe banana.', 'Blend with cocoa and a splash of soy milk until creamy like soft-serve.'] }),
+  r({ id: 'x-soypudding', name: 'Chocolate Soy Yogurt Pudding', slot: 'dessert', servingLabel: '1 bowl', art: 'pudding',
+    ingredients: [{ foodId: 'soy-yogurt', amount: 0.75, unit: 'cup' }, { foodId: 'cocoa', amount: 1, unit: 'tbsp' }, { foodId: 'sweetener', amount: 1, unit: 'each' }, { foodId: 'dark-chocolate', amount: 10, unit: 'g' }],
+    instructions: ['Whisk yogurt, cocoa, and sweetener.', 'Top with chopped dark chocolate (check it’s dairy-free if needed).'] })
 ];
 
 // Monday = 1 ... Sunday = 0 (JS getDay)
@@ -329,16 +415,16 @@ export const MOTIVATION = [
 ];
 
 export const defaultSettings = (today: string): Settings => ({
-  name: 'beautiful',
-  startWeight: 178,
-  goalWeight: 150,
-  heightIn: 67,
-  age: 33,
-  calTarget: 1600,
-  calMin: 1550,
-  calMax: 1700,
-  proteinMin: 115,
-  proteinMax: 135,
+  name: '',
+  startWeight: 0,
+  goalWeight: 0,
+  heightIn: 65,
+  age: 30,
+  calTarget: 1800,
+  calMin: 1700,
+  calMax: 1900,
+  proteinMin: 100,
+  proteinMax: 130,
   waterTarget: 8,
   workoutMinutes: 20,
   walkMinutes: 20,
@@ -357,5 +443,42 @@ export const defaultSettings = (today: string): Settings => ({
   startDate: today,
   moveNudge: { on: false, start: '09:00', end: '17:00' },
   stepsGoal: 7000,
-  cycleOnHome: true
+  cycleOnHome: true,
+  onboarded: false,
+  sex: 'female',
+  activity: 'sedentary',
+  diets: [],
+  navTabs: ['home', 'meals', 'workouts', 'progress', 'social'],
+  quotes: [],
+  prepDays: { sunday: 0, wednesday: 3 }
 });
+
+export const SEED_MOOD_TAGS = ['Calm', 'Happy', 'Grateful', 'Motivated', 'Tired', 'Stressed', 'Anxious', 'Overwhelmed', 'Lonely', 'Irritable'];
+
+export const SEED_MIND_GOALS: MindGoal[] = [
+  { id: 'm-outside', name: '10 minutes outside', perWeek: 7, icon: '🌿' },
+  { id: 'm-breathe', name: '5 minutes of breathing or meditation', perWeek: 5, icon: '🫧' },
+  { id: 'm-journal', name: 'Journal or reflect', perWeek: 3, icon: '📓' },
+  { id: 'm-connect', name: 'Connect with someone I love', perWeek: 2, icon: '💌' },
+  { id: 'm-winddown', name: 'Screen-free wind-down before bed', perWeek: 4, icon: '🌙' },
+  { id: 'm-joy', name: 'Something just for me', perWeek: 2, icon: '🎀' }
+];
+
+export const SEED_ROOMS = ['Kitchen', 'Bathroom', 'Bedroom', 'Living room', 'Laundry', 'Whole home'];
+const c = (id: string, name: string, room: string, freq: CleanTask['freq'], minutes: number, extra: Partial<CleanTask> = {}): CleanTask => ({ id, name, room, freq, minutes, ...extra });
+export const SEED_CLEAN: CleanTask[] = [
+  c('c-dishes', 'Dishes & wipe counters', 'Kitchen', 'daily', 10),
+  c('c-tidy', '10-minute tidy', 'Living room', 'daily', 10),
+  c('c-bed', 'Make the bed', 'Bedroom', 'daily', 2),
+  c('c-bath', 'Clean bathroom (sink, toilet, mirror)', 'Bathroom', 'weekly', 20, { days: [1] }),
+  c('c-dust', 'Dust surfaces', 'Whole home', 'weekly', 15, { days: [2] }),
+  c('c-trash', 'Take out trash & recycling', 'Kitchen', 'weekly', 5, { days: [2] }),
+  c('c-floors', 'Vacuum & mop floors', 'Whole home', 'weekly', 25, { days: [3] }),
+  c('c-laundry', 'Laundry', 'Laundry', 'weekly', 30, { days: [4, 0] }),
+  c('c-sheets', 'Change bed sheets', 'Bedroom', 'weekly', 15, { days: [5] }),
+  c('c-fridge', 'Fridge clean-out before groceries', 'Kitchen', 'weekly', 10, { days: [6] }),
+  c('c-prep', 'Reset kitchen for meal prep', 'Kitchen', 'weekly', 10, { days: [0] }),
+  c('c-oven', 'Clean microwave & oven', 'Kitchen', 'monthly', 20, { monthDay: 1 }),
+  c('c-baseboards', 'Wipe baseboards & doors', 'Whole home', 'monthly', 20, { monthDay: 15 }),
+  c('c-windows', 'Wash windows & mirrors', 'Whole home', 'every', 30, { every: 30 })
+];

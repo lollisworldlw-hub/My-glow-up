@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Home as HomeIcon, UtensilsCrossed, Dumbbell, LineChart, ShoppingBasket, Settings as SettingsIcon } from 'lucide-react';
+import { NAV, MORE, bottomTabs } from './lib/nav';
 import { useStore } from './lib/store';
 import { useUI, type Tab } from './lib/ui';
 import { todayKey } from './lib/date';
@@ -11,16 +11,15 @@ import Groceries from './screens/Groceries';
 import Settings from './screens/Settings';
 import { Celebration, Toaster, toast } from './components/ui';
 import { WorkoutPlayer } from './components/WorkoutPlayer';
-import { startSync } from './lib/sync';
+import { startSync, useSync } from './lib/sync';
+import Social from './screens/Social';
+import Mind from './screens/Mind';
+import Clean from './screens/Clean';
+import More from './screens/More';
+import Onboarding from './screens/Onboarding';
+import { useSocial, unreadCount, loadSocial, startLive } from './lib/social';
 
-const NAV: { id: Tab; label: string; icon: typeof HomeIcon }[] = [
-  { id: 'home', label: 'Home', icon: HomeIcon },
-  { id: 'meals', label: 'Meals', icon: UtensilsCrossed },
-  { id: 'workouts', label: 'Workouts', icon: Dumbbell },
-  { id: 'progress', label: 'Progress', icon: LineChart },
-  { id: 'groceries', label: 'Groceries', icon: ShoppingBasket },
-  { id: 'settings', label: 'Settings', icon: SettingsIcon }
-];
+
 
 function useHydrated() {
   const [h, setH] = useState(useStore.persist.hasHydrated());
@@ -91,6 +90,12 @@ export default function App() {
   const tab = useUI((u) => u.tab);
   const go = useUI((u) => u.go);
   const hasSession = useStore((s) => !!s.session);
+  const onboarded = useStore((s) => s.settings.onboarded);
+  const bottom = bottomTabs(useStore((s) => s.settings.navTabs));
+  const { userId, member } = useSync();
+  useSocial((s) => s.messages.length + Object.keys(s.lastRead).length); // re-render on new messages
+  const unread = member ? unreadCount(userId) : 0;
+  useEffect(() => { if (member) { loadSocial(); startLive(); } }, [member]);
   useTheme();
   useReminders();
 
@@ -104,6 +109,8 @@ export default function App() {
     return <div className="h-full grid place-items-center"><div className="h-serif text-[28px] text-deep animate-pulse">My Glow-Up ♡</div></div>;
   }
 
+  if (!onboarded) return <><Onboarding /><Toaster /></>;
+
   return (
     <div className="min-h-full">
       <main className="mx-auto max-w-[640px] px-4 safe-top pb-nav">
@@ -114,17 +121,22 @@ export default function App() {
           {tab === 'progress' && <Progress />}
           {tab === 'groceries' && <Groceries />}
           {tab === 'settings' && <Settings />}
+          {tab === 'social' && <Social />}
+          {tab === 'mind' && <Mind />}
+          {tab === 'clean' && <Clean />}
+          {tab === 'more' && <More />}
         </div>
       </main>
 
       <nav className="fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur border-t border-line safe-bottom" aria-label="Main">
-        <div className="mx-auto max-w-[640px] grid grid-cols-6">
-          {NAV.map((n) => {
-            const on = tab === n.id;
+        <div className="mx-auto max-w-[640px] flex">
+          {[...bottom.map((id) => NAV.find((n) => n.id === id)!), MORE].map((n) => {
+            const on = n.id === 'more' ? !bottom.includes(tab) : tab === n.id;
             const Icon = n.icon;
             return (
               <button key={n.id} onClick={() => go(n.id)} aria-current={on ? 'page' : undefined}
-                className={`flex flex-col items-center justify-center gap-1 pt-2.5 pb-2 min-h-[62px] transition ${on ? 'text-deep' : 'text-muted'}`}>
+                className={`relative flex-1 flex flex-col items-center justify-center gap-1 pt-2.5 pb-2 min-h-[62px] transition ${on ? 'text-deep' : 'text-muted'}`}>
+                {n.id === 'social' && unread > 0 && <span className="absolute top-1.5 left-1/2 ml-2 min-w-[18px] h-[18px] px-1 rounded-full bg-deep text-white text-[11px] grid place-items-center" aria-label={`${unread} unread`}>{unread > 9 ? '9+' : unread}</span>}
                 <span className={`grid place-items-center w-11 h-7 rounded-full transition ${on ? 'bg-petal' : ''}`}><Icon size={21} strokeWidth={on ? 2.2 : 1.7} /></span>
                 <span className={`text-[11px] leading-none ${on ? 'font-semibold' : ''}`}>{n.label}</span>
               </button>

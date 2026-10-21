@@ -132,3 +132,44 @@ describe('strength progression', () => {
     expect(readyToLevelUp([w(2, [12, 12])], 'squat', 0, 12)).toBe(false);
   });
 });
+
+import { conflicts, dietBadges } from '../src/lib/diet';
+import { isDue } from '../src/lib/clean';
+import { suggestTargets } from '../src/lib/targets';
+
+describe('diet filtering', () => {
+  it('flags conflicts by diet', () => {
+    expect(conflicts(recipes['l-chicken'], foods, ['vegetarian']).length).toBe(1);
+    expect(conflicts(recipes['d-shrimp'], foods, ['pescatarian'])).toEqual([]);
+    expect(conflicts(recipes['d-shrimp'], foods, ['shellfish-free']).length).toBe(1);
+    expect(conflicts(recipes['d-tofu'], foods, ['vegan'])).toEqual([]);
+    expect(conflicts(recipes['d-tofu'], foods, ['gluten-free']).length).toBe(1);
+    expect(dietBadges(recipes['l-lentil'], foods)).toContain('Vegan');
+    // every diet has at least one recipe for every meal
+    for (const d of ['vegetarian', 'pescatarian', 'vegan', 'gluten-free', 'dairy-free'] as const)
+      for (const slot of ['breakfast', 'lunch', 'dinner', 'snack', 'dessert'])
+        expect(SEED_RECIPES.some((r) => r.slot === slot && conflicts(r, foods, [d]).length === 0), `${d} ${slot}`).toBe(true);
+  });
+});
+
+describe('cleaning schedule', () => {
+  it('handles weekly, every-N and monthly tasks', () => {
+    expect(isDue({ id: 'a', name: '', room: '', freq: 'weekly', days: [2], minutes: 5 }, '2026-10-20')).toBe(true); // Tuesday
+    expect(isDue({ id: 'a', name: '', room: '', freq: 'weekly', days: [3], minutes: 5 }, '2026-10-20')).toBe(false);
+    expect(isDue({ id: 'b', name: '', room: '', freq: 'every', every: 7, minutes: 5, lastDone: '2026-10-15' }, '2026-10-20')).toBe(false);
+    expect(isDue({ id: 'b', name: '', room: '', freq: 'every', every: 7, minutes: 5, lastDone: '2026-10-10' }, '2026-10-20')).toBe(true);
+    expect(isDue({ id: 'c', name: '', room: '', freq: 'monthly', monthDay: 15, minutes: 5, lastDone: '2026-09-15' }, '2026-10-20')).toBe(true);
+    expect(isDue({ id: 'c', name: '', room: '', freq: 'monthly', monthDay: 15, minutes: 5, lastDone: '2026-10-16' }, '2026-10-20')).toBe(false);
+  });
+});
+
+describe('targets', () => {
+  it('suggests a reasonable starting target', () => {
+    const t = suggestTargets({ sex: 'female', age: 33, heightIn: 67, weightLb: 178, goalLb: 150, activity: 'sedentary' });
+    expect(t.cal).toBeGreaterThanOrEqual(1500);
+    expect(t.cal).toBeLessThanOrEqual(1750);
+    expect(t.proteinMin).toBe(115);
+    const low = suggestTargets({ sex: 'female', age: 60, heightIn: 58, weightLb: 110, goalLb: 100, activity: 'sedentary' });
+    expect(low.cal).toBeGreaterThanOrEqual(1300);
+  });
+});

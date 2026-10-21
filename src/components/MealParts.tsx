@@ -10,6 +10,7 @@ import {
 import { addDays, fmtDow, fmtShort, uid, weekDays, weekStart } from '../lib/date';
 import { CheckCircle, Field, NumberInput, Segmented, Sheet, Stepper, toast } from './ui';
 import { FoodArt } from './Art';
+import { conflicts, dietBadges } from '../lib/diet';
 
 export const fmtServ = (n: number) => (n === 1 ? '' : ` × ${fmtAmount(n)}`);
 
@@ -46,6 +47,7 @@ export function MealCard({ date, slot, item, compact }: { date: string; slot: Sl
               <div className="font-medium text-[17px] leading-snug">{itemName(item, s.recipes)}</div>
               <div className="text-[14px] text-muted">{recipe?.servingLabel ?? '1 serving'}{fmtServ(item.servings)}</div>
               <MacroLine cal={mac.cal} protein={mac.protein} est={est} />
+              {recipe && conflicts(recipe, s.foods, s.settings.diets).length > 0 && <div className="text-[13px] text-deep mt-0.5">Contains {conflicts(recipe, s.foods, s.settings.diets).join(', ').toLowerCase()} — swap?</div>}
               {logged && <div className="text-[13px] text-sagedeep font-medium mt-0.5">{logged.prelogged ? 'Pre-logged for later ♡' : `Logged · ${logged.cal} cal`}</div>}
             </div>
           </button>
@@ -275,8 +277,10 @@ export function DayPicker({ multi, from, title, onPick, onClose }: { multi: bool
 export function SwapSheet({ date, slot, itemId, onClose }: { date: string; slot: Slot; itemId?: string; onClose: () => void }) {
   const s = useStore();
   const [allSlots, setAllSlots] = useState(false);
+  const [allDiets, setAllDiets] = useState(false);
   const list = Object.values(s.recipes)
     .filter((r) => allSlots || r.slot === slot)
+    .filter((r) => allDiets || conflicts(r, s.foods, s.settings.diets).length === 0)
     .sort((a, b) => Number(s.favorites.includes(b.id)) - Number(s.favorites.includes(a.id)) || a.name.localeCompare(b.name));
   const current = itemId ? findItem(s, itemId)?.item.recipeId : undefined;
   return (
@@ -284,6 +288,11 @@ export function SwapSheet({ date, slot, itemId, onClose }: { date: string; slot:
       <label className="flex items-center gap-2 mb-3 text-[15px] text-muted">
         <input type="checkbox" checked={allSlots} onChange={(e) => setAllSlots(e.target.checked)} className="w-5 h-5 accent-[var(--rose-deep)]" />Show recipes from every meal type
       </label>
+      {s.settings.diets.length > 0 && (
+        <label className="flex items-center gap-2 mb-3 text-[15px] text-muted">
+          <input type="checkbox" checked={allDiets} onChange={(e) => setAllDiets(e.target.checked)} className="w-5 h-5 accent-[var(--rose-deep)]" />Include recipes that don’t fit my diet
+        </label>
+      )}
       <div className="space-y-2">
         {list.map((r) => {
           const m = round(recipeMacros(s.foods, r));
@@ -305,6 +314,7 @@ export function SwapSheet({ date, slot, itemId, onClose }: { date: string; slot:
               <div className="flex-1 min-w-0">
                 <div className="font-medium">{r.name}{s.favorites.includes(r.id) && <span className="text-rose"> ♥</span>}</div>
                 <div className="text-[14px] text-muted">{r.servingLabel} · ≈ {m.cal} cal · {m.protein} g protein</div>
+                <div className="flex flex-wrap gap-1 mt-1">{dietBadges(r, s.foods).map((b) => <span key={b} className="text-[11px] rounded-full bg-petal text-deep px-2 py-0.5">{b}</span>)}</div>
               </div>
               {r.id === current && <span className="text-[13px] text-muted">Current</span>}
             </button>

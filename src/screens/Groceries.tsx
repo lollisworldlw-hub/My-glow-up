@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Clock, Plus, RefreshCcw, Share2, ShieldCheck, ShoppingBasket, Sparkles, Undo2 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { GROCERY_CATEGORIES } from '../lib/types';
-import type { GroceryCategory, GroceryItem } from '../lib/types';
-import { addDays, fmtLong, fmtShort, uid, weekDays, weekStart, weekday } from '../lib/date';
+import type { GroceryCategory, GroceryItem, PrepTask } from '../lib/types';
+import { addDays, fmtLong, fmtShort, uid, weekDays, weekStart, weekday, DOW_NAMES } from '../lib/date';
 import { useToday } from '../lib/derived';
 import { groceryText } from '../lib/grocery';
 import { FOOD_SAFETY } from '../lib/seed';
@@ -161,7 +161,10 @@ function MealPrep() {
   const wd = weekday(today);
   const [which, setWhich] = useState<'sunday' | 'wednesday'>(wd === 0 || wd >= 4 ? 'sunday' : 'wednesday');
   // the prep day this checklist belongs to: the upcoming (or today's) Sunday/Wednesday
-  const target = which === 'sunday' ? 0 : 3;
+  const pd = s.settings.prepDays ?? { sunday: 0, wednesday: 3 };
+  const target = pd[which];
+  const [editing, setEditing] = useState<PrepTask | 'new' | null>(null);
+  const [dayPick, setDayPick] = useState(false);
   const delta = (target - wd + 7) % 7;
   const prepDate = addDays(today, delta);
   const tasks = s.prepTasks[which];
@@ -177,9 +180,9 @@ function MealPrep() {
 
   return (
     <div className="space-y-4">
-      <Segmented value={which} onChange={setWhich} options={[{ value: 'sunday', label: 'Sunday prep' }, { value: 'wednesday', label: 'Wednesday prep' }]} />
+      <Segmented value={which} onChange={setWhich} options={[{ value: 'sunday', label: `${DOW_NAMES[pd.sunday]} prep` }, { value: 'wednesday', label: `${DOW_NAMES[pd.wednesday]} prep` }]} />
       <Card>
-        <div className="eyebrow">{which === 'sunday' ? 'Meals for Monday–Wednesday' : 'Meals for Thursday–Sunday'}</div>
+        <div className="flex justify-between items-center"><div className="eyebrow">{which === 'sunday' ? 'First prep of the week' : 'Second prep of the week'}</div><button className="text-[14px] text-deep font-medium" onClick={() => setDayPick(true)}>Change day</button></div>
         <div className="h-serif text-[26px] mt-1">{fmtLong(prepDate)}</div>
         <div className="text-[14px] text-muted mb-3 flex items-center gap-1.5"><Clock size={14} />About {mins} min total{left && left < mins ? ` · ${left} min left` : ''} — some steps overlap</div>
         <Bar pct={(checks.length / tasks.length) * 100} color="var(--sage)" />
@@ -193,7 +196,7 @@ function MealPrep() {
               <div className="flex items-start gap-3">
                 <CheckCircle on={on} onToggle={() => toggle(t.id)} label={t.title} />
                 <div className="flex-1 min-w-0" onClick={() => toggle(t.id)}>
-                  <div className="flex justify-between gap-2"><div className={`font-medium ${on ? 'line-through decoration-blush' : ''}`}>{i + 1}. {t.title}</div><span className="text-[13px] text-muted whitespace-nowrap">{t.minutes} min</span></div>
+                  <div className="flex justify-between gap-2"><div className={`font-medium ${on ? 'line-through decoration-blush' : ''}`}>{i + 1}. {t.title}</div><span className="text-[13px] text-muted whitespace-nowrap">{t.minutes} min <button aria-label={`Edit ${t.title}`} className="ml-1 text-deep" onClick={(e) => { e.stopPropagation(); setEditing(t); }}>Edit</button></span></div>
                   <p className="text-[15px] mt-1">{t.instructions}</p>
                   <div className="flex flex-wrap gap-1.5 mt-2">{t.ingredients.map((x) => <span key={x} className="text-[13px] rounded-full bg-petal px-2.5 py-1">{x}</span>)}</div>
                 </div>
@@ -202,10 +205,45 @@ function MealPrep() {
           );
         })}
       </div>
+      <button className="btn-soft w-full" onClick={() => setEditing('new')}><Plus size={18} />Add a prep step</button>
+      {editing && <PrepEditor which={which} task={editing === 'new' ? null : editing} onClose={() => setEditing(null)} />}
+      {dayPick && (
+        <Sheet open onClose={() => setDayPick(false)} title="Prep day">
+          <div className="grid grid-cols-2 gap-2">{[0, 1, 2, 3, 4, 5, 6].map((d) => (
+            <button key={d} className={`btn ${pd[which] === d ? 'btn-primary' : 'btn-ghost'}`} onClick={() => { s.set((x) => { x.settings.prepDays = { ...pd, [which]: d }; }); setDayPick(false); }}>{DOW_NAMES[d]}</button>
+          ))}</div>
+        </Sheet>
+      )}
       <Card className="bg-petal border-blush">
         <div className="flex items-center gap-2 font-semibold mb-2"><ShieldCheck size={18} className="text-deep" />Food safety & storage</div>
         <ul className="space-y-1.5 text-[15px] list-disc pl-5">{FOOD_SAFETY.map((x) => <li key={x}>{x}</li>)}</ul>
       </Card>
     </div>
+  );
+}
+
+function PrepEditor({ which, task, onClose }: { which: 'sunday' | 'wednesday'; task: PrepTask | null; onClose: () => void }) {
+  const s = useStore();
+  const [t, setT] = useState<PrepTask>(task ?? { id: uid(), title: '', minutes: 10, instructions: '', ingredients: [] });
+  const [ing, setIng] = useState(t.ingredients.join(', '));
+  const list = s.prepTasks[which];
+  const idx = list.findIndex((x) => x.id === t.id);
+  const save = () => s.set((x) => {
+    const v = { ...t, title: t.title.trim(), ingredients: ing.split(',').map((y) => y.trim()).filter(Boolean) };
+    const arr = x.prepTasks[which];
+    const i = arr.findIndex((y) => y.id === v.id);
+    if (i >= 0) arr[i] = v; else arr.push(v);
+  });
+  const move = (d: number) => s.set((x) => { const arr = x.prepTasks[which]; const j = idx + d; if (idx < 0 || j < 0 || j >= arr.length) return; [arr[idx], arr[j]] = [arr[j], arr[idx]]; });
+  return (
+    <Sheet open onClose={onClose} title={task ? 'Edit prep step' : 'New prep step'} footer={<div className="flex gap-2">
+      {task && <button className="btn-ghost flex-1" onClick={() => { s.set((x) => { x.prepTasks[which] = x.prepTasks[which].filter((y) => y.id !== t.id); }); onClose(); }}>Delete</button>}
+      <button className="btn-primary flex-[2]" disabled={!t.title.trim()} onClick={() => { save(); toast('Saved'); onClose(); }}>Save</button></div>}>
+      <Field label="Step"><input className="field" value={t.title} onChange={(e) => setT({ ...t, title: e.target.value })} /></Field>
+      <Field label="Minutes"><NumberInput value={t.minutes} onChange={(v) => v && setT({ ...t, minutes: Math.round(v) })} /></Field>
+      <Field label="Instructions"><textarea className="field py-3 min-h-[80px]" value={t.instructions} onChange={(e) => setT({ ...t, instructions: e.target.value })} /></Field>
+      <Field label="Ingredients / supplies (comma separated)"><input className="field" value={ing} onChange={(e) => setIng(e.target.value)} /></Field>
+      {task && <div className="flex gap-2"><button className="btn-ghost btn-sm flex-1" onClick={() => move(-1)}>Move earlier</button><button className="btn-ghost btn-sm flex-1" onClick={() => move(1)}>Move later</button></div>}
+    </Sheet>
   );
 }
