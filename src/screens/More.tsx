@@ -21,7 +21,7 @@ export default function More() {
             <button key={n.id} className="card p-4 text-left" onClick={() => go(n.id)}>
               <span className="w-11 h-11 rounded-2xl bg-petal text-deep grid place-items-center mb-3"><Icon size={21} /></span>
               <div className="font-semibold">{n.label}</div>
-              <div className="text-[14px] text-muted">{n.blurb}</div>
+              <div className="text-[13px] text-muted">{n.blurb}</div>
             </button>
           );
         })}
@@ -38,7 +38,7 @@ export function NavEditor({ onClose }: { onClose: () => void }) {
   const move = (i: number, d: number) => { const a = [...sel]; const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; setSel(a); };
   return (
     <Sheet open onClose={onClose} title="Bottom bar" footer={<button className="btn-primary w-full" disabled={!sel.length} onClick={() => { s.set((x) => { x.settings.navTabs = sel; }); toast('Bottom bar updated'); onClose(); }}>Save</button>}>
-      <p className="text-[14px] text-muted mb-3">Pick up to 5 tabs. Tap the logo at the top for Home; everything else lives under “More”.</p>
+      <p className="text-[13px] text-muted mb-3">Pick up to 5 tabs. Tap the logo at the top for Home; everything else lives under “More”.</p>
       <div className="space-y-2">
         {sel.map((id, i) => {
           const n = NAV.find((x) => x.id === id)!;

@@ -22,8 +22,8 @@ export function CycleChip({ today }: { today: string }) {
       <span className="w-10 h-10 rounded-full bg-petal text-deep grid place-items-center shrink-0"><CalendarHeart size={19} /></span>
       <span className="min-w-0">
         <span className="block font-medium">Cycle day {st.day} · {st.phase}</span>
-        <span className="block text-[14px] text-muted">{when}{st.fromData ? '' : ' (estimate until you log 2 cycles)'}</span>
-        <span className="block text-[14px] mt-1">{PHASE_NOTE[st.phase]}</span>
+        <span className="block text-[13px] text-muted">{when}{st.fromData ? '' : ' (estimate until you log 2 cycles)'}</span>
+        <span className="block text-[13px] mt-1">{PHASE_NOTE[st.phase]}</span>
       </span>
     </button>
   );
@@ -46,13 +46,13 @@ export function CheckinCard({ today }: { today: string }) {
             <span className="w-10 h-10 rounded-full bg-card text-deep grid place-items-center shrink-0"><ClipboardCheck size={19} /></span>
             <div className="flex-1">
               <div className="font-semibold">Your weekly check-in</div>
-              <p className="text-[14px] text-muted">Two minutes to see your trend, celebrate wins, and pick one focus.</p>
+              <p className="text-[13px] text-muted">Two minutes to see your trend, celebrate wins, and pick one focus.</p>
               <button className="btn-primary btn-sm mt-3" onClick={() => setOpen(true)}>Start check-in</button>
             </div>
           </div>
         </Card>
       ) : (
-        <div className="rounded-2xl bg-petal px-4 py-3 text-[15px]"><b>This week’s focus:</b> {last!.focus}</div>
+        <div className="rounded-2xl bg-petal px-4 py-3 text-[14px]"><b>This week’s focus:</b> {last!.focus}</div>
       )}
       {open && monday && <CheckinSheet monday={monday} today={today} onClose={() => setOpen(false)} />}
     </>
@@ -80,7 +80,7 @@ export function ProteinFixer({ today }: { today: string }) {
   }).filter(Boolean) as (typeof QUICK[number] & { m: ReturnType<typeof round> })[];
   return (
     <div className="mt-4 pt-4 border-t border-line">
-      <div className="text-[14px] font-medium mb-2">{Math.round(gap)} g protein to go — quick adds:</div>
+      <div className="text-[13px] font-medium mb-2">{Math.round(gap)} g protein to go — quick adds:</div>
       <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
         {opts.map((o) => (
           <button key={o.foodId} className="chip shrink-0 !py-2" onClick={() => {
@@ -113,7 +113,7 @@ export function DessertBudget({ today }: { today: string }) {
   return (
     <div className="rounded-3xl border border-blush bg-petal px-4 py-3 flex gap-3 items-start">
       <Sparkles size={18} className="text-deep mt-0.5 shrink-0" />
-      <p className="text-[15px]">{msg}</p>
+      <p className="text-[14px]">{msg}</p>
     </div>
   );
 }
@@ -134,7 +134,7 @@ export function LogDayButton({ today }: { today: string }) {
             for (const p of pending) s.logItem(today, p.slot, p.it.id);
             toast(`Logged ${pending.length} meals ♡`); setOpen(false);
           }}>Log all {pending.length}</button>}>
-          <p className="text-muted text-[15px] mb-3">These will be logged at their planned portions. Ate something differently? Close this and log that one meal instead.</p>
+          <p className="text-muted text-[14px] mb-3">These will be logged at their planned portions. Ate something differently? Close this and log that one meal instead.</p>
           {pending.map((p) => {
             const m = round(itemMacros(p.it, s.recipes, s.foods));
             return <div key={p.it.id} className="flex justify-between py-2.5 border-b border-line"><span>{itemName(p.it, s.recipes)}</span><span className="text-muted tabular-nums">{m.cal} cal</span></div>;
@@ -165,7 +165,7 @@ export function CheckReminders({ today }: { today: string }) {
           <span className="w-10 h-10 rounded-full bg-petal text-deep grid place-items-center shrink-0">{i.icon}</span>
           <div className="flex-1 min-w-0">
             <div className="font-medium">{i.title}</div>
-            <div className="text-[14px] text-muted">{i.sub}</div>
+            <div className="text-[13px] text-muted">{i.sub}</div>
             <div className="flex gap-2 mt-2">
               <button className="btn-primary btn-sm" onClick={i.action}>Do it now</button>
               <button className="btn-ghost btn-sm" onClick={() => s.set((x) => { x.snoozes[i.key] = addDays(today, 3); })}>Later</button>

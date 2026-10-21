@@ -104,7 +104,7 @@ export function WorkoutPlayer() {
   return (
     <div className="fixed inset-0 z-[55] bg-bg flex flex-col safe-top" role="dialog" aria-label="Workout timer">
       <div className="px-5 flex items-center justify-between">
-        <div><div className="eyebrow">{name}</div><div className="text-[14px] text-muted tabular-nums">{mmss(active)} active{phase.round ? ` · Round ${phase.round}${session.workoutId === 'strength' ? ' of 2' : ''}` : ''}</div></div>
+        <div><div className="eyebrow">{name}</div><div className="text-[13px] text-muted tabular-nums">{mmss(active)} active{phase.round ? ` · Round ${phase.round}${session.workoutId === 'strength' ? ' of 2' : ''}` : ''}</div></div>
         <button className="btn-ghost btn-sm" onClick={() => setEnding(true)}><Square size={15} />End</button>
       </div>
       <div className="px-5 mt-3"><Bar pct={(doneSec / totalSec) * 100} h={6} /></div>
@@ -112,7 +112,7 @@ export function WorkoutPlayer() {
       {done ? (
         <div className="flex-1 overflow-y-auto px-6 pt-8 text-center">
           <div className="text-[44px] text-rose">♡</div>
-          <h2 className="h-serif text-[34px]">Workout complete</h2>
+          <h2 className="h-serif text-[28px]">Workout complete</h2>
           <p className="text-muted mt-1">{Math.round(active / 60)} minutes of showing up for yourself.</p>
           <div className="mt-6 text-left"><div className="label">How did it feel? (optional)</div>
             <div className="grid grid-cols-5 gap-2">{[1, 2, 3, 4, 5].map((d) => (
@@ -125,18 +125,18 @@ export function WorkoutPlayer() {
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto px-5 flex flex-col items-center pt-4">
-          <div className="text-center"><h2 className="h-serif text-[30px] leading-tight">{phase.label}</h2></div>
+          <div className="text-center"><h2 className="h-serif text-[26px] leading-tight">{phase.label}</h2></div>
           <div className="my-2"><ExerciseArt id={phase.exercise ?? (session.workoutId.startsWith('bike') ? 'bike' : 'walk')} size={110} /></div>
           {phase.kind === 'timed' ? (
             <Ring pct={(el / phase.seconds) * 100} size={210} stroke={14} color={INTENSITY_COLOR[phase.intensity]}>
               <div>
                 <div className="text-[54px] font-semibold tabular-nums leading-none">{mmss(remaining)}</div>
-                <div className="text-[14px] text-muted mt-1 capitalize">{phase.intensity === 'work' ? '' : phase.intensity}</div>
+                <div className="text-[13px] text-muted mt-1 capitalize">{phase.intensity === 'work' ? '' : phase.intensity}</div>
               </div>
             </Ring>
           ) : (
             <div className="text-center">
-              <div className="text-muted text-[15px]">Tap to count your reps</div>
+              <div className="text-muted text-[14px]">Tap to count your reps</div>
               <button aria-label="Count a rep" className="mt-2 w-[200px] h-[200px] rounded-full bg-petal border-[10px] border-blush grid place-items-center active:scale-95 transition"
                 onClick={() => save({ ...session, reps: Math.min((phase.reps ?? 12) * 2, session.reps + 1) })}>
                 <div><div className="text-[58px] font-semibold tabular-nums leading-none">{session.reps}</div><div className="text-muted">of {phase.reps}</div></div>
@@ -147,8 +147,8 @@ export function WorkoutPlayer() {
               </div>
             </div>
           )}
-          <p className="text-center text-[16px] mt-4 max-w-[360px]">{phase.cue}</p>
-          {next && <p className="text-center text-[14px] text-muted mt-2">Up next: {next.label}</p>}
+          <p className="text-center text-[15px] mt-4 max-w-[360px]">{phase.cue}</p>
+          {next && <p className="text-center text-[13px] text-muted mt-2">Up next: {next.label}</p>}
           {session.pausedAt && <p className="text-center text-deep font-medium mt-2">Paused — take all the time you need.</p>}
         </div>
       )}

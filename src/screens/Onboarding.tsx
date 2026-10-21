@@ -17,7 +17,7 @@ function Shell({ children, back, title, sub, go }: { children: React.ReactNode; 
     <InstallBanner />
     <div className="min-h-full mx-auto max-w-[560px] px-5 safe-top pb-10">
       {back && <button className="flex items-center gap-1 text-deep font-medium min-h-[44px]" onClick={() => go(back)}><ChevronLeft size={18} />Back</button>}
-      <h1 className="h-serif text-[34px] leading-tight mt-2">{title}</h1>
+      <h1 className="h-serif text-[28px] leading-tight mt-2">{title}</h1>
       {sub && <p className="text-muted mt-1 mb-5">{sub}</p>}
       <div className="rise">{children}</div>
     </div>
@@ -112,7 +112,7 @@ export default function Onboarding() {
       <div className="space-y-2 mb-4">
         {[{ v: 'sedentary', l: 'Mostly sitting', d: 'Desk job, few steps' }, { v: 'light', l: 'Lightly active', d: 'On my feet some of the day' }, { v: 'moderate', l: 'Active', d: 'On my feet most of the day' }].map((o) => (
           <button key={o.v} onClick={() => setActivity(o.v as any)} className={`w-full card p-4 text-left ${activity === o.v ? 'border-rose bg-petal' : ''}`}>
-            <div className="font-medium">{o.l}</div><div className="text-[14px] text-muted">{o.d}</div>
+            <div className="font-medium">{o.l}</div><div className="text-[13px] text-muted">{o.d}</div>
           </button>
         ))}
       </div>

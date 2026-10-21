@@ -22,7 +22,7 @@ export default function Mind() {
       {tab === 'tools' && <Tools />}
       <Card className="mt-6 bg-petal border-blush">
         <div className="flex gap-3 items-start"><HeartHandshake className="text-deep shrink-0" size={20} />
-          <p className="text-[14px]">Having a hard time? You don’t have to carry it alone. Reach out to someone you trust or a professional. In the US you can call or text <b>988</b> any time to talk with someone.</p></div>
+          <p className="text-[13px]">Having a hard time? You don’t have to carry it alone. Reach out to someone you trust or a professional. In the US you can call or text <b>988</b> any time to talk with someone.</p></div>
       </Card>
       <p className="text-[13px] text-muted mt-3 text-center">Your mood and notes are private and never shared with friends.</p>
     </div>
@@ -40,21 +40,21 @@ function MoodToday() {
   const data = days.filter((d) => s.moods[d]?.mood).map((d) => ({ t: fromKey(d).getTime(), m: s.moods[d].mood }));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Card>
         <div className="flex items-center justify-between mb-3">
           <div className="eyebrow">How are you feeling?</div>
-          <input type="date" aria-label="Day" className="text-[14px] bg-transparent text-muted" value={date} max={today} onChange={(e) => e.target.value && setDate(e.target.value)} />
+          <input type="date" aria-label="Day" className="text-[13px] bg-transparent text-muted" value={date} max={today} onChange={(e) => e.target.value && setDate(e.target.value)} />
         </div>
         <div className="grid grid-cols-5 gap-2">
           {MOODS.map((m) => (
             <button key={m.v} aria-pressed={entry.mood === m.v} onClick={() => up({ mood: m.v })}
               className={`rounded-2xl py-3 flex flex-col items-center gap-1 border transition ${entry.mood === m.v ? 'bg-petal border-rose' : 'border-line bg-card'}`}>
-              <span className="text-[28px]">{m.e}</span><span className="text-[12px] text-muted">{m.l}</span>
+              <span className="text-[24px]">{m.e}</span><span className="text-[12px] text-muted">{m.l}</span>
             </button>
           ))}
         </div>
-        <div className="flex items-center justify-between mt-4 mb-2"><div className="label !mb-0">What’s going on?</div><button className="text-[14px] text-deep" onClick={() => setEditTags(true)}>Edit</button></div>
+        <div className="flex items-center justify-between mt-4 mb-2"><div className="label !mb-0">What’s going on?</div><button className="text-[13px] text-deep" onClick={() => setEditTags(true)}>Edit</button></div>
         <div className="flex flex-wrap gap-2">
           {s.moodTags.map((t) => {
             const on = entry.tags.includes(t);
@@ -70,7 +70,7 @@ function MoodToday() {
       </Card>
       <Card>
         <div className="eyebrow mb-2">Last 30 days</div>
-        {data.length < 2 ? <p className="text-[15px] text-muted">Your mood trend appears after a few check-ins.</p> : (
+        {data.length < 2 ? <p className="text-[14px] text-muted">Your mood trend appears after a few check-ins.</p> : (
           <div className="h-[180px] -ml-3">
             <ResponsiveContainer>
               <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
@@ -118,10 +118,10 @@ function MindGoals() {
         return (
           <div key={g.id} className="card p-4">
             <div className="flex items-center gap-3">
-              <span className="text-[26px] w-10 text-center" aria-hidden>{g.icon}</span>
+              <span className="text-[22px] w-10 text-center" aria-hidden>{g.icon}</span>
               <div className="flex-1 min-w-0">
                 <div className="font-medium">{g.name}</div>
-                <div className="text-[14px] text-muted">{count} of {g.perWeek} this week{count >= g.perWeek ? ' ♡' : ''}</div>
+                <div className="text-[13px] text-muted">{count} of {g.perWeek} this week{count >= g.perWeek ? ' ♡' : ''}</div>
               </div>
               <button aria-label={`Edit ${g.name}`} className="w-10 h-10 grid place-items-center text-muted" onClick={() => setEdit(g)}><Pencil size={16} /></button>
               <CheckCircle on={doneToday.includes(g.id)} onToggle={() => toggle(g.id)} label={`${g.name} today`} />
@@ -148,25 +148,25 @@ function GoalEditor({ goal, onClose }: { goal: MindGoal | null; onClose: () => v
       <Field label="Goal"><input className="field" value={g.name} onChange={(e) => setG({ ...g, name: e.target.value })} placeholder="e.g. Read for 15 minutes" /></Field>
       <Field label="Times per week"><NumberInput value={g.perWeek} onChange={(v) => v && setG({ ...g, perWeek: Math.min(7, Math.max(1, Math.round(v))) })} /></Field>
       <div className="label">Icon</div>
-      <div className="flex flex-wrap gap-2">{ICONS.map((i) => <button key={i} onClick={() => setG({ ...g, icon: i })} className={`w-11 h-11 rounded-full text-[22px] ${g.icon === i ? 'bg-deep' : 'bg-petal'}`}>{i}</button>)}</div>
+      <div className="flex flex-wrap gap-2">{ICONS.map((i) => <button key={i} onClick={() => setG({ ...g, icon: i })} className={`w-11 h-11 rounded-full text-[19px] ${g.icon === i ? 'bg-deep' : 'bg-petal'}`}>{i}</button>)}</div>
     </Sheet>
   );
 }
 
 function Tools() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Breathing />
       <Card>
         <div className="eyebrow mb-2">5-4-3-2-1 grounding</div>
-        <p className="text-[15px] mb-2">When your mind is racing, gently notice:</p>
-        <ul className="space-y-1.5 text-[16px]">
+        <p className="text-[14px] mb-2">When your mind is racing, gently notice:</p>
+        <ul className="space-y-1.5 text-[15px]">
           <li><b>5</b> things you can see</li><li><b>4</b> things you can touch</li><li><b>3</b> things you can hear</li><li><b>2</b> things you can smell</li><li><b>1</b> thing you can taste</li>
         </ul>
       </Card>
       <Card>
         <div className="eyebrow mb-2">Kind self-talk</div>
-        <p className="text-[15px]">Try speaking to yourself the way you’d speak to a dear friend: “This is hard, and I’m doing my best. One small step is enough today.”</p>
+        <p className="text-[14px]">Try speaking to yourself the way you’d speak to a dear friend: “This is hard, and I’m doing my best. One small step is enough today.”</p>
       </Card>
     </div>
   );
@@ -197,7 +197,7 @@ function Breathing() {
       <div className="grid place-items-center py-4">
         <div className="w-[200px] h-[200px] rounded-full bg-petal grid place-items-center">
           <div className="rounded-full bg-blush grid place-items-center transition-none" style={{ width: 180 * (start ? scale : 0.7), height: 180 * (start ? scale : 0.7) }}>
-            <div className="text-center"><div className="font-serif text-[24px] font-semibold text-ink">{start ? PHASES[idx].l : 'Ready'}</div>{start && <div className="text-[14px]">{Math.ceil(4 - (cyc % 4))}</div>}</div>
+            <div className="text-center"><div className="font-serif text-[20px] font-semibold text-ink">{start ? PHASES[idx].l : 'Ready'}</div>{start && <div className="text-[13px]">{Math.ceil(4 - (cyc % 4))}</div>}</div>
           </div>
         </div>
       </div>

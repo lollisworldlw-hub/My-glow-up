@@ -59,7 +59,7 @@ export function ShareRecipeSheet({ recipe, onClose }: { recipe: Recipe; onClose:
   };
   return (
     <Sheet open onClose={onClose} title={`Share “${recipe.name}”`} footer={<button className="btn-primary w-full" disabled={busy} onClick={share}><Share2 size={17} />{busy ? 'Sharing…' : 'Share to the group'}</button>}>
-      <p className="text-[14px] text-muted mb-3">Friends see the ingredients, steps, and nutrition, and can save it to their own recipes with one tap.</p>
+      <p className="text-[13px] text-muted mb-3">Friends see the ingredients, steps, and nutrition, and can save it to their own recipes with one tap.</p>
       <PhotoPicker file={file} setFile={setFile} />
       <Field label="Add a note (optional)"><input className="field" value={note} onChange={(e) => setNote(e.target.value)} placeholder="So easy and so good!" /></Field>
     </Sheet>
@@ -79,7 +79,7 @@ export function FoodPhotos({ date }: { date: string }) {
         <div className="font-medium">Food photos</div>
         <button className="btn-soft btn-sm" onClick={() => ref.current?.click()}><Camera size={16} />Add</button>
       </div>
-      {list.length === 0 ? <p className="text-[14px] text-muted">Snap what you ate — a lovely visual diary. Photos stay on your phone unless you share one.</p> : (
+      {list.length === 0 ? <p className="text-[13px] text-muted">Snap what you ate — a lovely visual diary. Photos stay on your phone unless you share one.</p> : (
         <div className="grid grid-cols-3 gap-2">
           {list.map((p) => <button key={p.id} onClick={() => setOpen(p.id)} className="relative"><LocalImg id={p.id} className="w-full aspect-square rounded-xl" />{p.sharedAt && <span className="absolute bottom-1 right-1 text-[11px] bg-black/45 text-white rounded-full px-1.5">Shared</span>}</button>)}
         </div>

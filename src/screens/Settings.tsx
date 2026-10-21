@@ -39,7 +39,7 @@ export default function Settings() {
           <Field label="Age"><NumberInput value={st.age} onChange={(v) => v && set({ age: Math.round(v) })} /></Field>
         </div>
         <div className="flex items-center justify-between rounded-2xl bg-petal px-4 py-3">
-          <div><div className="text-[14px] text-muted">Current weight</div><div className="font-semibold">{cur ? `${wIn(cur)} ${kg ? 'kg' : 'lbs'}` : 'Not logged yet'}</div></div>
+          <div><div className="text-[13px] text-muted">Current weight</div><div className="font-semibold">{cur ? `${wIn(cur)} ${kg ? 'kg' : 'lbs'}` : 'Not logged yet'}</div></div>
           <button className="btn-primary btn-sm" onClick={() => setSheet('weight')}>Log weight</button>
         </div>
         <p className="text-[13px] text-muted mt-2">{st.heightIn >= 12 ? `Height ${Math.floor(st.heightIn / 12)}′${Math.round(st.heightIn % 12)}″` : ''}</p>
@@ -129,7 +129,7 @@ export default function Settings() {
 
       <SectionTitle>Reminders</SectionTitle>
       <Card>
-        <p className="text-[14px] text-muted mb-3">Gentle reminders appear while the app is open. iPhone only allows web apps to send background notifications through a push server, which this private app doesn’t use.</p>
+        <p className="text-[13px] text-muted mb-3">Gentle reminders appear while the app is open. iPhone only allows web apps to send background notifications through a push server, which this private app doesn’t use.</p>
         <button className="btn-soft w-full" onClick={() => setSheet('reminders')}><Bell size={16} />Set reminders</button>
       </Card>
 
@@ -151,7 +151,7 @@ export default function Settings() {
 export function Toggle({ label, on, onChange }: { label: string; on: boolean; onChange: (v: boolean) => void }) {
   return (
     <button role="switch" aria-checked={on} className="w-full flex items-center justify-between py-2.5 text-left" onClick={() => onChange(!on)}>
-      <span className="text-[16px] pr-3">{label}</span>
+      <span className="text-[15px] pr-3">{label}</span>
       <span className={`w-[52px] h-[32px] rounded-full p-1 transition shrink-0 ${on ? 'bg-deep' : 'bg-line'}`}><span className={`block w-6 h-6 rounded-full bg-white shadow transition ${on ? 'translate-x-5' : ''}`} /></span>
     </button>
   );
@@ -174,7 +174,7 @@ function ScheduleEditor({ onClose }: { onClose: () => void }) {
               </select>
               <select className="field" aria-label={`${DOW_NAMES[d]} home`} value={sc.home} onChange={(e) => up(d, { home: e.target.value as any })}>{homeOpts.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select>
             </div>
-            <label className="flex items-center gap-2 mt-2 text-[14px]"><input type="checkbox" className="w-5 h-5 accent-[var(--rose-deep)]" checked={sc.homeOptional} onChange={(e) => up(d, { homeOptional: e.target.checked })} />Home workout is optional (doesn’t count toward daily habits)</label>
+            <label className="flex items-center gap-2 mt-2 text-[13px]"><input type="checkbox" className="w-5 h-5 accent-[var(--rose-deep)]" checked={sc.homeOptional} onChange={(e) => up(d, { homeOptional: e.target.checked })} />Home workout is optional (doesn’t count toward daily habits)</label>
           </div>
         );
       })}
@@ -186,7 +186,7 @@ function Favorites({ onClose }: { onClose: () => void }) {
   const s = useStore();
   return (
     <Sheet open onClose={onClose} title="Favorite meals & desserts">
-      <p className="text-[14px] text-muted mb-3">Favorites show first when swapping, and “Mix from my favorites” builds weeks from them.</p>
+      <p className="text-[13px] text-muted mb-3">Favorites show first when swapping, and “Mix from my favorites” builds weeks from them.</p>
       {Object.values(s.recipes).map((r) => {
         const on = s.favorites.includes(r.id);
         return (
@@ -207,7 +207,7 @@ function FoodLibrary({ onClose }: { onClose: () => void }) {
   const foods = Object.values(s.foods).filter((f) => f.name.toLowerCase().includes(q.toLowerCase())).sort((a, b) => a.name.localeCompare(b.name));
   return (
     <Sheet open onClose={onClose} title="Food library">
-      <p className="text-[14px] text-muted mb-3">Values are generic estimates until you enter them from your package label. Then every recipe using that food updates automatically.</p>
+      <p className="text-[13px] text-muted mb-3">Values are generic estimates until you enter them from your package label. Then every recipe using that food updates automatically.</p>
       <button className="btn-primary w-full mb-3" onClick={() => setEdit('new')}><Plus size={18} />Add a food</button>
       <div className="relative mb-3"><Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" /><input className="field pl-11" placeholder="Search" value={q} onChange={(e) => setQ(e.target.value)} /></div>
       {foods.map((f) => (
@@ -347,13 +347,13 @@ function DataSection({ onDelete }: { onDelete: () => void }) {
       <div className="mb-4"><CloudCard /></div>
       <Card>
         <div className="flex items-start gap-3 mb-3"><Database className="text-deep shrink-0 mt-0.5" size={20} />
-          <p className="text-[14px]">Everything is saved privately on this device (IndexedDB). It can be lost if you clear Safari’s website data, delete the Home Screen app, or switch phones — so download a backup now and then and keep it in Files or iCloud Drive.</p>
+          <p className="text-[13px]">Everything is saved privately on this device (IndexedDB). It can be lost if you clear Safari’s website data, delete the Home Screen app, or switch phones — so download a backup now and then and keep it in Files or iCloud Drive.</p>
         </div>
-        <div className="text-[14px] text-muted mb-3">
+        <div className="text-[13px] text-muted mb-3">
           {days == null ? 'No backup yet.' : days === 0 ? 'Last backup: today.' : `Last backup: ${days} day${days === 1 ? '' : 's'} ago.`}
           {persisted === true ? ' Storage is protected from automatic cleanup.' : ''} {usage}
         </div>
-        {days != null && days > 14 && <div className="rounded-2xl bg-petal px-3 py-2 text-[14px] mb-3">It’s been a while — a fresh backup is a good idea.</div>}
+        {days != null && days > 14 && <div className="rounded-2xl bg-petal px-3 py-2 text-[13px] mb-3">It’s been a while — a fresh backup is a good idea.</div>}
         <Toggle label="Include progress photos in backups" on={photos} onChange={setPhotos} />
         <div className="grid grid-cols-2 gap-2 mt-2">
           <button className="btn-primary btn-sm" onClick={doExport}><Download size={16} />Export backup</button>
@@ -375,7 +375,7 @@ function DeleteAll({ onClose }: { onClose: () => void }) {
   const keep = (fn: (x: any) => void, msg: string) => { s.set(fn); toast(msg); onClose(); };
   return (
     <Sheet open onClose={onClose} title="Delete data">
-      <p className="text-muted text-[15px] mb-4">These can’t be undone. If cloud backup is on, the cloud copy updates too. Export a backup first if you might want this later.</p>
+      <p className="text-muted text-[14px] mb-4">These can’t be undone. If cloud backup is on, the cloud copy updates too. Export a backup first if you might want this later.</p>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.logs = []; }, 'Food log cleared')}>Clear food log</button>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.weights = []; x.measures = []; }, 'Weight & measurements cleared')}>Clear weight & measurements</button>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.workouts = []; }, 'Workout history cleared')}>Clear workout history</button>
@@ -385,7 +385,7 @@ function DeleteAll({ onClose }: { onClose: () => void }) {
       <button className="btn-ghost w-full mb-5" onClick={async () => { await clearPhotos(); keep((x) => { x.photos = []; }, 'Photos deleted'); }}>Delete all photos</button>
       <div className="rounded-2xl border border-blush p-4">
         <div className="font-medium mb-2">Start completely fresh</div>
-        <p className="text-[14px] text-muted mb-2">Type DELETE to erase everything and restore the starting recipes.</p>
+        <p className="text-[13px] text-muted mb-2">Type DELETE to erase everything and restore the starting recipes.</p>
         <input className="field mb-2" value={txt} onChange={(e) => setTxt(e.target.value)} placeholder="DELETE" />
         <button className="btn-primary w-full" disabled={txt !== 'DELETE'} onClick={async () => { await clearPhotos(); s.replaceAll(initialState()); toast('Everything erased'); onClose(); }}>Erase everything</button>
       </div>

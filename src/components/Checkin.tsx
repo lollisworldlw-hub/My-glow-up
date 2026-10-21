@@ -67,10 +67,10 @@ export function CheckinSheet({ monday, today, onClose }: { monday: string; today
         {w.waistChange != null && <Stat l="Waist since start" v={`${w.waistChange > 0 ? '+' : ''}${w.waistChange} in`} />}
         <Stat l="Days logged" v={`${w.loggedDays}`} />
       </div>
-      {w.pace && <div className={`rounded-2xl px-4 py-3 mb-3 text-[15px] ${w.pace.tone === 'good' ? 'bg-sage/20' : 'bg-petal'}`}>{w.pace.label}</div>}
-      {w.avgPro != null && w.avgPro < st.proteinMin && <div className="rounded-2xl bg-petal px-4 py-3 mb-3 text-[15px]">Protein averaged {w.avgPro} g. Getting closer to {st.proteinMin} g helps you keep muscle and stay full — a yogurt cup or 2 eggs closes most of the gap.</div>}
+      {w.pace && <div className={`rounded-2xl px-4 py-3 mb-3 text-[14px] ${w.pace.tone === 'good' ? 'bg-sage/20' : 'bg-petal'}`}>{w.pace.label}</div>}
+      {w.avgPro != null && w.avgPro < st.proteinMin && <div className="rounded-2xl bg-petal px-4 py-3 mb-3 text-[14px]">Protein averaged {w.avgPro} g. Getting closer to {st.proteinMin} g helps you keep muscle and stay full — a yogurt cup or 2 eggs closes most of the gap.</div>}
       {w.plateau && (
-        <div className="rounded-2xl border border-blush px-4 py-3 mb-3 text-[15px]">
+        <div className="rounded-2xl border border-blush px-4 py-3 mb-3 text-[14px]">
           <div className="font-semibold mb-1">Your 3-week trend is flat</div>
           <p className="mb-1.5">That’s normal at times. A few things worth looking at, in order:</p>
           <ol className="list-decimal pl-5 space-y-1">

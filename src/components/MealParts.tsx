@@ -17,7 +17,7 @@ export const fmtServ = (n: number) => (n === 1 ? '' : ` × ${fmtAmount(n)}`);
 
 export function MacroLine({ cal, protein, est }: { cal: number; protein: number; est?: boolean }) {
   return (
-    <span className="text-[14px] text-muted tabular-nums">
+    <span className="text-[13px] text-muted tabular-nums">
       {est && '≈ '}{Math.round(cal)} cal · {Math.round(protein)} g protein
     </span>
   );
@@ -45,8 +45,8 @@ export function MealCard({ date, slot, item, compact }: { date: string; slot: Sl
             <FoodArt art={recipe?.art ?? 'custom'} size={compact ? 48 : 56} />
             <div className="min-w-0 flex-1">
               <div className="eyebrow !text-[12px]">{SLOT_LABEL[slot]}</div>
-              <div className="font-medium text-[17px] leading-snug">{itemName(item, s.recipes)}</div>
-              <div className="text-[14px] text-muted">{recipe?.servingLabel ?? '1 serving'}{fmtServ(item.servings)}</div>
+              <div className="font-medium text-[15px] leading-snug">{itemName(item, s.recipes)}</div>
+              <div className="text-[13px] text-muted">{recipe?.servingLabel ?? '1 serving'}{fmtServ(item.servings)}</div>
               <MacroLine cal={mac.cal} protein={mac.protein} est={est} />
               {recipe && conflicts(recipe, s.foods, s.settings.diets).length > 0 && <div className="text-[13px] text-deep mt-0.5">Contains {conflicts(recipe, s.foods, s.settings.diets).join(', ').toLowerCase()} — swap?</div>}
               {logged && <div className="text-[13px] text-sagedeep font-medium mt-0.5">{logged.prelogged ? 'Pre-logged for later ♡' : `Logged · ${logged.cal} cal`}</div>}
@@ -76,10 +76,10 @@ export function LogConfirmSheet({ date, slot, item, onClose }: { date: string; s
   const prelog = s.logs.find((l) => l.planItemId === item.id && l.prelogged);
   return (
     <Sheet open onClose={onClose} title={`Log ${name}?`}>
-      <p className="text-muted text-[15px] mb-4">Only what you actually eat counts toward today. Adjust the portion if it was different.</p>
+      <p className="text-muted text-[14px] mb-4">Only what you actually eat counts toward today. Adjust the portion if it was different.</p>
       <div className="card p-4 flex items-center justify-between mb-4">
         <div>
-          <div className="text-[14px] text-muted">Portion</div>
+          <div className="text-[13px] text-muted">Portion</div>
           <div className="font-semibold">{mac.cal} cal · {mac.protein} g protein</div>
         </div>
         <Stepper value={serv} onChange={setServ} format={(v) => `${fmtAmount(v)}×`} />
@@ -146,7 +146,7 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
           <button className="btn-soft flex-1" onClick={() => setMode('swap')}><ArrowLeftRight size={16} />Swap</button>
         </div>
       }>
-      <div className="text-muted text-[15px] -mt-1 mb-4">{SLOT_LABEL[slot]} · {fmtDow(date)} {fmtShort(date)}</div>
+      <div className="text-muted text-[14px] -mt-1 mb-4">{SLOT_LABEL[slot]} · {fmtDow(date)} {fmtShort(date)}</div>
       <div className="flex items-center gap-4 mb-4">
         <FoodArt art={recipe?.art ?? 'custom'} size={72} />
         <div className="grid grid-cols-2 gap-x-5 gap-y-1 flex-1">
@@ -161,7 +161,7 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
       <div className="card p-4 mb-4 flex items-center justify-between">
         <div>
           <div className="font-medium">Portion</div>
-          <div className="text-[14px] text-muted">{recipe?.servingLabel ?? '1 serving'}{fmtServ(item.servings)}</div>
+          <div className="text-[13px] text-muted">{recipe?.servingLabel ?? '1 serving'}{fmtServ(item.servings)}</div>
         </div>
         <Stepper value={item.servings} onChange={(v) => mutate((it) => { it.servings = v; })} format={(v) => `${fmtAmount(v)}×`} />
       </div>
@@ -169,9 +169,9 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
       {!item.quick && (
         <>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="h-serif text-[21px]">Ingredients</h3>
+            <h3 className="h-serif text-[18px]">Ingredients</h3>
             {item.ingredients && (
-              <button className="text-[14px] text-deep font-medium inline-flex items-center gap-1" onClick={() => mutate((it) => { delete it.ingredients; })}><RotateCcw size={14} />Reset</button>
+              <button className="text-[13px] text-deep font-medium inline-flex items-center gap-1" onClick={() => mutate((it) => { delete it.ingredients; })}><RotateCcw size={14} />Reset</button>
             )}
           </div>
           <div className="space-y-2 mb-3">
@@ -183,8 +183,8 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
               return (
                 <div key={i} className="rounded-2xl border border-line bg-card p-3">
                   <div className="flex justify-between gap-2">
-                    <div className="text-[15px] font-medium">{food.name}{food.state && ['cooked', 'raw', 'dry'].includes(food.state) && <span className="ml-1.5 text-[12px] uppercase tracking-wider text-deep bg-petal rounded-full px-2 py-0.5">{food.state}</span>}</div>
-                    <div className="text-[14px] text-muted tabular-nums whitespace-nowrap">{Math.round(m.cal)} cal · {Math.round(m.protein)} g</div>
+                    <div className="text-[14px] font-medium">{food.name}{food.state && ['cooked', 'raw', 'dry'].includes(food.state) && <span className="ml-1.5 text-[12px] uppercase tracking-wider text-deep bg-petal rounded-full px-2 py-0.5">{food.state}</span>}</div>
+                    <div className="text-[13px] text-muted tabular-nums whitespace-nowrap">{Math.round(m.cal)} cal · {Math.round(m.protein)} g</div>
                   </div>
                   <div className="flex gap-2 mt-2">
                     <div className="w-28"><NumberInput ariaLabel={`${food.name} amount`} value={+(ing.amount * item.servings).toFixed(2)} onChange={(v) => v != null && v >= 0 && setIng(i, { amount: v })} /></div>
@@ -209,9 +209,9 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
 
       {recipe && (
         <>
-          <h3 className="h-serif text-[21px] mb-2">How to make it</h3>
-          <ol className="list-decimal pl-5 space-y-1.5 text-[16px] mb-2">{recipe.instructions.map((t, i) => <li key={i}>{t}</li>)}</ol>
-          {recipe.note && <p className="text-[14px] text-muted mb-2">{recipe.note}</p>}
+          <h3 className="h-serif text-[18px] mb-2">How to make it</h3>
+          <ol className="list-decimal pl-5 space-y-1.5 text-[15px] mb-2">{recipe.instructions.map((t, i) => <li key={i}>{t}</li>)}</ol>
+          {recipe.note && <p className="text-[13px] text-muted mb-2">{recipe.note}</p>}
         </>
       )}
 
@@ -256,7 +256,7 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
 }
 
 const Stat = ({ label, value }: { label: string; value: string }) => (
-  <div><div className="text-[13px] text-muted">{label}</div><div className="font-semibold text-[18px] tabular-nums">{value}</div></div>
+  <div><div className="text-[13px] text-muted">{label}</div><div className="font-semibold text-[16px] tabular-nums">{value}</div></div>
 );
 
 export function DayPicker({ multi, from, title, onPick, onClose }: { multi: boolean; from: string; title: string; onPick: (d: string[]) => void; onClose: () => void }) {
@@ -289,11 +289,11 @@ export function SwapSheet({ date, slot, itemId, onClose }: { date: string; slot:
   const current = itemId ? findItem(s, itemId)?.item.recipeId : undefined;
   return (
     <Sheet open onClose={onClose} title={itemId ? 'Swap this meal' : `Add to ${SLOT_LABEL[slot].toLowerCase()}`}>
-      <label className="flex items-center gap-2 mb-3 text-[15px] text-muted">
+      <label className="flex items-center gap-2 mb-3 text-[14px] text-muted">
         <input type="checkbox" checked={allSlots} onChange={(e) => setAllSlots(e.target.checked)} className="w-5 h-5 accent-[var(--rose-deep)]" />Show recipes from every meal type
       </label>
       {s.settings.diets.length > 0 && (
-        <label className="flex items-center gap-2 mb-3 text-[15px] text-muted">
+        <label className="flex items-center gap-2 mb-3 text-[14px] text-muted">
           <input type="checkbox" checked={allDiets} onChange={(e) => setAllDiets(e.target.checked)} className="w-5 h-5 accent-[var(--rose-deep)]" />Include recipes that don’t fit my diet
         </label>
       )}
@@ -317,7 +317,7 @@ export function SwapSheet({ date, slot, itemId, onClose }: { date: string; slot:
               <FoodArt art={r.art} size={48} />
               <div className="flex-1 min-w-0">
                 <div className="font-medium">{r.name}{s.favorites.includes(r.id) && <span className="text-rose"> ♥</span>}</div>
-                <div className="text-[14px] text-muted">{r.servingLabel} · ≈ {m.cal} cal · {m.protein} g protein</div>
+                <div className="text-[13px] text-muted">{r.servingLabel} · ≈ {m.cal} cal · {m.protein} g protein</div>
                 <div className="flex flex-wrap gap-1 mt-1">{dietBadges(r, s.foods).map((b) => <span key={b} className="text-[11px] rounded-full bg-petal text-deep px-2 py-0.5">{b}</span>)}</div>
               </div>
               {r.id === current && <span className="text-[13px] text-muted">Current</span>}
@@ -374,7 +374,7 @@ export function LogFoodSheet({ date, onClose, defaultSlot = 'snack' }: { date: s
             {foods.map((f) => (
               <button key={f.id} className={`w-full text-left px-4 py-3 border-b border-line last:border-0 ${foodId === f.id ? 'bg-petal' : ''}`}
                 onClick={() => { setFoodId(f.id); const u = unitsFor(f)[0]; setUnit(u); setAmt(u === 'each' ? 1 : u === 'g' ? 100 : 1); }}>
-                <div className="text-[15px]">{f.name}{f.state ? <span className="text-muted"> · {f.state}</span> : null}</div>
+                <div className="text-[14px]">{f.name}{f.state ? <span className="text-muted"> · {f.state}</span> : null}</div>
                 <div className="text-[13px] text-muted">{f.per100g.cal} cal / 100 g{f.estimate ? ' · estimate' : ' · from label'}</div>
               </button>
             ))}
@@ -387,7 +387,7 @@ export function LogFoodSheet({ date, onClose, defaultSlot = 'snack' }: { date: s
               </div>
             </div>
           )}
-          {foodMac && <div className="mt-3 text-[15px]"><b>{foodMac.cal} cal</b> · {foodMac.protein} g protein</div>}
+          {foodMac && <div className="mt-3 text-[14px]"><b>{foodMac.cal} cal</b> · {foodMac.protein} g protein</div>}
         </>
       )}
       {tab === 'recipe' && (
@@ -395,11 +395,11 @@ export function LogFoodSheet({ date, onClose, defaultSlot = 'snack' }: { date: s
           <div className="max-h-64 overflow-y-auto rounded-2xl border border-line bg-card mb-3">
             {Object.values(s.recipes).map((r) => (
               <button key={r.id} className={`w-full text-left px-4 py-3 border-b border-line last:border-0 ${recipeId === r.id ? 'bg-petal' : ''}`} onClick={() => setRecipeId(r.id)}>
-                <div className="text-[15px]">{r.name}</div><div className="text-[13px] text-muted">{SLOT_LABEL[r.slot]}</div>
+                <div className="text-[14px]">{r.name}</div><div className="text-[13px] text-muted">{SLOT_LABEL[r.slot]}</div>
               </button>
             ))}
           </div>
-          {recipe && <div className="flex items-center justify-between"><Stepper value={serv} onChange={setServ} format={(v) => `${fmtAmount(v)}×`} /><div className="text-[15px]"><b>{recMac!.cal} cal</b> · {recMac!.protein} g</div></div>}
+          {recipe && <div className="flex items-center justify-between"><Stepper value={serv} onChange={setServ} format={(v) => `${fmtAmount(v)}×`} /><div className="text-[14px]"><b>{recMac!.cal} cal</b> · {recMac!.protein} g</div></div>}
         </>
       )}
       {tab === 'quick' && (

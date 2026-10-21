@@ -70,14 +70,14 @@ function WeightView() {
   const yMax = Math.ceil(Math.max(start, ...vals) + 2);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Card>
         <div className="flex justify-between items-start">
-          <div><div className="eyebrow">Current</div><div className="h-serif text-[38px] leading-none mt-1">{showW(cur, u)}</div></div>
+          <div><div className="eyebrow">Current</div><div className="h-serif text-[30px] leading-none mt-1">{showW(cur, u)}</div></div>
           <button className="btn-primary btn-sm" onClick={() => setSheet('new')}><Plus size={16} />Weigh-in</button>
         </div>
         <div className="mt-4"><Bar pct={p.pct} h={12} /></div>
-        <div className="text-[14px] text-muted mt-1.5">{Math.round(p.pct)}% of the way to {showW(st.goalWeight, u)}</div>
+        <div className="text-[13px] text-muted mt-1.5">{Math.round(p.pct)}% of the way to {showW(st.goalWeight, u)}</div>
         <div className="grid grid-cols-3 gap-2 mt-4 text-center">
           <Mini label="Lost" value={showW(Math.max(0, p.lost), u)} />
           <Mini label="To go" value={showW(p.remaining, u)} />
@@ -135,7 +135,7 @@ function WeightView() {
 }
 
 const Mini = ({ label, value }: { label: string; value: string }) => (
-  <div className="rounded-2xl bg-petal px-2 py-2.5"><div className="text-[12px] text-muted">{label}</div><div className="font-semibold text-[15px] tabular-nums">{value}</div></div>
+  <div className="rounded-2xl bg-petal px-2 py-2.5"><div className="text-[12px] text-muted">{label}</div><div className="font-semibold text-[14px] tabular-nums">{value}</div></div>
 );
 
 const toLen = (inch: number, u: 'in' | 'cm') => (u === 'cm' ? +(inch * 2.54).toFixed(1) : +inch.toFixed(2));
@@ -149,7 +149,7 @@ function BodyView() {
   const series = sorted.filter((m) => m.values[key] != null).map((m) => ({ t: fromKey(m.date).getTime(), v: toLen(m.values[key]!, u) }));
   const first = series[0]?.v, last = series[series.length - 1]?.v;
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <button className="btn-primary w-full" onClick={() => setSheet('new')}><Ruler size={18} />Add measurements</button>
       <Card>
         <Field label="Show">
@@ -180,7 +180,7 @@ function BodyView() {
           {[...sorted].reverse().map((m) => (
             <button key={m.id} className="card p-4 w-full text-left" onClick={() => setSheet(m.id)}>
               <div className="font-medium mb-1 flex justify-between">{fmtDow(m.date)} {fmtShort(m.date)}<Pencil size={14} className="text-muted" /></div>
-              <div className="text-[14px] text-muted">{MEASURES.filter((x) => m.values[x.key] != null).map((x) => `${x.label.replace(' (optional)', '')} ${toLen(m.values[x.key]!, u)}`).join(' · ')}</div>
+              <div className="text-[13px] text-muted">{MEASURES.filter((x) => m.values[x.key] != null).map((x) => `${x.label.replace(' (optional)', '')} ${toLen(m.values[x.key]!, u)}`).join(' · ')}</div>
             </button>
           ))}
         </div>
@@ -211,7 +211,7 @@ function MeasureSheet({ id, onClose }: { id?: string; onClose: () => void }) {
       {ex && <button className="btn-ghost flex-1" onClick={() => { s.set((st) => { st.measures = st.measures.filter((m) => m.id !== ex.id); }); onClose(); }}>Delete</button>}
       <button className="btn-primary flex-[2]" onClick={save}>Save</button></div>}>
       <Field label="Date"><input type="date" className="field" value={date} max={todayKey()} onChange={(e) => e.target.value && setDate(e.target.value)} /></Field>
-      <p className="text-[14px] text-muted mb-3">In {u === 'cm' ? 'centimeters' : 'inches'}. Fill in any you like — skip the rest.</p>
+      <p className="text-[13px] text-muted mb-3">In {u === 'cm' ? 'centimeters' : 'inches'}. Fill in any you like — skip the rest.</p>
       <div className="grid grid-cols-2 gap-x-3">
         {MEASURES.map((m) => <Field key={m.key} label={m.label}><NumberInput value={vals[m.key] ?? null} onChange={(v) => setVals({ ...vals, [m.key]: v })} ariaLabel={m.label} /></Field>)}
       </div>
@@ -264,9 +264,9 @@ function PhotosView() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Card>
-        <div className="text-[14px] text-muted mb-3">Photos stay on this iPhone only — never uploaded anywhere. Include them in backups if you want to keep them.</div>
+        <div className="text-[13px] text-muted mb-3">Photos stay on this iPhone only — never uploaded anywhere. Include them in backups if you want to keep them.</div>
         <Segmented small value={pose} onChange={setPose} options={POSES} />
         <div className="flex gap-2 mt-3 items-end">
           <div className="flex-1"><span className="label">Photo date</span><input type="date" className="field" value={date} max={todayKey()} onChange={(e) => e.target.value && setDate(e.target.value)} /></div>
@@ -353,16 +353,16 @@ function HabitsView() {
   const lead = (first.getDay() + 6) % 7;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="grid grid-cols-3 gap-2">
         <Mini label="Today" value={`${stats.done}/${stats.total}`} />
         <Mini label="This week" value={`${weekPct}%`} />
         <Mini label="Days showing up" value={String(showedUp)} />
       </div>
-      <p className="text-[14px] text-muted -mt-1">{streak > 1 ? `${streak} days in a row with at least one habit. ` : ''}Missed a day? It doesn’t erase anything — every day you show up still counts.</p>
+      <p className="text-[13px] text-muted -mt-1">{streak > 1 ? `${streak} days in a row with at least one habit. ` : ''}Missed a day? It doesn’t erase anything — every day you show up still counts.</p>
 
       <Card>
-        <div className="flex items-center justify-between"><div className="eyebrow">Today</div><button className="text-deep text-[15px] font-medium" onClick={() => setEdit(true)}>Edit habits</button></div>
+        <div className="flex items-center justify-between"><div className="eyebrow">Today</div><button className="text-deep text-[14px] font-medium" onClick={() => setEdit(true)}>Edit habits</button></div>
         <div className="divide-y divide-line">
           {stats.habits.map((h) => <CheckRow key={h.id} on={habitDone(s, h, today)} onToggle={() => toggle(h.id, today)} title={h.name} sub={h.optional ? 'Optional' : undefined} />)}
         </div>
@@ -445,7 +445,7 @@ function HabitEditor({ onClose }: { onClose: () => void }) {
               <input className="field flex-1" value={h.name} aria-label="Habit name" onChange={(e) => s.set((st) => { st.habits.find((x) => x.id === h.id)!.name = e.target.value; })} />
               <button aria-label="Delete habit" className="w-11 h-11 grid place-items-center text-muted" onClick={() => s.set((st) => { st.habits = st.habits.filter((x) => x.id !== h.id); })}><Trash2 size={18} /></button>
             </div>
-            <div className="flex gap-4 mt-2 text-[14px]">
+            <div className="flex gap-4 mt-2 text-[13px]">
               <label className="flex items-center gap-2"><input type="checkbox" className="w-5 h-5 accent-[var(--rose-deep)]" checked={h.home} onChange={(e) => s.set((st) => { st.habits.find((x) => x.id === h.id)!.home = e.target.checked; })} />On Home</label>
               <label className="flex items-center gap-2"><input type="checkbox" className="w-5 h-5 accent-[var(--rose-deep)]" checked={h.optional} onChange={(e) => s.set((st) => { st.habits.find((x) => x.id === h.id)!.optional = e.target.checked; })} />Optional</label>
             </div>
@@ -477,23 +477,23 @@ function MilestonesView() {
           return (
             <div key={m} className={`card p-4 text-center ${hit ? 'bg-petal border-blush' : ''}`}>
               <div className={`mx-auto w-12 h-12 rounded-full grid place-items-center mb-2 ${hit ? 'bg-deep text-white' : 'bg-petal text-blush'}`}><Trophy size={20} /></div>
-              <div className="h-serif text-[28px]">{showW(m, u)}</div>
-              <div className="text-[14px] text-muted">{hit ? `Reached ${fmtShort(hit.date)} ♡` : m === s.settings.goalWeight ? 'Your goal' : 'Ahead of you'}</div>
+              <div className="h-serif text-[24px]">{showW(m, u)}</div>
+              <div className="text-[13px] text-muted">{hit ? `Reached ${fmtShort(hit.date)} ♡` : m === s.settings.goalWeight ? 'Your goal' : 'Ahead of you'}</div>
             </div>
           );
         })}
-        <p className="col-span-2 text-[14px] text-muted">No deadlines — milestones arrive when they arrive.</p>
+        <p className="col-span-2 text-[13px] text-muted">No deadlines — milestones arrive when they arrive.</p>
       </div>
       <div>
-        <div className="flex items-center justify-between mb-2"><h3 className="h-serif text-[22px]">Weekly check-ins</h3>
+        <div className="flex items-center justify-between mb-2"><h3 className="h-serif text-[19px]">Weekly check-ins</h3>
           <button className="btn-soft btn-sm" onClick={() => setOpen(thisWeek)}>This week</button></div>
-        {checks.length === 0 ? <p className="text-[15px] text-muted">Your Sunday check-ins will collect here — a lovely record of how far you’ve come.</p> : (
+        {checks.length === 0 ? <p className="text-[14px] text-muted">Your Sunday check-ins will collect here — a lovely record of how far you’ve come.</p> : (
           <div className="space-y-2">
             {checks.map((c) => (
               <button key={c.weekStart} className="card p-4 w-full text-left" onClick={() => setOpen(c.weekStart)}>
                 <div className="font-medium">Week of {fmtShort(c.weekStart)}</div>
-                {c.wins && <div className="text-[14px]"><span className="text-muted">Wins:</span> {c.wins}</div>}
-                {c.focus && <div className="text-[14px]"><span className="text-muted">Focus:</span> {c.focus}</div>}
+                {c.wins && <div className="text-[13px]"><span className="text-muted">Wins:</span> {c.wins}</div>}
+                {c.focus && <div className="text-[13px]"><span className="text-muted">Focus:</span> {c.focus}</div>}
               </button>
             ))}
           </div>

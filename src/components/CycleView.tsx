@@ -59,13 +59,13 @@ export function CycleView() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Card>
         {st ? (
           <>
             <div className="eyebrow">Cycle day {st.day}</div>
-            <div className="h-serif text-[28px] leading-tight mt-1">{st.phase}</div>
-            <p className="text-[15px] mt-1">{PHASE_NOTE[st.phase]}</p>
+            <div className="h-serif text-[24px] leading-tight mt-1">{st.phase}</div>
+            <p className="text-[14px] mt-1">{PHASE_NOTE[st.phase]}</p>
             <div className="grid grid-cols-3 gap-2 mt-4 text-center">
               <Mini l="Next period" v={cur ? '—' : st.until >= 0 ? `~${fmtShort(st.nextStart)}` : `${-st.until}d late`} />
               <Mini l="Avg cycle" v={`${length} days`} />
@@ -76,7 +76,7 @@ export function CycleView() {
         ) : (
           <div className="flex gap-3 items-start">
             <span className="w-10 h-10 rounded-full bg-petal text-deep grid place-items-center shrink-0"><CalendarHeart size={19} /></span>
-            <div><div className="font-semibold">Log your last period to begin</div><p className="text-[14px] text-muted">Set the date below to when it started, then tap “My period started.”</p></div>
+            <div><div className="font-semibold">Log your last period to begin</div><p className="text-[13px] text-muted">Set the date below to when it started, then tap “My period started.”</p></div>
           </div>
         )}
       </Card>
@@ -134,7 +134,7 @@ export function CycleView() {
               return (
                 <button key={p.id} className="w-full text-left px-4 py-3 flex justify-between" onClick={() => setEdit(p)}>
                   <span>{fmtShort(p.start)} – {p.end ? fmtShort(p.end) : 'ongoing'}</span>
-                  <span className="text-muted text-[14px]">{p.end ? `${daysBetween(p.start, p.end) + 1}-day period` : ''}{next ? ` · ${daysBetween(p.start, next.start)}-day cycle` : ''}</span>
+                  <span className="text-muted text-[13px]">{p.end ? `${daysBetween(p.start, p.end) + 1}-day period` : ''}{next ? ` · ${daysBetween(p.start, next.start)}-day cycle` : ''}</span>
                 </button>
               );
             })}
@@ -147,7 +147,7 @@ export function CycleView() {
   );
 }
 
-const Mini = ({ l, v }: { l: string; v: string }) => <div className="rounded-2xl bg-petal px-2 py-2.5"><div className="text-[12px] text-muted">{l}</div><div className="font-semibold text-[15px]">{v}</div></div>;
+const Mini = ({ l, v }: { l: string; v: string }) => <div className="rounded-2xl bg-petal px-2 py-2.5"><div className="text-[12px] text-muted">{l}</div><div className="font-semibold text-[14px]">{v}</div></div>;
 
 function EditPeriod({ p, onClose }: { p: Period; onClose: () => void }) {
   const s = useStore();

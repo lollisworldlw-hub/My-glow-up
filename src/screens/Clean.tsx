@@ -40,10 +40,10 @@ function Today() {
   });
   const rooms = [...new Set(list.map((t) => t.room))];
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Card>
         <div className="flex justify-between items-center mb-2">
-          <div><div className="font-semibold">{done.filter((d) => list.some((t) => t.id === d)).length} of {list.length} done</div><div className="text-[14px] text-muted">{mins ? `About ${mins} minutes left` : list.length ? 'All done — enjoy your space ♡' : 'Nothing scheduled today'}</div></div>
+          <div><div className="font-semibold">{done.filter((d) => list.some((t) => t.id === d)).length} of {list.length} done</div><div className="text-[13px] text-muted">{mins ? `About ${mins} minutes left` : list.length ? 'All done — enjoy your space ♡' : 'Nothing scheduled today'}</div></div>
           <Sparkles className="text-rose" />
         </div>
         <Bar pct={list.length ? (done.filter((d) => list.some((t) => t.id === d)).length / list.length) * 100 : 0} color="var(--sage)" />
@@ -82,11 +82,11 @@ function Week() {
         return (
           <div key={d} className={`card p-4 ${d === today ? 'border-rose' : ''}`}>
             <div className="flex justify-between mb-1"><div className="font-semibold">{fmtDow(d)} {fmtShort(d)}{d === today && <span className="text-deep text-[13px] ml-2">Today</span>}</div><div className="text-[13px] text-muted">{list.reduce((a, t) => a + t.minutes, 0)} min</div></div>
-            {list.length ? list.map((t) => <div key={t.id} className={`text-[15px] ${done.includes(t.id) ? 'line-through text-muted' : ''}`}>• {t.name}</div>) : <div className="text-[14px] text-muted">Just the daily basics</div>}
+            {list.length ? list.map((t) => <div key={t.id} className={`text-[14px] ${done.includes(t.id) ? 'line-through text-muted' : ''}`}>• {t.name}</div>) : <div className="text-[13px] text-muted">Just the daily basics</div>}
           </div>
         );
       })}
-      <p className="text-[14px] text-muted">Daily tasks show every day on Today. Monthly and every-few-days tasks appear when they’re due and stay until you check them off.</p>
+      <p className="text-[13px] text-muted">Daily tasks show every day on Today. Monthly and every-few-days tasks appear when they’re due and stay until you check them off.</p>
     </div>
   );
 }
@@ -96,7 +96,7 @@ function AllTasks() {
   const [edit, setEdit] = useState<CleanTask | 'new' | null>(null);
   const [rooms, setRooms] = useState(false);
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="grid grid-cols-2 gap-2">
         <button className="btn-primary btn-sm" onClick={() => setEdit('new')}><Plus size={16} />New task</button>
         <button className="btn-soft btn-sm" onClick={() => setRooms(true)}>Edit rooms</button>

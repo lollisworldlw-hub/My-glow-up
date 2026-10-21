@@ -41,14 +41,14 @@ export default function Workouts() {
       <div className="mb-5"><Segmented value={tab} onChange={setTab} options={[{ value: 'today', label: 'Today' }, { value: 'week', label: 'Schedule' }, { value: 'history', label: 'History' }]} /></div>
 
       {tab === 'today' && (
-        <div className="space-y-4">
+        <div className="space-y-3">
           <Card>
             <div className="flex items-start gap-3">
               <div className="w-12 h-12 rounded-2xl bg-petal text-deep grid place-items-center"><Footprints /></div>
               <div className="flex-1">
                 <div className="eyebrow">Lunch</div>
-                <div className="h-serif text-[24px] leading-tight">{sched.walk === 'walk' ? `${s.settings.walkMinutes}-minute brisk walk` : WALK_LABEL[sched.walk]}</div>
-                <div className="text-[14px] text-muted">{sched.walk === 'recovery' ? 'Rest is part of the plan. A gentle stroll is welcome.' : 'Brisk enough to warm up, easy enough to chat.'}</div>
+                <div className="h-serif text-[20px] leading-tight">{sched.walk === 'walk' ? `${s.settings.walkMinutes}-minute brisk walk` : WALK_LABEL[sched.walk]}</div>
+                <div className="text-[13px] text-muted">{sched.walk === 'recovery' ? 'Rest is part of the plan. A gentle stroll is welcome.' : 'Brisk enough to warm up, easy enough to chat.'}</div>
               </div>
             </div>
             {doneToday(true) ? <div className="mt-4 rounded-2xl bg-sage/20 text-sagedeep font-medium px-4 py-3 flex items-center gap-2"><Check size={18} />Walk done today</div> : (
@@ -64,8 +64,8 @@ export default function Workouts() {
               <div className="w-12 h-12 rounded-2xl bg-petal text-deep grid place-items-center">{sched.home === 'strength' ? <Dumbbell /> : sched.home === 'rest' ? <Moon /> : <Bike />}</div>
               <div className="flex-1">
                 <div className="eyebrow">At home</div>
-                <div className="h-serif text-[24px] leading-tight">{homeDef?.name ?? HOME_LABEL.rest}</div>
-                <div className="text-[14px] text-muted">{homeDef ? `${homeDef.plannedMin} min · ${homeDef.subtitle}` : 'No workout today — recovery helps you come back stronger.'}</div>
+                <div className="h-serif text-[20px] leading-tight">{homeDef?.name ?? HOME_LABEL.rest}</div>
+                <div className="text-[13px] text-muted">{homeDef ? `${homeDef.plannedMin} min · ${homeDef.subtitle}` : 'No workout today — recovery helps you come back stronger.'}</div>
               </div>
             </div>
             {sched.home === 'bike' && (
@@ -74,7 +74,7 @@ export default function Workouts() {
             {homeDef && (
               <>
                 <div className="mt-4 rounded-2xl bg-petal p-3 space-y-1">
-                  {summarize(homeDef.id).map((l, i) => <div key={i} className="text-[15px] flex justify-between gap-2"><span>{l[0]}</span><span className="text-muted tabular-nums whitespace-nowrap">{l[1]}</span></div>)}
+                  {summarize(homeDef.id).map((l, i) => <div key={i} className="text-[14px] flex justify-between gap-2"><span>{l[0]}</span><span className="text-muted tabular-nums whitespace-nowrap">{l[1]}</span></div>)}
                 </div>
                 {doneToday(false) ? <div className="mt-4 rounded-2xl bg-sage/20 text-sagedeep font-medium px-4 py-3 flex items-center gap-2"><Check size={18} />Home workout done today</div> : (
                   <div className="flex gap-2 mt-4">
@@ -93,7 +93,7 @@ export default function Workouts() {
           </Card>
 
           <SectionTitle>Your strength moves</SectionTitle>
-          <p className="text-[14px] text-muted -mt-1 mb-3">Each move has 5 levels. When you hit every rep and it feels easy for two workouts in a row, I'll suggest the next level — making moves harder over time is what keeps your muscle while you lose fat.</p>
+          <p className="text-[13px] text-muted -mt-1 mb-3">Each move has 5 levels. When you hit every rep and it feels easy for two workouts in a row, I'll suggest the next level — making moves harder over time is what keeps your muscle while you lose fat.</p>
           <div className="space-y-2">
             {['squat', 'pushup', 'hinge', 'knee'].map((id) => {
               const lv = levelOf(s.exerciseLevels, id);
@@ -111,8 +111,8 @@ export default function Workouts() {
                       <div className="text-[13px] text-muted">{id === 'knee' ? '12 each side' : '12 reps'} × 2 rounds{last ? ` · last time: ${last.reps![id].join(' / ')}` : ''}</div>
                     </div>
                   </div>
-                  <p className="text-[14px] mt-2">{info.how}</p>
-                  {ready && <div className="mt-2 rounded-2xl bg-petal px-3 py-2 text-[14px]">You’ve nailed this twice — ready for <b>{LEVELS[id][lv + 1].name}</b>?</div>}
+                  <p className="text-[13px] mt-2">{info.how}</p>
+                  {ready && <div className="mt-2 rounded-2xl bg-petal px-3 py-2 text-[13px]">You’ve nailed this twice — ready for <b>{LEVELS[id][lv + 1].name}</b>?</div>}
                   <div className="flex gap-2 mt-2">
                     {lv > 0 && <button className="btn-ghost btn-sm flex-1" onClick={() => s.set((st) => { st.exerciseLevels[id] = lv - 1; })}>Easier</button>}
                     {lv < LEVELS[id].length - 1 && <button className={`${ready ? 'btn-primary' : 'btn-soft'} btn-sm flex-1`} onClick={() => { s.set((st) => { st.exerciseLevels[id] = lv + 1; }); toast(`Level up: ${LEVELS[id][lv + 1].name} ♡`); }}>Level up</button>}
@@ -126,7 +126,7 @@ export default function Workouts() {
             </div>
           </div>
           <StepsCard today={today} />
-          <p className="text-[14px] text-muted">The timer keeps accurate time even if you lock your phone. iPhone may not play sounds or vibrate while the app is in the background — check back when you’re ready.</p>
+          <p className="text-[13px] text-muted">The timer keeps accurate time even if you lock your phone. iPhone may not play sounds or vibrate while the app is in the background — check back when you’re ready.</p>
         </div>
       )}
 
@@ -142,7 +142,7 @@ export default function Workouts() {
                   <div className={`w-11 h-11 rounded-full grid place-items-center ${w.completed ? 'bg-sage/25 text-sagedeep' : 'bg-petal text-deep'}`}>{w.type === 'walk' ? <Footprints size={19} /> : w.type === 'strength' ? <Dumbbell size={19} /> : <Bike size={19} />}</div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium">{w.name}</div>
-                    <div className="text-[14px] text-muted">{fmtDow(w.date)} {fmtShort(w.date)} · {w.actualMin} of {w.plannedMin} min · {w.completed ? 'Completed' : 'Partial'}{w.difficulty ? ` · felt ${['easy', 'light', 'good', 'hard', 'max'][w.difficulty - 1]}` : ''}</div>
+                    <div className="text-[13px] text-muted">{fmtDow(w.date)} {fmtShort(w.date)} · {w.actualMin} of {w.plannedMin} min · {w.completed ? 'Completed' : 'Partial'}{w.difficulty ? ` · felt ${['easy', 'light', 'good', 'hard', 'max'][w.difficulty - 1]}` : ''}</div>
                   </div>
                   <button aria-label="Delete workout" className="w-10 h-10 grid place-items-center text-muted" onClick={() => s.set((st) => { st.workouts = st.workouts.filter((x) => x.id !== w.id); })}><Trash2 size={17} /></button>
                 </div>
@@ -174,11 +174,11 @@ function ScheduleView({ today }: { today: string }) {
         return (
           <div key={d} className={`p-4 ${isToday ? 'bg-petal/60' : ''}`}>
             <div className="flex justify-between"><div className="font-semibold">{DOW_NAMES[d]}{isToday && <span className="text-deep text-[13px] ml-2">Today</span>}</div></div>
-            <div className="text-[15px] text-muted mt-0.5">Lunch: {sc.walk === 'walk' ? `${s.settings.walkMinutes}-minute brisk walk` : WALK_LABEL[sc.walk]} · Home: {HOME_LABEL[sc.home]}</div>
+            <div className="text-[14px] text-muted mt-0.5">Lunch: {sc.walk === 'walk' ? `${s.settings.walkMinutes}-minute brisk walk` : WALK_LABEL[sc.walk]} · Home: {HOME_LABEL[sc.home]}</div>
           </div>
         );
       })}
-      <p className="p-4 text-[14px] text-muted">Change your schedule anytime in Settings → Exercise schedule.</p>
+      <p className="p-4 text-[13px] text-muted">Change your schedule anytime in Settings → Exercise schedule.</p>
     </div>
   );
 }
@@ -213,7 +213,7 @@ function StepsCard({ today }: { today: string }) {
     <>
       <SectionTitle>Steps</SectionTitle>
       <Card>
-        <p className="text-[14px] text-muted mb-3">A desk job makes everyday steps extra valuable. Copy today’s count from your iPhone’s Health app.</p>
+        <p className="text-[13px] text-muted mb-3">A desk job makes everyday steps extra valuable. Copy today’s count from your iPhone’s Health app.</p>
         <div className="flex gap-2">
           <div className="flex-1"><NumberInput value={val} onChange={setVal} placeholder={`Goal ${s.settings.stepsGoal.toLocaleString()}`} ariaLabel="Steps today" /></div>
           <button className="btn-primary" onClick={() => { if (val == null) return; s.set((st) => { st.steps[today] = Math.round(val); }); toast('Steps saved'); }}>Save</button>

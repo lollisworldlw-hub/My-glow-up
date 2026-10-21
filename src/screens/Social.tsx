@@ -41,7 +41,7 @@ export default function Social() {
         <Card>
           <div className="flex gap-3 items-start mb-4">
             <span className="w-11 h-11 rounded-full bg-petal text-deep grid place-items-center shrink-0"><Lock size={19} /></span>
-            <p className="text-[15px]">Chat with your friends, share wins, and cheer each other on. <b>Your weight, food, cycle, mood and everything else stay private</b> — friends only see your name, emoji, and what you choose to post.</p>
+            <p className="text-[14px]">Chat with your friends, share wins, and cheer each other on. <b>Your weight, food, cycle, mood and everything else stay private</b> — friends only see your name, emoji, and what you choose to post.</p>
           </div>
           {email && member === null ? <p className="text-muted">Checking your account…</p> : <AccountForm />}
         </Card>
@@ -88,7 +88,7 @@ function RecipeCard({ m, me, mine }: { m: Message; me: string; mine: boolean }) 
     <div className="rounded-3xl border border-blush bg-card overflow-hidden shadow-soft w-full">
       {m.meta?.image && <MediaImg image={m.meta.image} />}
       <button className="w-full text-left px-4 pt-3" onClick={() => setOpen(true)}>
-        {m.body && <div className="text-[15px] mb-2">{m.body}</div>}
+        {m.body && <div className="text-[14px] mb-2">{m.body}</div>}
         <div className="flex items-center gap-3">
           {!m.meta?.image && <FoodArt art={p.recipe.art} size={48} />}
           <div className="min-w-0"><div className="eyebrow !text-[11px]">Recipe · {SLOT_LABEL[p.recipe.slot]}</div>
@@ -103,12 +103,12 @@ function RecipeCard({ m, me, mine }: { m: Message; me: string; mine: boolean }) 
       {open && (
         <Sheet open onClose={() => setOpen(false)} title={p.recipe.name} footer={!mine ? <button className="btn-primary w-full" onClick={() => { save(); setOpen(false); }}>Save to my recipes</button> : undefined}>
           {m.meta?.image && <div className="mb-3"><MediaImg image={m.meta.image} /></div>}
-          <div className="text-[15px] mb-3">{p.recipe.servingLabel} · ≈ {p.macros.cal} cal · {p.macros.protein} g protein</div>
-          <h3 className="h-serif text-[20px] mb-1">Ingredients</h3>
-          <ul className="list-disc pl-5 mb-3 text-[15px]">{p.recipe.ingredients.map((i, k) => <li key={k}>{fmtIngredient(foods[i.foodId], i)}</li>)}</ul>
-          <h3 className="h-serif text-[20px] mb-1">Steps</h3>
-          <ol className="list-decimal pl-5 text-[15px] space-y-1">{p.recipe.instructions.map((t, k) => <li key={k}>{t}</li>)}</ol>
-          {p.recipe.note && <p className="text-[14px] text-muted mt-2">{p.recipe.note}</p>}
+          <div className="text-[14px] mb-3">{p.recipe.servingLabel} · ≈ {p.macros.cal} cal · {p.macros.protein} g protein</div>
+          <h3 className="h-serif text-[17px] mb-1">Ingredients</h3>
+          <ul className="list-disc pl-5 mb-3 text-[14px]">{p.recipe.ingredients.map((i, k) => <li key={k}>{fmtIngredient(foods[i.foodId], i)}</li>)}</ul>
+          <h3 className="h-serif text-[17px] mb-1">Steps</h3>
+          <ol className="list-decimal pl-5 text-[14px] space-y-1">{p.recipe.instructions.map((t, k) => <li key={k}>{t}</li>)}</ol>
+          {p.recipe.note && <p className="text-[13px] text-muted mt-2">{p.recipe.note}</p>}
         </Sheet>
       )}
     </div>
@@ -117,7 +117,8 @@ function RecipeCard({ m, me, mine }: { m: Message; me: string; mine: boolean }) 
 
 function Bubble({ m, me, onLong }: { m: Message; me: string; onLong: () => void }) {
   const member = useSocial((s) => s.members[m.sender]);
-  const reactions = useSocial((s) => s.reactions.filter((r) => r.message_id === m.id));
+  const allReactions = useSocial((s) => s.reactions);
+  const reactions = useMemo(() => allReactions.filter((r) => r.message_id === m.id), [allReactions, m.id]);
   const [picker, setPicker] = useState(false);
   const [zoom, setZoom] = useState<string | null>(null);
   const mine = m.sender === me;
@@ -129,22 +130,22 @@ function Bubble({ m, me, onLong }: { m: Message; me: string; onLong: () => void 
   if (m.kind === 'recipe') content = <RecipeCard m={m} me={me} mine={mine} />;
   else if (m.kind === 'achievement') content = (
     <div className="rounded-3xl border border-blush bg-card px-4 py-3 text-left shadow-soft">
-      <div className="flex items-center gap-3"><span className="text-[30px]">{m.meta?.icon ?? '🏆'}</span>
-        <div><div className="eyebrow !text-[11px]">Achievement</div><div className="font-semibold text-[16px] leading-snug">{m.body}</div></div></div>
+      <div className="flex items-center gap-3"><span className="text-[26px]">{m.meta?.icon ?? '🏆'}</span>
+        <div><div className="eyebrow !text-[11px]">Achievement</div><div className="font-semibold text-[15px] leading-snug">{m.body}</div></div></div>
     </div>
   );
   else if (m.kind === 'photo' || m.meta?.image || gif) content = (
     <div className={`rounded-3xl overflow-hidden ${mine ? 'bg-deep text-white' : 'bg-card border border-line'} w-full`}>
       {gif ? <img src={gif} alt="GIF" className="w-full rounded-2xl" style={{ maxHeight: 300, objectFit: 'cover' }} /> : <MediaImg image={m.meta.image} onOpen={setZoom} />}
       {m.kind === 'photo' && m.meta?.slot && <div className={`px-4 pt-2 text-[12px] uppercase tracking-wider ${mine ? 'text-white/80' : 'text-muted'}`}>{SLOT_LABEL[m.meta.slot as keyof typeof SLOT_LABEL]}</div>}
-      {caption && !gif && <div className="px-4 py-2 text-[15px] whitespace-pre-wrap break-words">{caption}</div>}
+      {caption && !gif && <div className="px-4 py-2 text-[14px] whitespace-pre-wrap break-words">{caption}</div>}
     </div>
   );
-  else content = <div className={`rounded-3xl px-4 py-2.5 text-left text-[16px] whitespace-pre-wrap break-words ${mine ? 'bg-deep text-white rounded-br-lg' : 'bg-card border border-line rounded-bl-lg'}`}>{m.body}</div>;
+  else content = <div className={`rounded-3xl px-4 py-2.5 text-left text-[15px] whitespace-pre-wrap break-words ${mine ? 'bg-deep text-white rounded-br-lg' : 'bg-card border border-line rounded-bl-lg'}`}>{m.body}</div>;
 
   return (
     <div className={`flex gap-2 ${mine ? 'justify-end' : ''}`}>
-      {!mine && <div className="w-9 h-9 rounded-full bg-petal grid place-items-center text-[18px] shrink-0 mt-5" aria-hidden>{member?.emoji ?? '🌸'}</div>}
+      {!mine && <div className="w-9 h-9 rounded-full bg-petal grid place-items-center text-[16px] shrink-0 mt-5" aria-hidden>{member?.emoji ?? '🌸'}</div>}
       <div className={`${m.kind === 'text' && !m.meta?.image && !gif ? 'max-w-[80%]' : 'w-[80%]'} min-w-0 flex flex-col ${mine ? 'items-end' : ''}`}>
         <div className={`text-[12px] text-muted mb-1 ${mine ? 'text-right' : ''}`}>{mine ? 'You' : member?.display_name ?? 'Friend'} · {timeLabel(m.created_at)}</div>
         <div className="w-full flex flex-col" style={{ alignItems: mine ? 'flex-end' : 'flex-start' }} onDoubleClick={() => toggleReaction(m.id, '❤️')}
@@ -158,7 +159,7 @@ function Bubble({ m, me, onLong }: { m: Message; me: string; onLong: () => void 
         </div>
         {picker && (
           <div className={`flex flex-wrap gap-1 mt-1 p-1.5 rounded-2xl bg-card border border-line shadow-soft ${mine ? 'self-end' : ''}`}>
-            {REACTIONS.map((e) => <button key={e} aria-label={`React ${e}`} onClick={() => { toggleReaction(m.id, e); setPicker(false); }} className="w-10 h-10 rounded-full text-[20px] hover:bg-petal">{e}</button>)}
+            {REACTIONS.map((e) => <button key={e} aria-label={`React ${e}`} onClick={() => { toggleReaction(m.id, e); setPicker(false); }} className="w-10 h-10 rounded-full text-[17px] hover:bg-petal">{e}</button>)}
           </div>
         )}
       </div>
@@ -188,12 +189,12 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
 
   return (
     <>
-      <div className="space-y-4 pb-24">
+      <div className="space-y-3 pb-24">
         {msgs.length === 0 && <Empty icon={<Send />} title={peer ? 'Say hi!' : 'Start the conversation'} sub={peer ? 'Only the two of you can see these messages.' : 'Share a win, ask for a recipe, or cheer someone on.'} />}
         {msgs.map((m) => <Bubble key={m.id} m={m} me={me} onLong={() => setDel(m)} />)}
         <div ref={end} />
       </div>
-      <div className="fixed inset-x-0 z-30 bg-bg/95 backdrop-blur border-t border-line" style={{ bottom: 'calc(63px + env(safe-area-inset-bottom))' }}>
+      <div className="fixed inset-x-0 z-30 bg-bg/95 backdrop-blur border-t border-line" style={{ bottom: 'calc(55px + env(safe-area-inset-bottom))' }}>
         <div className="mx-auto max-w-[640px] px-3 py-2 flex gap-2 items-end">
           {peer === null && <button aria-label="Share an achievement" className="w-11 h-11 shrink-0 rounded-full bg-petal text-deep grid place-items-center" onClick={() => setShare(true)}><Trophy size={19} /></button>}
           {GIPHY_KEY && <button aria-label="Search GIFs" className="h-11 px-3 shrink-0 rounded-full bg-petal text-deep font-bold text-[13px]" onClick={() => setGifs(true)}>GIF</button>}
@@ -215,7 +216,7 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
       {gifs && <GifPicker onClose={() => setGifs(false)} onPick={async (url) => { setGifs(false); try { await send(url, peer); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); } }} />}
       {del && (
         <Sheet open onClose={() => setDel(null)} title="Your message">
-          <p className="text-[15px] mb-4 whitespace-pre-wrap">{del.body}</p>
+          <p className="text-[14px] mb-4 whitespace-pre-wrap">{del.body}</p>
           <button className="btn-ghost w-full text-deep" onClick={async () => { try { await removeMessage(del.id); toast('Message deleted'); } catch { toast('Couldn’t delete'); } setDel(null); }}><Trash2 size={16} />Delete for everyone</button>
         </Sheet>
       )}
@@ -245,15 +246,15 @@ export function ShareSheet({ onClose, preselect }: { onClose: () => void; presel
 
   return (
     <Sheet open onClose={onClose} title="Share an achievement">
-      <p className="text-[14px] text-muted mb-3">Only the words on the card are shared. Numbers stay private unless you switch them on for that post.</p>
-      {shown.length === 0 && <p className="text-[15px] mb-3">No new achievements yet — they appear as you log workouts, habits, and weigh-ins. You can write your own below.</p>}
+      <p className="text-[13px] text-muted mb-3">Only the words on the card are shared. Numbers stay private unless you switch them on for that post.</p>
+      {shown.length === 0 && <p className="text-[14px] mb-3">No new achievements yet — they appear as you log workouts, habits, and weigh-ins. You can write your own below.</p>}
       <div className="space-y-2 mb-4">
         {shown.map((a) => (
           <div key={a.key} className="card p-3">
-            <div className="flex items-center gap-3"><span className="text-[28px]">{a.icon}</span><div className="flex-1 font-medium">{nums[a.key] && a.withNumbers ? a.withNumbers : a.title}</div></div>
+            <div className="flex items-center gap-3"><span className="text-[24px]">{a.icon}</span><div className="flex-1 font-medium">{nums[a.key] && a.withNumbers ? a.withNumbers : a.title}</div></div>
             <div className="flex items-center justify-between mt-2 gap-2">
               {a.withNumbers ? (
-                <label className="flex items-center gap-2 text-[14px] text-muted"><input type="checkbox" className="w-5 h-5 accent-[var(--rose-deep)]" checked={!!nums[a.key]} onChange={(e) => setNums({ ...nums, [a.key]: e.target.checked })} />Include numbers</label>
+                <label className="flex items-center gap-2 text-[13px] text-muted"><input type="checkbox" className="w-5 h-5 accent-[var(--rose-deep)]" checked={!!nums[a.key]} onChange={(e) => setNums({ ...nums, [a.key]: e.target.checked })} />Include numbers</label>
               ) : <span />}
               <button className="btn-primary btn-sm" onClick={() => share(a)}><Share2 size={15} />Share</button>
             </div>
@@ -281,7 +282,7 @@ function DMList({ me }: { me: string }) {
     return (
       <div>
         <button className="flex items-center gap-2 text-deep font-medium mb-4 min-h-[40px]" onClick={() => setPeer(null)}><ChevronLeft size={18} />All messages</button>
-        <div className="flex items-center gap-3 mb-4"><span className="w-11 h-11 rounded-full bg-petal grid place-items-center text-[22px]">{p?.emoji}</span><div><div className="font-semibold">{p?.display_name}</div><div className="text-[13px] text-muted">Private — only you two can see this</div></div></div>
+        <div className="flex items-center gap-3 mb-4"><span className="w-11 h-11 rounded-full bg-petal grid place-items-center text-[19px]">{p?.emoji}</span><div><div className="font-semibold">{p?.display_name}</div><div className="text-[13px] text-muted">Private — only you two can see this</div></div></div>
         <Thread peer={peer} me={me} />
       </div>
     );
@@ -295,8 +296,8 @@ function DMList({ me }: { me: string }) {
         const unread = thread.filter((m) => m.sender === o.user_id && m.id > (lastRead[o.user_id] ?? 0)).length;
         return (
           <button key={o.user_id} className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => setPeer(o.user_id)}>
-            <span className="w-11 h-11 rounded-full bg-petal grid place-items-center text-[22px] shrink-0">{o.emoji}</span>
-            <span className="flex-1 min-w-0"><span className="block font-medium">{o.display_name}</span><span className="block text-[14px] text-muted truncate">{last ? (last.sender === me ? 'You: ' : '') + last.body : 'Say hi ♡'}</span></span>
+            <span className="w-11 h-11 rounded-full bg-petal grid place-items-center text-[19px] shrink-0">{o.emoji}</span>
+            <span className="flex-1 min-w-0"><span className="block font-medium">{o.display_name}</span><span className="block text-[13px] text-muted truncate">{last ? (last.sender === me ? 'You: ' : '') + last.body : 'Say hi ♡'}</span></span>
             {unread > 0 && <span className="min-w-[22px] h-[22px] px-1.5 rounded-full bg-deep text-white text-[12px] grid place-items-center">{unread}</span>}
           </button>
         );
@@ -322,10 +323,10 @@ function Friends({ me }: { me: string }) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Card>
         <div className="eyebrow mb-3">Your profile</div>
-        <div className="flex flex-wrap gap-2 mb-4">{EMOJIS.map((e) => <button key={e} aria-label={`Avatar ${e}`} onClick={() => updateProfile({ emoji: e })} className={`w-11 h-11 rounded-full text-[22px] grid place-items-center ${mine?.emoji === e ? 'bg-deep' : 'bg-petal'}`}>{e}</button>)}</div>
+        <div className="flex flex-wrap gap-2 mb-4">{EMOJIS.map((e) => <button key={e} aria-label={`Avatar ${e}`} onClick={() => updateProfile({ emoji: e })} className={`w-11 h-11 rounded-full text-[19px] grid place-items-center ${mine?.emoji === e ? 'bg-deep' : 'bg-petal'}`}>{e}</button>)}</div>
         <Field label="Display name"><input className="field" value={name} maxLength={40} onChange={(e) => setName(e.target.value)} /></Field>
         <Field label="A little about you (optional)"><input className="field" value={bio} maxLength={200} onChange={(e) => setBio(e.target.value)} placeholder="Mom of 2, chocolate lover, walking queen" /></Field>
         <button className="btn-soft btn-sm" disabled={!name.trim()} onClick={async () => { try { await updateProfile({ display_name: name.trim(), bio }); toast('Profile saved'); } catch (e: any) { toast(e?.message ?? 'Couldn’t save'); } }}>Save profile</button>
@@ -333,7 +334,7 @@ function Friends({ me }: { me: string }) {
 
       <Card>
         <div className="eyebrow mb-2">Invite a friend</div>
-        <p className="text-[14px] text-muted mb-3">Each code works once. Send it to a friend — they enter it when creating their account.</p>
+        <p className="text-[13px] text-muted mb-3">Each code works once. Send it to a friend — they enter it when creating their account.</p>
         <button className="btn-primary w-full mb-3" onClick={async () => { try { const c = await createInvite(); setCodes(await myInvites()); shareCode(c); } catch (e: any) { toast(e?.message ?? 'Couldn’t create a code'); } }}><UserPlus size={18} />Create invite code</button>
         {codes.map((c) => (
           <div key={c.code} className="flex items-center justify-between py-2 border-t border-line">
@@ -344,24 +345,24 @@ function Friends({ me }: { me: string }) {
       </Card>
 
       <div>
-        <h3 className="h-serif text-[22px] mb-2">Members</h3>
+        <h3 className="h-serif text-[19px] mb-2">Members</h3>
         <div className="card divide-y divide-line !rounded-2xl">
           {Object.values(members).sort((a, b) => a.joined_at.localeCompare(b.joined_at)).map((m) => (
             <div key={m.user_id} className="flex items-center gap-3 px-4 py-3">
-              <span className="w-11 h-11 rounded-full bg-petal grid place-items-center text-[22px] shrink-0">{m.emoji}</span>
-              <div className="min-w-0"><div className="font-medium">{m.display_name}{m.user_id === me ? ' (you)' : ''}</div>{m.bio && <div className="text-[14px] text-muted">{m.bio}</div>}</div>
+              <span className="w-11 h-11 rounded-full bg-petal grid place-items-center text-[19px] shrink-0">{m.emoji}</span>
+              <div className="min-w-0"><div className="font-medium">{m.display_name}{m.user_id === me ? ' (you)' : ''}</div>{m.bio && <div className="text-[13px] text-muted">{m.bio}</div>}</div>
             </div>
           ))}
         </div>
       </div>
 
       <Card className="bg-petal border-blush">
-        <div className="flex gap-3"><Lock size={18} className="text-deep shrink-0 mt-0.5" /><p className="text-[14px]">Friends can see only your profile, group posts, and private messages sent to them. Your weight, goals, meals, cycle, mood and photos are never shared.</p></div>
+        <div className="flex gap-3"><Lock size={18} className="text-deep shrink-0 mt-0.5" /><p className="text-[13px]">Friends can see only your profile, group posts, and private messages sent to them. Your weight, goals, meals, cycle, mood and photos are never shared.</p></div>
       </Card>
       <button className="btn-ghost w-full" onClick={() => setLeaving(true)}><LogOut size={16} />Leave the group</button>
       {leaving && (
         <Sheet open onClose={() => setLeaving(false)} title="Leave the group?">
-          <p className="text-[15px] mb-4">This removes your profile and all your messages, and deletes your cloud backup. Data on this phone stays. You’d need a new invite code to rejoin.</p>
+          <p className="text-[14px] mb-4">This removes your profile and all your messages, and deletes your cloud backup. Data on this phone stays. You’d need a new invite code to rejoin.</p>
           <button className="btn-primary w-full" onClick={async () => { try { await leaveGroup(); toast('You left the group'); } catch (e: any) { toast(e?.message ?? 'Couldn’t leave'); } setLeaving(false); }}>Leave & delete my group data</button>
         </Sheet>
       )}

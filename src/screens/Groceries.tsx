@@ -52,7 +52,7 @@ function GroceryList() {
     <>
       <Card className="mb-4">
         <div className="flex justify-between items-center mb-2">
-          <div><div className="font-semibold">{done} of {items.length} in the basket</div>{total > 0 && <div className="text-[14px] text-muted">Estimated ${total.toFixed(2)}</div>}</div>
+          <div><div className="font-semibold">{done} of {items.length} in the basket</div>{total > 0 && <div className="text-[13px] text-muted">Estimated ${total.toFixed(2)}</div>}</div>
           <ShoppingBasket className="text-rose" />
         </div>
         <Bar pct={items.length ? (done / items.length) * 100 : 0} color="var(--sage)" />
@@ -62,7 +62,7 @@ function GroceryList() {
           <button className="btn-soft btn-sm" onClick={share}><Share2 size={16} />Share / copy</button>
           <button className="btn-soft btn-sm" onClick={() => { s.set((st) => { st.groceries.forEach((g) => { g.checked = false; }); }); toast('Checklist reset'); }}><Undo2 size={16} />Reset checks</button>
         </div>
-        <label className="flex items-center gap-2 mt-3 text-[15px] text-muted"><input type="checkbox" className="w-5 h-5 accent-[var(--rose-deep)]" checked={hideDone} onChange={(e) => setHideDone(e.target.checked)} />Hide items in the basket</label>
+        <label className="flex items-center gap-2 mt-3 text-[14px] text-muted"><input type="checkbox" className="w-5 h-5 accent-[var(--rose-deep)]" checked={hideDone} onChange={(e) => setHideDone(e.target.checked)} />Hide items in the basket</label>
       </Card>
 
       {items.length === 0 && <Empty icon={<ShoppingBasket />} title="Your list is empty" sub="Generate it from your meal plan, or add items yourself." />}
@@ -77,10 +77,10 @@ function GroceryList() {
                 <div key={i.id} className="flex items-center gap-3 px-4 py-3">
                   <CheckCircle on={i.checked} label={i.name} onToggle={() => s.set((st) => { const g = st.groceries.find((x) => x.id === i.id); if (g) g.checked = !g.checked; })} />
                   <button className="flex-1 text-left min-w-0" onClick={() => setEdit(i)}>
-                    <div className={`text-[16px] ${i.checked ? 'line-through text-muted decoration-blush' : ''}`}>{i.name}</div>
-                    <div className="text-[14px] text-muted">{i.qty != null ? `${i.qty} ${i.unit}` : 'As needed'}{i.price ? ` · $${i.price.toFixed(2)}` : ''}{i.source === 'plan' ? ' · from plan' : ''}</div>
+                    <div className={`text-[15px] ${i.checked ? 'line-through text-muted decoration-blush' : ''}`}>{i.name}</div>
+                    <div className="text-[13px] text-muted">{i.qty != null ? `${i.qty} ${i.unit}` : 'As needed'}{i.price ? ` · $${i.price.toFixed(2)}` : ''}{i.source === 'plan' ? ' · from plan' : ''}</div>
                   </button>
-                  <button className="text-[14px] text-deep font-medium px-2 min-h-[40px]" onClick={() => setEdit(i)}>Edit</button>
+                  <button className="text-[13px] text-deep font-medium px-2 min-h-[40px]" onClick={() => setEdit(i)}>Edit</button>
                 </div>
               ))}
             </div>
@@ -91,7 +91,7 @@ function GroceryList() {
       {s.owned.length > 0 && (
         <Card className="mt-2">
           <div className="font-medium mb-1">Pantry items you already have</div>
-          <p className="text-[14px] text-muted mb-2">These are left off generated lists. Tap to include again.</p>
+          <p className="text-[13px] text-muted mb-2">These are left off generated lists. Tap to include again.</p>
           <div className="flex flex-wrap gap-2">
             {s.owned.map((k) => {
               const f = Object.values(s.foods).find((x) => x.grocery.key === k);
@@ -103,7 +103,7 @@ function GroceryList() {
 
       {gen && (
         <Sheet open onClose={() => setGen(false)} title="Build from my meal plan">
-          <p className="text-muted text-[15px] mb-4">Combines matching ingredients and converts cooked amounts to what to buy raw. Your custom items and checks are kept.</p>
+          <p className="text-muted text-[14px] mb-4">Combines matching ingredients and converts cooked amounts to what to buy raw. Your custom items and checks are kept.</p>
           {ranges.map((r) => (
             <button key={r.label} className="w-full card p-4 mb-2 text-left flex items-center justify-between" onClick={() => {
               r.days.forEach((d) => s.ensureWeek(weekStart(d)));
@@ -111,7 +111,7 @@ function GroceryList() {
               toast('Grocery list updated from your plan');
               setGen(false);
             }}>
-              <span><span className="font-medium block">{r.label}</span><span className="text-[14px] text-muted">{fmtShort(r.days[0])} – {fmtShort(r.days[r.days.length - 1])}</span></span>
+              <span><span className="font-medium block">{r.label}</span><span className="text-[13px] text-muted">{fmtShort(r.days[0])} – {fmtShort(r.days[r.days.length - 1])}</span></span>
               <RefreshCcw size={18} className="text-deep" />
             </button>
           ))}
@@ -179,14 +179,14 @@ function MealPrep() {
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Segmented value={which} onChange={setWhich} options={[{ value: 'sunday', label: `${DOW_NAMES[pd.sunday]} prep` }, { value: 'wednesday', label: `${DOW_NAMES[pd.wednesday]} prep` }]} />
       <Card>
-        <div className="flex justify-between items-center"><div className="eyebrow">{which === 'sunday' ? 'First prep of the week' : 'Second prep of the week'}</div><button className="text-[14px] text-deep font-medium" onClick={() => setDayPick(true)}>Change day</button></div>
-        <div className="h-serif text-[26px] mt-1">{fmtLong(prepDate)}</div>
-        <div className="text-[14px] text-muted mb-3 flex items-center gap-1.5"><Clock size={14} />About {mins} min total{left && left < mins ? ` · ${left} min left` : ''} — some steps overlap</div>
+        <div className="flex justify-between items-center"><div className="eyebrow">{which === 'sunday' ? 'First prep of the week' : 'Second prep of the week'}</div><button className="text-[13px] text-deep font-medium" onClick={() => setDayPick(true)}>Change day</button></div>
+        <div className="h-serif text-[22px] mt-1">{fmtLong(prepDate)}</div>
+        <div className="text-[13px] text-muted mb-3 flex items-center gap-1.5"><Clock size={14} />About {mins} min total{left && left < mins ? ` · ${left} min left` : ''} — some steps overlap</div>
         <Bar pct={(checks.length / tasks.length) * 100} color="var(--sage)" />
-        <div className="text-[14px] text-muted mt-1.5">{checks.length} of {tasks.length} steps done{checks.length === tasks.length ? ' — your week is ready ♡' : ''}</div>
+        <div className="text-[13px] text-muted mt-1.5">{checks.length} of {tasks.length} steps done{checks.length === tasks.length ? ' — your week is ready ♡' : ''}</div>
       </Card>
       <div className="space-y-3">
         {tasks.map((t, i) => {
@@ -197,7 +197,7 @@ function MealPrep() {
                 <CheckCircle on={on} onToggle={() => toggle(t.id)} label={t.title} />
                 <div className="flex-1 min-w-0" onClick={() => toggle(t.id)}>
                   <div className="flex justify-between gap-2"><div className={`font-medium ${on ? 'line-through decoration-blush' : ''}`}>{i + 1}. {t.title}</div><span className="text-[13px] text-muted whitespace-nowrap">{t.minutes} min <button aria-label={`Edit ${t.title}`} className="ml-1 text-deep" onClick={(e) => { e.stopPropagation(); setEditing(t); }}>Edit</button></span></div>
-                  <p className="text-[15px] mt-1">{t.instructions}</p>
+                  <p className="text-[14px] mt-1">{t.instructions}</p>
                   <div className="flex flex-wrap gap-1.5 mt-2">{t.ingredients.map((x) => <span key={x} className="text-[13px] rounded-full bg-petal px-2.5 py-1">{x}</span>)}</div>
                 </div>
               </div>
@@ -216,7 +216,7 @@ function MealPrep() {
       )}
       <Card className="bg-petal border-blush">
         <div className="flex items-center gap-2 font-semibold mb-2"><ShieldCheck size={18} className="text-deep" />Food safety & storage</div>
-        <ul className="space-y-1.5 text-[15px] list-disc pl-5">{FOOD_SAFETY.map((x) => <li key={x}>{x}</li>)}</ul>
+        <ul className="space-y-1.5 text-[14px] list-disc pl-5">{FOOD_SAFETY.map((x) => <li key={x}>{x}</li>)}</ul>
       </Card>
     </div>
   );

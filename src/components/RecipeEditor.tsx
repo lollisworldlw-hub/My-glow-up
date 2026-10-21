@@ -43,7 +43,7 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
         <Field label="Meal type"><select className="field" value={r.slot} onChange={(e) => setR({ ...r, slot: e.target.value as Slot })}>{SLOTS.map((x) => <option key={x} value={x}>{SLOT_LABEL[x]}</option>)}</select></Field>
         <Field label="Portion label"><input className="field" value={r.servingLabel} onChange={(e) => setR({ ...r, servingLabel: e.target.value })} /></Field>
       </div>
-      <div className="rounded-2xl bg-petal p-3 mb-4 text-[15px]">Per portion: <b>≈ {mac.cal} cal</b> · {mac.protein} g protein · {mac.carbs} g carbs · {mac.fat} g fat</div>
+      <div className="rounded-2xl bg-petal p-3 mb-4 text-[14px]">Per portion: <b>≈ {mac.cal} cal</b> · {mac.protein} g protein · {mac.carbs} g carbs · {mac.fat} g fat</div>
 
       <div className="label">Ingredients</div>
       <div className="space-y-2 mb-3">
@@ -54,7 +54,7 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
           return (
             <div key={i} className="rounded-2xl border border-line bg-card p-3">
               <div className="flex justify-between gap-2 items-start">
-                <div className="text-[15px] font-medium">{food.name}{food.state ? <span className="text-muted font-normal"> · {food.state}</span> : null}</div>
+                <div className="text-[14px] font-medium">{food.name}{food.state ? <span className="text-muted font-normal"> · {food.state}</span> : null}</div>
                 <button aria-label="Remove ingredient" className="text-muted p-1" onClick={() => setR({ ...r, ingredients: r.ingredients.filter((_, j) => j !== i) })}><Trash2 size={16} /></button>
               </div>
               <div className="flex gap-2 mt-2 items-center">

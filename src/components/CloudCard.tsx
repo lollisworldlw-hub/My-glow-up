@@ -31,7 +31,7 @@ export function AccountForm({ compact, onDone }: { compact?: boolean; onDone?: (
   if (email && member === false) {
     return (
       <div>
-        <p className="text-[15px] mb-3">You’re signed in as {email}. Enter an invite code from a friend to join the group.</p>
+        <p className="text-[14px] mb-3">You’re signed in as {email}. Enter an invite code from a friend to join the group.</p>
         <Field label="Your name (friends see this)"><input className="field" value={name} onChange={(e) => setName(e.target.value)} /></Field>
         <Field label="Invite code"><input className="field uppercase" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="GLOW-XXXXXX" /></Field>
         <button className="btn-primary w-full" disabled={busy || !code || !name.trim()} onClick={async () => {
@@ -63,7 +63,7 @@ export function AccountForm({ compact, onDone }: { compact?: boolean; onDone?: (
   return (
     <div>
       {sent && (
-        <div className="rounded-2xl bg-petal px-4 py-3 mb-4 text-[15px]">
+        <div className="rounded-2xl bg-petal px-4 py-3 mb-4 text-[14px]">
           <b>Almost done!</b> We emailed a confirmation link to {em || 'you'}. Tap it (it may open in Safari — that’s fine), then come back here and sign in with the same email and password. You’ll join the group automatically.
         </div>
       )}
@@ -76,7 +76,7 @@ export function AccountForm({ compact, onDone }: { compact?: boolean; onDone?: (
       <Field label="Email"><input className="field" type="email" autoComplete="email" inputMode="email" value={em} onChange={(e) => setEm(e.target.value)} /></Field>
       <Field label={mode === 'up' ? 'Create a password (8+ characters)' : 'Password'}><input className="field" type="password" autoComplete={mode === 'up' ? 'new-password' : 'current-password'} value={pw} onChange={(e) => setPw(e.target.value)} /></Field>
       <button className="btn-primary w-full" disabled={busy} onClick={go}>{busy ? 'One moment…' : mode === 'up' ? 'Create my account' : 'Sign in'}</button>
-      <div className={`flex justify-between mt-3 text-[14px] ${compact ? '' : ''}`}>
+      <div className={`flex justify-between mt-3 text-[13px] ${compact ? '' : ''}`}>
         <button className="text-deep font-medium min-h-[40px]" onClick={() => setMode(mode === 'up' ? 'in' : 'up')}>{mode === 'up' ? 'I already have an account' : 'I have an invite code'}</button>
         {mode === 'in' && <button className="text-muted min-h-[40px]" onClick={async () => { if (!em.includes('@')) { toast('Enter your email first'); return; } try { await resetPassword(em.trim()); toast('Password reset email sent'); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); } }}>Forgot password?</button>}
       </div>
@@ -93,7 +93,7 @@ export function CloudCard() {
         {email && member ? <Cloud className="text-deep shrink-0" size={22} /> : <CloudOff className="text-muted shrink-0" size={22} />}
         <div>
           <div className="font-semibold">{email && member ? 'Your account & cloud backup' : 'Account & cloud backup'}</div>
-          <p className="text-[14px] text-muted">{email && member
+          <p className="text-[13px] text-muted">{email && member
             ? `Signed in as ${email}. Last synced ${ago(lastSynced)}${status === 'syncing' ? ' · syncing…' : status === 'offline' ? ' · waiting for internet' : status === 'error' ? ' · will retry' : ''}.`
             : 'Your account backs up everything except photos to a private cloud space only you can open, and unlocks the Social tab. Sign-up needs an invite code.'}</p>
           {status === 'error' && error && <p className="text-[13px] text-deep mt-1">{error}</p>}

@@ -2,6 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App';
+import { useSync } from './lib/sync';
+import { useSocial } from './lib/social';
+
+// handles for automated UI tests
+(window as any).__glowup = { useSync, useSocial };
 import './index.css';
 
 // Updates: check for a new version on launch, every minute, and whenever the app comes back

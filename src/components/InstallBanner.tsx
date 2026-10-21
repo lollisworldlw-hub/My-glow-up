@@ -33,8 +33,8 @@ export function InstallBanner() {
     <div className="bg-deep text-white safe-top" role="region" aria-label="Install the app">
       <div className="mx-auto max-w-[640px] px-4 py-3 flex items-start gap-3">
         <img src="/icons/icon-192.png" alt="" className="w-10 h-10 rounded-xl shrink-0" />
-        <div className="flex-1 min-w-0 text-[14px] leading-snug">
-          <div className="font-semibold text-[15px]">Get the My Glow-Up app</div>
+        <div className="flex-1 min-w-0 text-[13px] leading-snug">
+          <div className="font-semibold text-[14px]">Get the My Glow-Up app</div>
           {canPrompt ? (
             <div>Install it for full-screen use, offline access, and staying signed in.</div>
           ) : otherIOSBrowser ? (
