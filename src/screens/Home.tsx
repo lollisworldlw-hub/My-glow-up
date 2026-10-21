@@ -46,9 +46,9 @@ export default function Home() {
   return (
     <div className="space-y-3">
       <div className="rise pt-1">
-        <h1 className="h-serif text-[28px] leading-[1.1]">{greeting()}{st.name ? `, ${st.name}` : ''} <span className="text-rose">♡</span></h1>
+        <h1 className="h-serif text-[24px] leading-[1.1]">{greeting()}{st.name ? `, ${st.name}` : ''} <span className="text-rose">♡</span></h1>
         <div className="text-muted mt-1">{fmtLong(today)}</div>
-        <p className="mt-3 font-serif italic text-[17px] text-deep">“{msg}”</p>
+        <p className="mt-3 font-serif italic text-[15px] text-deep">“{msg}”</p>
       </div>
 
       <CheckinCard today={today} />
@@ -59,7 +59,7 @@ export default function Home() {
         <div className="flex items-start justify-between mb-3">
           <div>
             <div className="eyebrow">Weight journey</div>
-            <div className="h-serif text-[28px] leading-none mt-1">{showW(cur, st.weightUnit)}</div>
+            <div className="h-serif text-[24px] leading-none mt-1">{showW(cur, st.weightUnit)}</div>
             <div className="text-[13px] text-muted mt-1">{s.weights.length ? 'Most recent weigh-in' : 'Starting weight — log your first weigh-in'}</div>
           </div>
           <button className="btn-soft btn-sm" onClick={() => setSheet('weight')}><Scale size={16} />Log</button>
@@ -67,8 +67,8 @@ export default function Home() {
         <Bar pct={p.pct} h={12} />
         <div className="flex justify-between text-[13px] text-muted mt-1.5"><span>Start {showW(st.startWeight, st.weightUnit)}</span><span>{Math.round(p.pct)}%</span><span>Goal {showW(st.goalWeight, st.weightUnit)}</span></div>
         <div className="grid grid-cols-2 gap-3 mt-4">
-          <div className="rounded-2xl bg-petal p-3"><div className="text-[13px] text-muted">Lost so far</div><div className="font-semibold text-[17px]">{showW(Math.max(0, p.lost), st.weightUnit)}</div></div>
-          <div className="rounded-2xl bg-petal p-3"><div className="text-[13px] text-muted">To go</div><div className="font-semibold text-[17px]">{showW(p.remaining, st.weightUnit)}</div></div>
+          <div className="rounded-2xl bg-petal p-3"><div className="text-[13px] text-muted">Lost so far</div><div className="font-semibold text-[15px]">{showW(Math.max(0, p.lost), st.weightUnit)}</div></div>
+          <div className="rounded-2xl bg-petal p-3"><div className="text-[13px] text-muted">To go</div><div className="font-semibold text-[15px]">{showW(p.remaining, st.weightUnit)}</div></div>
         </div>
       </Card>
 
@@ -78,14 +78,14 @@ export default function Home() {
         <div className="flex items-center gap-5">
           <Ring pct={calPct} ghostPct={(plan.cal / st.calTarget) * 100} size={120} stroke={10}>
             <div>
-              <div className="text-[26px] font-semibold leading-none tabular-nums">{Math.round(eaten.cal)}</div>
+              <div className="text-[22px] font-semibold leading-none tabular-nums">{Math.round(eaten.cal)}</div>
               <div className="text-[13px] text-muted">of {st.calTarget} cal</div>
             </div>
           </Ring>
           <div className="flex-1 min-w-0 space-y-3">
             <div>
               <div className="text-[13px] text-muted">Remaining to plan</div>
-              <div className="font-semibold text-[17px] tabular-nums">{Math.max(0, Math.round(st.calTarget - eaten.cal))} cal</div>
+              <div className="font-semibold text-[15px] tabular-nums">{Math.max(0, Math.round(st.calTarget - eaten.cal))} cal</div>
             </div>
             <div>
               <div className="flex justify-between text-[13px] text-muted"><span>Protein</span><span className="tabular-nums">{Math.round(eaten.protein)} / {st.proteinMin} g</span></div>
@@ -117,12 +117,12 @@ export default function Home() {
       <Card className="rise" onClick={() => go('workouts')}>
         <div className="eyebrow mb-3">Today’s movement</div>
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-11 h-11 rounded-2xl bg-petal grid place-items-center text-deep"><Footprints size={20} /></div>
+          <div className="w-10 h-10 rounded-2xl bg-petal grid place-items-center text-deep"><Footprints size={20} /></div>
           <div><div className="font-medium">{sched?.walk === 'walk' ? `${st.walkMinutes}-minute brisk lunch walk` : sched?.walk === 'optional' ? 'Optional walk' : 'Recovery day'}</div>
             <div className="text-[13px] text-muted">{s.workouts.some((w) => w.date === today && w.type === 'walk' && w.completed) ? 'Done ♡' : 'Lunch break'}</div></div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-petal grid place-items-center text-deep">{sched?.home === 'strength' ? <Dumbbell size={20} /> : sched?.home === 'rest' ? <Moon size={20} /> : <Bike size={20} />}</div>
+          <div className="w-10 h-10 rounded-2xl bg-petal grid place-items-center text-deep">{sched?.home === 'strength' ? <Dumbbell size={20} /> : sched?.home === 'rest' ? <Moon size={20} /> : <Bike size={20} />}</div>
           <div className="flex-1"><div className="font-medium">{HOME_LABEL[sched?.home ?? 'rest']}</div>
             <div className="text-[13px] text-muted">{s.workouts.some((w) => w.date === today && w.type !== 'walk' && w.completed) ? 'Done ♡' : sched?.home === 'rest' ? 'Enjoy the rest' : `${st.workoutMinutes} minutes at home`}</div></div>
           <span className="text-deep font-medium text-[14px]">Open →</span>
@@ -136,7 +136,7 @@ export default function Home() {
           <div className="eyebrow">Today’s checklist</div>
           <Sparkles size={18} className="text-rose" />
         </div>
-        <div className="h-serif text-[20px] mt-1 mb-1">
+        <div className="h-serif text-[18px] mt-1 mb-1">
           {habits.done === habits.total && habits.total > 0 ? 'Every habit done — beautiful work!' : `${habits.done} of ${habits.total} daily habits completed!`}
         </div>
         <div className="divide-y divide-line">

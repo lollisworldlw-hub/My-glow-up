@@ -16,7 +16,7 @@ import { GifPicker, GIPHY_KEY } from '../components/GifPicker';
 import { useUI } from '../lib/ui';
 
 const REACTIONS = ['❤️', '😂', '😍', '👏', '🔥', '💪', '🥹', '😮'];
-const EMOJIS = ['🌸', '🌷', '🦋', '🌙', '⭐', '🍓', '🐝', '🌻', '🍒', '🦩', '🐚', '🌈', '💎', '🎀', '🐱', '🐶'];
+const EMOJIS = ['🦙', '🌸', '🌷', '🦋', '🌙', '⭐', '🍓', '🐝', '🌻', '🍒', '🦩', '🐚', '🌈', '💎', '🎀', '🐱', '🐶'];
 
 const timeLabel = (iso: string) => {
   const d = new Date(iso);
@@ -40,7 +40,7 @@ export default function Social() {
         <Header eyebrow="Friends & cheering" title="Social" />
         <Card>
           <div className="flex gap-3 items-start mb-4">
-            <span className="w-11 h-11 rounded-full bg-petal text-deep grid place-items-center shrink-0"><Lock size={19} /></span>
+            <span className="w-10 h-10 rounded-full bg-petal text-deep grid place-items-center shrink-0"><Lock size={19} /></span>
             <p className="text-[14px]">Chat with your friends, share wins, and cheer each other on. <b>Your weight, food, cycle, mood and everything else stay private</b> — friends only see your name, emoji, and what you choose to post.</p>
           </div>
           {email && member === null ? <p className="text-muted">Checking your account…</p> : <AccountForm />}
@@ -61,6 +61,15 @@ export default function Social() {
         </>
       )}
     </div>
+  );
+}
+
+export function Avatar({ member, size = 36 }: { member?: { emoji: string; avatar_path?: string | null }; size?: number }) {
+  const url = useMediaUrl(member?.avatar_path ?? null);
+  return (
+    <span className="rounded-full bg-petal grid place-items-center shrink-0 overflow-hidden" style={{ width: size, height: size, fontSize: size * 0.5 }} aria-hidden>
+      {member?.avatar_path && url ? <img src={url} alt="" className="w-full h-full object-cover" /> : (member?.emoji ?? '🌸')}
+    </span>
   );
 }
 
@@ -104,9 +113,9 @@ function RecipeCard({ m, me, mine }: { m: Message; me: string; mine: boolean }) 
         <Sheet open onClose={() => setOpen(false)} title={p.recipe.name} footer={!mine ? <button className="btn-primary w-full" onClick={() => { save(); setOpen(false); }}>Save to my recipes</button> : undefined}>
           {m.meta?.image && <div className="mb-3"><MediaImg image={m.meta.image} /></div>}
           <div className="text-[14px] mb-3">{p.recipe.servingLabel} · ≈ {p.macros.cal} cal · {p.macros.protein} g protein</div>
-          <h3 className="h-serif text-[17px] mb-1">Ingredients</h3>
+          <h3 className="h-serif text-[15px] mb-1">Ingredients</h3>
           <ul className="list-disc pl-5 mb-3 text-[14px]">{p.recipe.ingredients.map((i, k) => <li key={k}>{fmtIngredient(foods[i.foodId], i)}</li>)}</ul>
-          <h3 className="h-serif text-[17px] mb-1">Steps</h3>
+          <h3 className="h-serif text-[15px] mb-1">Steps</h3>
           <ol className="list-decimal pl-5 text-[14px] space-y-1">{p.recipe.instructions.map((t, k) => <li key={k}>{t}</li>)}</ol>
           {p.recipe.note && <p className="text-[13px] text-muted mt-2">{p.recipe.note}</p>}
         </Sheet>
@@ -130,8 +139,8 @@ function Bubble({ m, me, onLong }: { m: Message; me: string; onLong: () => void 
   if (m.kind === 'recipe') content = <RecipeCard m={m} me={me} mine={mine} />;
   else if (m.kind === 'achievement') content = (
     <div className="rounded-3xl border border-blush bg-card px-4 py-3 text-left shadow-soft">
-      <div className="flex items-center gap-3"><span className="text-[26px]">{m.meta?.icon ?? '🏆'}</span>
-        <div><div className="eyebrow !text-[11px]">Achievement</div><div className="font-semibold text-[15px] leading-snug">{m.body}</div></div></div>
+      <div className="flex items-center gap-3"><span className="text-[22px]">{m.meta?.icon ?? '🏆'}</span>
+        <div><div className="eyebrow !text-[11px]">Achievement</div><div className="font-semibold text-[14px] leading-snug">{m.body}</div></div></div>
     </div>
   );
   else if (m.kind === 'photo' || m.meta?.image || gif) content = (
@@ -141,11 +150,11 @@ function Bubble({ m, me, onLong }: { m: Message; me: string; onLong: () => void 
       {caption && !gif && <div className="px-4 py-2 text-[14px] whitespace-pre-wrap break-words">{caption}</div>}
     </div>
   );
-  else content = <div className={`rounded-3xl px-4 py-2.5 text-left text-[15px] whitespace-pre-wrap break-words ${mine ? 'bg-deep text-white rounded-br-lg' : 'bg-card border border-line rounded-bl-lg'}`}>{m.body}</div>;
+  else content = <div className={`rounded-3xl px-4 py-2.5 text-left text-[14px] whitespace-pre-wrap break-words ${mine ? 'bg-deep text-white rounded-br-lg' : 'bg-card border border-line rounded-bl-lg'}`}>{m.body}</div>;
 
   return (
     <div className={`flex gap-2 ${mine ? 'justify-end' : ''}`}>
-      {!mine && <div className="w-9 h-9 rounded-full bg-petal grid place-items-center text-[16px] shrink-0 mt-5" aria-hidden>{member?.emoji ?? '🌸'}</div>}
+      {!mine && <div className="mt-5"><Avatar member={member} size={32} /></div>}
       <div className={`${m.kind === 'text' && !m.meta?.image && !gif ? 'max-w-[80%]' : 'w-[80%]'} min-w-0 flex flex-col ${mine ? 'items-end' : ''}`}>
         <div className={`text-[12px] text-muted mb-1 ${mine ? 'text-right' : ''}`}>{mine ? 'You' : member?.display_name ?? 'Friend'} · {timeLabel(m.created_at)}</div>
         <div className="w-full flex flex-col" style={{ alignItems: mine ? 'flex-end' : 'flex-start' }} onDoubleClick={() => toggleReaction(m.id, '❤️')}
@@ -159,7 +168,7 @@ function Bubble({ m, me, onLong }: { m: Message; me: string; onLong: () => void 
         </div>
         {picker && (
           <div className={`flex flex-wrap gap-1 mt-1 p-1.5 rounded-2xl bg-card border border-line shadow-soft ${mine ? 'self-end' : ''}`}>
-            {REACTIONS.map((e) => <button key={e} aria-label={`React ${e}`} onClick={() => { toggleReaction(m.id, e); setPicker(false); }} className="w-10 h-10 rounded-full text-[17px] hover:bg-petal">{e}</button>)}
+            {REACTIONS.map((e) => <button key={e} aria-label={`React ${e}`} onClick={() => { toggleReaction(m.id, e); setPicker(false); }} className="w-10 h-10 rounded-full text-[15px] hover:bg-petal">{e}</button>)}
           </div>
         )}
       </div>
@@ -189,16 +198,16 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
 
   return (
     <>
-      <div className="space-y-3 pb-24">
+      <div className="space-y-3 pb-16">
         {msgs.length === 0 && <Empty icon={<Send />} title={peer ? 'Say hi!' : 'Start the conversation'} sub={peer ? 'Only the two of you can see these messages.' : 'Share a win, ask for a recipe, or cheer someone on.'} />}
         {msgs.map((m) => <Bubble key={m.id} m={m} me={me} onLong={() => setDel(m)} />)}
         <div ref={end} />
       </div>
-      <div className="fixed inset-x-0 z-30 bg-bg/95 backdrop-blur border-t border-line" style={{ bottom: 'calc(55px + env(safe-area-inset-bottom))' }}>
-        <div className="mx-auto max-w-[640px] px-3 py-2 flex gap-2 items-end">
-          {peer === null && <button aria-label="Share an achievement" className="w-11 h-11 shrink-0 rounded-full bg-petal text-deep grid place-items-center" onClick={() => setShare(true)}><Trophy size={19} /></button>}
+      <div className="fixed inset-x-0 z-30 bg-bg border-t border-line" style={{ bottom: 'calc(51px + env(safe-area-inset-bottom))' }}>
+        <div className="mx-auto max-w-[640px] px-2.5 py-1.5 flex gap-1.5 items-end">
+          {peer === null && <button aria-label="Share an achievement" className="w-10 h-10 shrink-0 rounded-full bg-petal text-deep grid place-items-center" onClick={() => setShare(true)}><Trophy size={19} /></button>}
           {GIPHY_KEY && <button aria-label="Search GIFs" className="h-11 px-3 shrink-0 rounded-full bg-petal text-deep font-bold text-[13px]" onClick={() => setGifs(true)}>GIF</button>}
-          <button aria-label="Send a photo or GIF" disabled={busy} className="w-11 h-11 shrink-0 rounded-full bg-petal text-deep grid place-items-center" onClick={() => fileRef.current?.click()}><ImagePlus size={19} /></button>
+          <button aria-label="Send a photo or GIF" disabled={busy} className="w-10 h-10 shrink-0 rounded-full bg-petal text-deep grid place-items-center" onClick={() => fileRef.current?.click()}><ImagePlus size={19} /></button>
           <input ref={fileRef} type="file" accept="image/*,image/gif" className="hidden" onChange={async (e) => {
             const f = e.target.files?.[0]; e.target.value = '';
             if (!f) return;
@@ -207,9 +216,9 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
             catch (err: any) { toast(err?.message ?? 'Couldn’t send that'); }
             setBusy(false);
           }} />
-          <textarea aria-label="Message" rows={1} className="field py-2.5 min-h-[44px] max-h-32 flex-1 resize-none" placeholder={peer ? 'Message or paste a GIF link' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
+          <textarea aria-label="Message" rows={1} className="field py-2 min-h-[40px] max-h-32 flex-1 resize-none" placeholder={peer ? 'Message or paste a GIF link' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(pointer: fine)').matches) { e.preventDefault(); post(); } }} />
-          <button aria-label="Send" disabled={busy || !text.trim()} className="w-11 h-11 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-50" onClick={post}><Send size={18} /></button>
+          <button aria-label="Send" disabled={busy || !text.trim()} className="w-10 h-10 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-50" onClick={post}><Send size={18} /></button>
         </div>
       </div>
       {share && <ShareSheet onClose={() => setShare(false)} />}
@@ -251,7 +260,7 @@ export function ShareSheet({ onClose, preselect }: { onClose: () => void; presel
       <div className="space-y-2 mb-4">
         {shown.map((a) => (
           <div key={a.key} className="card p-3">
-            <div className="flex items-center gap-3"><span className="text-[24px]">{a.icon}</span><div className="flex-1 font-medium">{nums[a.key] && a.withNumbers ? a.withNumbers : a.title}</div></div>
+            <div className="flex items-center gap-3"><span className="text-[21px]">{a.icon}</span><div className="flex-1 font-medium">{nums[a.key] && a.withNumbers ? a.withNumbers : a.title}</div></div>
             <div className="flex items-center justify-between mt-2 gap-2">
               {a.withNumbers ? (
                 <label className="flex items-center gap-2 text-[13px] text-muted"><input type="checkbox" className="w-5 h-5 accent-[var(--rose-deep)]" checked={!!nums[a.key]} onChange={(e) => setNums({ ...nums, [a.key]: e.target.checked })} />Include numbers</label>
@@ -282,7 +291,7 @@ function DMList({ me }: { me: string }) {
     return (
       <div>
         <button className="flex items-center gap-2 text-deep font-medium mb-4 min-h-[40px]" onClick={() => setPeer(null)}><ChevronLeft size={18} />All messages</button>
-        <div className="flex items-center gap-3 mb-4"><span className="w-11 h-11 rounded-full bg-petal grid place-items-center text-[19px]">{p?.emoji}</span><div><div className="font-semibold">{p?.display_name}</div><div className="text-[13px] text-muted">Private — only you two can see this</div></div></div>
+        <div className="flex items-center gap-3 mb-4"><Avatar member={p} size={40} /><div><div className="font-semibold">{p?.display_name}</div><div className="text-[13px] text-muted">Private — only you two can see this</div></div></div>
         <Thread peer={peer} me={me} />
       </div>
     );
@@ -296,7 +305,7 @@ function DMList({ me }: { me: string }) {
         const unread = thread.filter((m) => m.sender === o.user_id && m.id > (lastRead[o.user_id] ?? 0)).length;
         return (
           <button key={o.user_id} className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => setPeer(o.user_id)}>
-            <span className="w-11 h-11 rounded-full bg-petal grid place-items-center text-[19px] shrink-0">{o.emoji}</span>
+            <Avatar member={o} size={40} />
             <span className="flex-1 min-w-0"><span className="block font-medium">{o.display_name}</span><span className="block text-[13px] text-muted truncate">{last ? (last.sender === me ? 'You: ' : '') + last.body : 'Say hi ♡'}</span></span>
             {unread > 0 && <span className="min-w-[22px] h-[22px] px-1.5 rounded-full bg-deep text-white text-[12px] grid place-items-center">{unread}</span>}
           </button>
@@ -308,6 +317,7 @@ function DMList({ me }: { me: string }) {
 
 function Friends({ me }: { me: string }) {
   const members = useSocial((s) => s.members);
+  const pfpRef = useRef<HTMLInputElement>(null);
   const mine = members[me];
   const [name, setName] = useState(mine?.display_name ?? '');
   const [bio, setBio] = useState(mine?.bio ?? '');
@@ -326,7 +336,20 @@ function Friends({ me }: { me: string }) {
     <div className="space-y-3">
       <Card>
         <div className="eyebrow mb-3">Your profile</div>
-        <div className="flex flex-wrap gap-2 mb-4">{EMOJIS.map((e) => <button key={e} aria-label={`Avatar ${e}`} onClick={() => updateProfile({ emoji: e })} className={`w-11 h-11 rounded-full text-[19px] grid place-items-center ${mine?.emoji === e ? 'bg-deep' : 'bg-petal'}`}>{e}</button>)}</div>
+        <div className="flex items-center gap-3 mb-3">
+          <Avatar member={mine} size={56} />
+          <div className="flex flex-col gap-1.5">
+            <button className="btn-soft btn-sm" onClick={() => pfpRef.current?.click()}><ImagePlus size={15} />{mine?.avatar_path ? 'Change photo' : 'Upload a photo'}</button>
+            {mine?.avatar_path && <button className="text-[13px] text-muted text-left" onClick={() => updateProfile({ avatar_path: null })}>Use an emoji instead</button>}
+          </div>
+          <input ref={pfpRef} type="file" accept="image/*" className="hidden" onChange={async (e) => {
+            const f = e.target.files?.[0]; e.target.value = '';
+            if (!f) return;
+            try { const img = await uploadMedia(f, 480); await updateProfile({ avatar_path: img.path }); toast('Profile photo updated ♡'); }
+            catch (err: any) { toast(err?.message ?? 'Couldn’t upload'); }
+          }} />
+        </div>
+        <div className="flex flex-wrap gap-1.5 mb-3">{EMOJIS.map((e) => <button key={e} aria-label={`Avatar ${e}`} onClick={() => updateProfile({ emoji: e, avatar_path: null })} className={`w-9 h-9 rounded-full text-[15px] grid place-items-center ${!mine?.avatar_path && mine?.emoji === e ? 'bg-deep' : 'bg-petal'}`}>{e}</button>)}</div>
         <Field label="Display name"><input className="field" value={name} maxLength={40} onChange={(e) => setName(e.target.value)} /></Field>
         <Field label="A little about you (optional)"><input className="field" value={bio} maxLength={200} onChange={(e) => setBio(e.target.value)} placeholder="Mom of 2, chocolate lover, walking queen" /></Field>
         <button className="btn-soft btn-sm" disabled={!name.trim()} onClick={async () => { try { await updateProfile({ display_name: name.trim(), bio }); toast('Profile saved'); } catch (e: any) { toast(e?.message ?? 'Couldn’t save'); } }}>Save profile</button>
@@ -345,11 +368,11 @@ function Friends({ me }: { me: string }) {
       </Card>
 
       <div>
-        <h3 className="h-serif text-[19px] mb-2">Members</h3>
+        <h3 className="h-serif text-[17px] mb-2">Members</h3>
         <div className="card divide-y divide-line !rounded-2xl">
           {Object.values(members).sort((a, b) => a.joined_at.localeCompare(b.joined_at)).map((m) => (
             <div key={m.user_id} className="flex items-center gap-3 px-4 py-3">
-              <span className="w-11 h-11 rounded-full bg-petal grid place-items-center text-[19px] shrink-0">{m.emoji}</span>
+              <Avatar member={m} size={40} />
               <div className="min-w-0"><div className="font-medium">{m.display_name}{m.user_id === me ? ' (you)' : ''}</div>{m.bio && <div className="text-[13px] text-muted">{m.bio}</div>}</div>
             </div>
           ))}

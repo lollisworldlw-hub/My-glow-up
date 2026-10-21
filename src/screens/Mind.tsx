@@ -50,7 +50,7 @@ function MoodToday() {
           {MOODS.map((m) => (
             <button key={m.v} aria-pressed={entry.mood === m.v} onClick={() => up({ mood: m.v })}
               className={`rounded-2xl py-3 flex flex-col items-center gap-1 border transition ${entry.mood === m.v ? 'bg-petal border-rose' : 'border-line bg-card'}`}>
-              <span className="text-[24px]">{m.e}</span><span className="text-[12px] text-muted">{m.l}</span>
+              <span className="text-[21px]">{m.e}</span><span className="text-[12px] text-muted">{m.l}</span>
             </button>
           ))}
         </div>
@@ -118,7 +118,7 @@ function MindGoals() {
         return (
           <div key={g.id} className="card p-4">
             <div className="flex items-center gap-3">
-              <span className="text-[22px] w-10 text-center" aria-hidden>{g.icon}</span>
+              <span className="text-[19px] w-10 text-center" aria-hidden>{g.icon}</span>
               <div className="flex-1 min-w-0">
                 <div className="font-medium">{g.name}</div>
                 <div className="text-[13px] text-muted">{count} of {g.perWeek} this week{count >= g.perWeek ? ' ♡' : ''}</div>
@@ -148,7 +148,7 @@ function GoalEditor({ goal, onClose }: { goal: MindGoal | null; onClose: () => v
       <Field label="Goal"><input className="field" value={g.name} onChange={(e) => setG({ ...g, name: e.target.value })} placeholder="e.g. Read for 15 minutes" /></Field>
       <Field label="Times per week"><NumberInput value={g.perWeek} onChange={(v) => v && setG({ ...g, perWeek: Math.min(7, Math.max(1, Math.round(v))) })} /></Field>
       <div className="label">Icon</div>
-      <div className="flex flex-wrap gap-2">{ICONS.map((i) => <button key={i} onClick={() => setG({ ...g, icon: i })} className={`w-11 h-11 rounded-full text-[19px] ${g.icon === i ? 'bg-deep' : 'bg-petal'}`}>{i}</button>)}</div>
+      <div className="flex flex-wrap gap-2">{ICONS.map((i) => <button key={i} onClick={() => setG({ ...g, icon: i })} className={`w-10 h-10 rounded-full text-[17px] ${g.icon === i ? 'bg-deep' : 'bg-petal'}`}>{i}</button>)}</div>
     </Sheet>
   );
 }
@@ -160,7 +160,7 @@ function Tools() {
       <Card>
         <div className="eyebrow mb-2">5-4-3-2-1 grounding</div>
         <p className="text-[14px] mb-2">When your mind is racing, gently notice:</p>
-        <ul className="space-y-1.5 text-[15px]">
+        <ul className="space-y-1.5 text-[14px]">
           <li><b>5</b> things you can see</li><li><b>4</b> things you can touch</li><li><b>3</b> things you can hear</li><li><b>2</b> things you can smell</li><li><b>1</b> thing you can taste</li>
         </ul>
       </Card>
@@ -197,7 +197,7 @@ function Breathing() {
       <div className="grid place-items-center py-4">
         <div className="w-[200px] h-[200px] rounded-full bg-petal grid place-items-center">
           <div className="rounded-full bg-blush grid place-items-center transition-none" style={{ width: 180 * (start ? scale : 0.7), height: 180 * (start ? scale : 0.7) }}>
-            <div className="text-center"><div className="font-serif text-[20px] font-semibold text-ink">{start ? PHASES[idx].l : 'Ready'}</div>{start && <div className="text-[13px]">{Math.ceil(4 - (cyc % 4))}</div>}</div>
+            <div className="text-center"><div className="font-serif text-[18px] font-semibold text-ink">{start ? PHASES[idx].l : 'Ready'}</div>{start && <div className="text-[13px]">{Math.ceil(4 - (cyc % 4))}</div>}</div>
           </div>
         </div>
       </div>

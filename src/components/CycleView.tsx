@@ -64,7 +64,7 @@ export function CycleView() {
         {st ? (
           <>
             <div className="eyebrow">Cycle day {st.day}</div>
-            <div className="h-serif text-[24px] leading-tight mt-1">{st.phase}</div>
+            <div className="h-serif text-[21px] leading-tight mt-1">{st.phase}</div>
             <p className="text-[14px] mt-1">{PHASE_NOTE[st.phase]}</p>
             <div className="grid grid-cols-3 gap-2 mt-4 text-center">
               <Mini l="Next period" v={cur ? '—' : st.until >= 0 ? `~${fmtShort(st.nextStart)}` : `${-st.until}d late`} />

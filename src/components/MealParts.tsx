@@ -45,7 +45,7 @@ export function MealCard({ date, slot, item, compact }: { date: string; slot: Sl
             <FoodArt art={recipe?.art ?? 'custom'} size={compact ? 48 : 56} />
             <div className="min-w-0 flex-1">
               <div className="eyebrow !text-[12px]">{SLOT_LABEL[slot]}</div>
-              <div className="font-medium text-[15px] leading-snug">{itemName(item, s.recipes)}</div>
+              <div className="font-medium text-[14px] leading-snug">{itemName(item, s.recipes)}</div>
               <div className="text-[13px] text-muted">{recipe?.servingLabel ?? '1 serving'}{fmtServ(item.servings)}</div>
               <MacroLine cal={mac.cal} protein={mac.protein} est={est} />
               {recipe && conflicts(recipe, s.foods, s.settings.diets).length > 0 && <div className="text-[13px] text-deep mt-0.5">Contains {conflicts(recipe, s.foods, s.settings.diets).join(', ').toLowerCase()} — swap?</div>}
@@ -169,7 +169,7 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
       {!item.quick && (
         <>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="h-serif text-[18px]">Ingredients</h3>
+            <h3 className="h-serif text-[16px]">Ingredients</h3>
             {item.ingredients && (
               <button className="text-[13px] text-deep font-medium inline-flex items-center gap-1" onClick={() => mutate((it) => { delete it.ingredients; })}><RotateCcw size={14} />Reset</button>
             )}
@@ -209,8 +209,8 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
 
       {recipe && (
         <>
-          <h3 className="h-serif text-[18px] mb-2">How to make it</h3>
-          <ol className="list-decimal pl-5 space-y-1.5 text-[15px] mb-2">{recipe.instructions.map((t, i) => <li key={i}>{t}</li>)}</ol>
+          <h3 className="h-serif text-[16px] mb-2">How to make it</h3>
+          <ol className="list-decimal pl-5 space-y-1.5 text-[14px] mb-2">{recipe.instructions.map((t, i) => <li key={i}>{t}</li>)}</ol>
           {recipe.note && <p className="text-[13px] text-muted mb-2">{recipe.note}</p>}
         </>
       )}
@@ -256,7 +256,7 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
 }
 
 const Stat = ({ label, value }: { label: string; value: string }) => (
-  <div><div className="text-[13px] text-muted">{label}</div><div className="font-semibold text-[16px] tabular-nums">{value}</div></div>
+  <div><div className="text-[13px] text-muted">{label}</div><div className="font-semibold text-[15px] tabular-nums">{value}</div></div>
 );
 
 export function DayPicker({ multi, from, title, onPick, onClose }: { multi: boolean; from: string; title: string; onPick: (d: string[]) => void; onClose: () => void }) {

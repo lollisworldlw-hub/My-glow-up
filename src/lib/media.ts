@@ -26,12 +26,12 @@ async function gifSize(blob: Blob): Promise<{ w: number; h: number }> {
 }
 
 /** Upload a photo or GIF to the group's private storage. GIFs keep their animation. */
-export async function uploadMedia(file: Blob): Promise<{ path: string; w: number; h: number; gif: boolean }> {
+export async function uploadMedia(file: Blob, max = 1280): Promise<{ path: string; w: number; h: number; gif: boolean }> {
   const me = useSync.getState().userId;
   if (!me) throw new Error('Please sign in');
   const gif = file.type === 'image/gif';
   if (gif && file.size > 9_500_000) throw new Error('That GIF is too big (max ~9 MB)');
-  const { blob, w, h } = gif ? { blob: file, ...(await gifSize(file)) } : await compress(file);
+  const { blob, w, h } = gif ? { blob: file, ...(await gifSize(file)) } : await compress(file, max);
   const path = `${me}/${uid()}.${gif ? 'gif' : 'jpg'}`;
   const { error } = await supabase.storage.from(BUCKET).upload(path, blob, { contentType: gif ? 'image/gif' : 'image/jpeg', upsert: false });
   if (error) throw error;

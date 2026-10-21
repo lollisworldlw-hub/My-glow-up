@@ -19,7 +19,7 @@ export default function More() {
           const Icon = n.icon;
           return (
             <button key={n.id} className="card p-4 text-left" onClick={() => go(n.id)}>
-              <span className="w-11 h-11 rounded-2xl bg-petal text-deep grid place-items-center mb-3"><Icon size={21} /></span>
+              <span className="w-10 h-10 rounded-2xl bg-petal text-deep grid place-items-center mb-3"><Icon size={21} /></span>
               <div className="font-semibold">{n.label}</div>
               <div className="text-[13px] text-muted">{n.blurb}</div>
             </button>

@@ -162,7 +162,7 @@ function RoomEditor({ onClose }: { onClose: () => void }) {
       {s.rooms.map((r, i) => (
         <div key={i} className="flex gap-2 mb-2">
           <input className="field flex-1" value={r} aria-label="Room name" onChange={(e) => s.set((x) => { const old = x.rooms[i]; x.rooms[i] = e.target.value; x.cleanTasks.forEach((t) => { if (t.room === old) t.room = e.target.value; }); })} />
-          <button aria-label="Delete room" className="w-11 h-11 grid place-items-center text-muted" disabled={s.cleanTasks.some((t) => t.room === r)} title="Move or delete its tasks first"
+          <button aria-label="Delete room" className="w-10 h-10 grid place-items-center text-muted" disabled={s.cleanTasks.some((t) => t.room === r)} title="Move or delete its tasks first"
             onClick={() => s.set((x) => { x.rooms = x.rooms.filter((_, j) => j !== i); })}><Trash2 size={17} /></button>
         </div>
       ))}

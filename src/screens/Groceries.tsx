@@ -77,7 +77,7 @@ function GroceryList() {
                 <div key={i.id} className="flex items-center gap-3 px-4 py-3">
                   <CheckCircle on={i.checked} label={i.name} onToggle={() => s.set((st) => { const g = st.groceries.find((x) => x.id === i.id); if (g) g.checked = !g.checked; })} />
                   <button className="flex-1 text-left min-w-0" onClick={() => setEdit(i)}>
-                    <div className={`text-[15px] ${i.checked ? 'line-through text-muted decoration-blush' : ''}`}>{i.name}</div>
+                    <div className={`text-[14px] ${i.checked ? 'line-through text-muted decoration-blush' : ''}`}>{i.name}</div>
                     <div className="text-[13px] text-muted">{i.qty != null ? `${i.qty} ${i.unit}` : 'As needed'}{i.price ? ` · $${i.price.toFixed(2)}` : ''}{i.source === 'plan' ? ' · from plan' : ''}</div>
                   </button>
                   <button className="text-[13px] text-deep font-medium px-2 min-h-[40px]" onClick={() => setEdit(i)}>Edit</button>
@@ -183,7 +183,7 @@ function MealPrep() {
       <Segmented value={which} onChange={setWhich} options={[{ value: 'sunday', label: `${DOW_NAMES[pd.sunday]} prep` }, { value: 'wednesday', label: `${DOW_NAMES[pd.wednesday]} prep` }]} />
       <Card>
         <div className="flex justify-between items-center"><div className="eyebrow">{which === 'sunday' ? 'First prep of the week' : 'Second prep of the week'}</div><button className="text-[13px] text-deep font-medium" onClick={() => setDayPick(true)}>Change day</button></div>
-        <div className="h-serif text-[22px] mt-1">{fmtLong(prepDate)}</div>
+        <div className="h-serif text-[19px] mt-1">{fmtLong(prepDate)}</div>
         <div className="text-[13px] text-muted mb-3 flex items-center gap-1.5"><Clock size={14} />About {mins} min total{left && left < mins ? ` · ${left} min left` : ''} — some steps overlap</div>
         <Bar pct={(checks.length / tasks.length) * 100} color="var(--sage)" />
         <div className="text-[13px] text-muted mt-1.5">{checks.length} of {tasks.length} steps done{checks.length === tasks.length ? ' — your week is ready ♡' : ''}</div>

@@ -443,7 +443,7 @@ function HabitEditor({ onClose }: { onClose: () => void }) {
           <div key={h.id} className="card p-3">
             <div className="flex gap-2 items-center">
               <input className="field flex-1" value={h.name} aria-label="Habit name" onChange={(e) => s.set((st) => { st.habits.find((x) => x.id === h.id)!.name = e.target.value; })} />
-              <button aria-label="Delete habit" className="w-11 h-11 grid place-items-center text-muted" onClick={() => s.set((st) => { st.habits = st.habits.filter((x) => x.id !== h.id); })}><Trash2 size={18} /></button>
+              <button aria-label="Delete habit" className="w-10 h-10 grid place-items-center text-muted" onClick={() => s.set((st) => { st.habits = st.habits.filter((x) => x.id !== h.id); })}><Trash2 size={18} /></button>
             </div>
             <div className="flex gap-4 mt-2 text-[13px]">
               <label className="flex items-center gap-2"><input type="checkbox" className="w-5 h-5 accent-[var(--rose-deep)]" checked={h.home} onChange={(e) => s.set((st) => { st.habits.find((x) => x.id === h.id)!.home = e.target.checked; })} />On Home</label>
@@ -477,7 +477,7 @@ function MilestonesView() {
           return (
             <div key={m} className={`card p-4 text-center ${hit ? 'bg-petal border-blush' : ''}`}>
               <div className={`mx-auto w-12 h-12 rounded-full grid place-items-center mb-2 ${hit ? 'bg-deep text-white' : 'bg-petal text-blush'}`}><Trophy size={20} /></div>
-              <div className="h-serif text-[24px]">{showW(m, u)}</div>
+              <div className="h-serif text-[21px]">{showW(m, u)}</div>
               <div className="text-[13px] text-muted">{hit ? `Reached ${fmtShort(hit.date)} ♡` : m === s.settings.goalWeight ? 'Your goal' : 'Ahead of you'}</div>
             </div>
           );
@@ -485,7 +485,7 @@ function MilestonesView() {
         <p className="col-span-2 text-[13px] text-muted">No deadlines — milestones arrive when they arrive.</p>
       </div>
       <div>
-        <div className="flex items-center justify-between mb-2"><h3 className="h-serif text-[19px]">Weekly check-ins</h3>
+        <div className="flex items-center justify-between mb-2"><h3 className="h-serif text-[17px]">Weekly check-ins</h3>
           <button className="btn-soft btn-sm" onClick={() => setOpen(thisWeek)}>This week</button></div>
         {checks.length === 0 ? <p className="text-[14px] text-muted">Your Sunday check-ins will collect here — a lovely record of how far you’ve come.</p> : (
           <div className="space-y-2">

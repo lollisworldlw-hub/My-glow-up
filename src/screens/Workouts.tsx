@@ -47,7 +47,7 @@ export default function Workouts() {
               <div className="w-12 h-12 rounded-2xl bg-petal text-deep grid place-items-center"><Footprints /></div>
               <div className="flex-1">
                 <div className="eyebrow">Lunch</div>
-                <div className="h-serif text-[20px] leading-tight">{sched.walk === 'walk' ? `${s.settings.walkMinutes}-minute brisk walk` : WALK_LABEL[sched.walk]}</div>
+                <div className="h-serif text-[18px] leading-tight">{sched.walk === 'walk' ? `${s.settings.walkMinutes}-minute brisk walk` : WALK_LABEL[sched.walk]}</div>
                 <div className="text-[13px] text-muted">{sched.walk === 'recovery' ? 'Rest is part of the plan. A gentle stroll is welcome.' : 'Brisk enough to warm up, easy enough to chat.'}</div>
               </div>
             </div>
@@ -64,7 +64,7 @@ export default function Workouts() {
               <div className="w-12 h-12 rounded-2xl bg-petal text-deep grid place-items-center">{sched.home === 'strength' ? <Dumbbell /> : sched.home === 'rest' ? <Moon /> : <Bike />}</div>
               <div className="flex-1">
                 <div className="eyebrow">At home</div>
-                <div className="h-serif text-[20px] leading-tight">{homeDef?.name ?? HOME_LABEL.rest}</div>
+                <div className="h-serif text-[18px] leading-tight">{homeDef?.name ?? HOME_LABEL.rest}</div>
                 <div className="text-[13px] text-muted">{homeDef ? `${homeDef.plannedMin} min · ${homeDef.subtitle}` : 'No workout today — recovery helps you come back stronger.'}</div>
               </div>
             </div>
@@ -139,7 +139,7 @@ export default function Workouts() {
             <div className="space-y-2">
               {[...s.workouts].sort((a, b) => b.date.localeCompare(a.date) || b.at - a.at).map((w) => (
                 <div key={w.id} className="card p-4 flex items-center gap-3">
-                  <div className={`w-11 h-11 rounded-full grid place-items-center ${w.completed ? 'bg-sage/25 text-sagedeep' : 'bg-petal text-deep'}`}>{w.type === 'walk' ? <Footprints size={19} /> : w.type === 'strength' ? <Dumbbell size={19} /> : <Bike size={19} />}</div>
+                  <div className={`w-10 h-10 rounded-full grid place-items-center ${w.completed ? 'bg-sage/25 text-sagedeep' : 'bg-petal text-deep'}`}>{w.type === 'walk' ? <Footprints size={19} /> : w.type === 'strength' ? <Dumbbell size={19} /> : <Bike size={19} />}</div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium">{w.name}</div>
                     <div className="text-[13px] text-muted">{fmtDow(w.date)} {fmtShort(w.date)} · {w.actualMin} of {w.plannedMin} min · {w.completed ? 'Completed' : 'Partial'}{w.difficulty ? ` · felt ${['easy', 'light', 'good', 'hard', 'max'][w.difficulty - 1]}` : ''}</div>

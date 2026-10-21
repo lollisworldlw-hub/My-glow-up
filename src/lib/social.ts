@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { supabase, useSync } from './sync';
 
-export interface Member { user_id: string; display_name: string; emoji: string; bio: string; joined_at: string }
+export interface Member { user_id: string; display_name: string; emoji: string; bio: string; joined_at: string; avatar_path?: string | null }
 export interface Message { id: number; sender: string; recipient: string | null; kind: 'text' | 'achievement' | 'recipe' | 'photo'; body: string; meta: any; created_at: string }
 export interface Reaction { message_id: number; user_id: string; emoji: string }
 
@@ -86,7 +86,7 @@ export async function toggleReaction(messageId: number, emoji: string) {
   if (error) loadSocial();
 }
 
-export async function updateProfile(p: Partial<Pick<Member, 'display_name' | 'emoji' | 'bio'>>) {
+export async function updateProfile(p: Partial<Pick<Member, 'display_name' | 'emoji' | 'bio' | 'avatar_path'>>) {
   const uid = useSync.getState().userId;
   if (!uid) return;
   const { error } = await supabase.from('glowup_members').update(p).eq('user_id', uid);

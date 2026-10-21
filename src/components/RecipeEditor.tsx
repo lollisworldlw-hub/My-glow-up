@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { useStore } from '../lib/store';
-import type { Ingredient, Recipe, Slot, Unit } from '../lib/types';
-import { SLOT_LABEL, SLOTS } from '../lib/types';
+import type { GroceryCategory, Ingredient, Recipe, Slot, Unit } from '../lib/types';
+import { GROCERY_CATEGORIES, SLOT_LABEL, SLOTS } from '../lib/types';
 import { ingredientMacros, round, sumIngredients, unitsFor } from '../lib/nutrition';
 import { uid } from '../lib/date';
 import { Field, NumberInput, Sheet, toast } from './ui';
@@ -15,6 +15,7 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
     id: uid(), name: '', slot, servingLabel: '1 serving', ingredients: [], instructions: [''], art: slot === 'dessert' ? 'choc-berry' : 'custom', custom: true
   });
   const [addFood, setAddFood] = useState('');
+  const [newIng, setNewIng] = useState(false);
   const [sharing, setSharing] = useState(false);
   const canShare = useCanShare();
   const foods = Object.values(s.foods).sort((a, b) => a.name.localeCompare(b.name));
@@ -67,8 +68,9 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
         })}
       </div>
       <div className="flex gap-2 mb-5">
-        <select className="field flex-1" value={addFood} onChange={(e) => setAddFood(e.target.value)} aria-label="Food to add">
+        <select className="field flex-1" value={addFood} onChange={(e) => { if (e.target.value === '__new') { setNewIng(true); setAddFood(''); } else setAddFood(e.target.value); }} aria-label="Food to add">
           <option value="">Add an ingredient…</option>
+          <option value="__new">＋ New ingredient (not on the list)</option>
           {foods.map((f) => <option key={f.id} value={f.id}>{f.name}{f.state ? ` (${f.state})` : ''}</option>)}
         </select>
         <button className="btn-soft" disabled={!addFood} onClick={() => {
@@ -78,7 +80,11 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
           setAddFood('');
         }}><Plus size={18} /></button>
       </div>
-      <p className="text-[13px] text-muted -mt-3 mb-5">Missing a food? Add it with its label values in Settings → Food library.</p>
+      {!newIng ? (
+        <button className="text-[13px] text-deep font-medium -mt-3 mb-5 block" onClick={() => setNewIng(true)}>＋ Ingredient not on the list? Add your own</button>
+      ) : (
+        <NewIngredient onCancel={() => setNewIng(false)} onAdd={(foodId, amount, unit) => { setR({ ...r, ingredients: [...r.ingredients, { foodId, amount, unit }] }); setNewIng(false); }} />
+      )}
 
       <div className="label">Steps</div>
       {r.instructions.map((t, i) => (
@@ -89,5 +95,62 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
       <Field label="Note (optional)"><input className="field" value={r.note ?? ''} onChange={(e) => setR({ ...r, note: e.target.value })} /></Field>
       {sharing && <ShareRecipeSheet recipe={r} onClose={() => setSharing(false)} />}
     </Sheet>
+  );
+}
+
+/** Quick custom ingredient: enter it from the package label (per serving) and add it to the recipe. */
+function NewIngredient({ onAdd, onCancel }: { onAdd: (foodId: string, amount: number, unit: Unit) => void; onCancel: () => void }) {
+  const s = useStore();
+  const [name, setName] = useState('');
+  const [mode, setMode] = useState<'g' | 'each'>('g');
+  const [serv, setServ] = useState<number | null>(100);
+  const [pieceG, setPieceG] = useState<number | null>(null);
+  const [cal, setCal] = useState<number | null>(null);
+  const [pro, setPro] = useState<number | null>(null);
+  const [carb, setCarb] = useState<number | null>(null);
+  const [fat, setFat] = useState<number | null>(null);
+  const [category, setCategory] = useState<GroceryCategory>('Pantry');
+  const grams = mode === 'g' ? serv : (pieceG ?? 50);
+  const ok = name.trim() && cal != null && grams && grams > 0;
+  const add = () => {
+    if (!ok) return;
+    const k = 100 / grams!;
+    const id = uid();
+    s.set((x) => {
+      x.foods[id] = {
+        id, name: name.trim(), category, estimate: false, custom: true, tags: [],
+        per100g: { cal: +(cal! * k).toFixed(1), protein: +((pro ?? 0) * k).toFixed(2), carbs: +((carb ?? 0) * k).toFixed(2), fat: +((fat ?? 0) * k).toFixed(2) },
+        units: mode === 'each' ? { each: grams! } : {},
+        eachLabel: mode === 'each' ? 'serving' : undefined,
+        grocery: { key: id, name: name.trim(), factor: 1, unitLabel: mode === 'each' ? 'servings' : 'g', gramsPerUnit: mode === 'each' ? grams! : 1, round: 'ceil' }
+      };
+    });
+    toast(`Added ${name.trim()} to your foods`);
+    onAdd(id, mode === 'each' ? 1 : grams!, mode === 'each' ? 'each' : 'g');
+  };
+  return (
+    <div className="rounded-2xl border border-blush bg-petal/40 p-3 mb-5">
+      <div className="font-medium mb-2">New ingredient</div>
+      <Field label="Name"><input className="field" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Chipotle mayo" /></Field>
+      <div className="label">Nutrition from the label is for…</div>
+      <div className="flex gap-2 mb-3">
+        <button className={`chip ${mode === 'g' ? 'chip-on' : ''}`} onClick={() => setMode('g')}>A weight in grams</button>
+        <button className={`chip ${mode === 'each' ? 'chip-on' : ''}`} onClick={() => setMode('each')}>1 serving / piece</button>
+      </div>
+      <div className="grid grid-cols-2 gap-x-3">
+        {mode === 'g'
+          ? <Field label="Grams"><NumberInput value={serv} onChange={setServ} ariaLabel="Serving grams" /></Field>
+          : <Field label="Grams per serving (optional)"><NumberInput value={pieceG} onChange={setPieceG} placeholder="50" ariaLabel="Grams per serving" /></Field>}
+        <Field label="Calories"><NumberInput value={cal} onChange={setCal} ariaLabel="New ingredient calories" /></Field>
+        <Field label="Protein (g)"><NumberInput value={pro} onChange={setPro} ariaLabel="New ingredient protein" /></Field>
+        <Field label="Carbs (g)"><NumberInput value={carb} onChange={setCarb} /></Field>
+        <Field label="Fat (g)"><NumberInput value={fat} onChange={setFat} /></Field>
+        <Field label="Grocery aisle"><select className="field" value={category} onChange={(e) => setCategory(e.target.value as GroceryCategory)}>{GROCERY_CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></Field>
+      </div>
+      <div className="flex gap-2">
+        <button className="btn-ghost btn-sm flex-1" onClick={onCancel}>Cancel</button>
+        <button className="btn-primary btn-sm flex-[2]" disabled={!ok} onClick={add}>Add to recipe</button>
+      </div>
+    </div>
   );
 }

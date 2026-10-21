@@ -4,15 +4,15 @@ import { create } from 'zustand';
 import { createPortal } from 'react-dom';
 
 export function Card({ children, className = '', onClick }: { children: ReactNode; className?: string; onClick?: () => void }) {
-  return <div onClick={onClick} className={`card p-4 ${className}`}>{children}</div>;
+  return <div onClick={onClick} className={`card p-3.5 ${className}`}>{children}</div>;
 }
 
 export function Header({ eyebrow, title, right }: { eyebrow?: string; title: string; right?: ReactNode }) {
   return (
-    <div className="flex items-end justify-between gap-3 mb-4 rise">
+    <div className="flex items-end justify-between gap-3 mb-3 rise">
       <div className="min-w-0">
         {eyebrow && <div className="eyebrow mb-1">{eyebrow}</div>}
-        <h1 className="h-serif text-[28px] leading-[1.05]">{title}</h1>
+        <h1 className="h-serif text-[24px] leading-[1.05]">{title}</h1>
       </div>
       {right}
     </div>
@@ -21,14 +21,14 @@ export function Header({ eyebrow, title, right }: { eyebrow?: string; title: str
 
 export function SectionTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {
   return (
-    <div className="flex items-center justify-between mt-5 mb-2">
-      <h2 className="h-serif text-[20px]">{children}</h2>
+    <div className="flex items-center justify-between mt-4 mb-2">
+      <h2 className="h-serif text-[18px]">{children}</h2>
       {right}
     </div>
   );
 }
 
-export function CheckCircle({ on, onToggle, label, size = 26 }: { on: boolean; onToggle: () => void; label: string; size?: number }) {
+export function CheckCircle({ on, onToggle, label, size = 24 }: { on: boolean; onToggle: () => void; label: string; size?: number }) {
   return (
     <button
       type="button"
@@ -46,10 +46,10 @@ export function CheckCircle({ on, onToggle, label, size = 26 }: { on: boolean; o
 
 export function CheckRow({ on, onToggle, title, sub, right }: { on: boolean; onToggle: () => void; title: string; sub?: string; right?: ReactNode }) {
   return (
-    <div className="flex items-center gap-3 py-2.5 cursor-pointer" onClick={onToggle}>
+    <div className="flex items-center gap-3 py-2 cursor-pointer" onClick={onToggle}>
       <CheckCircle on={on} onToggle={onToggle} label={title} />
       <div className="flex-1 min-w-0">
-        <div className={`text-[15px] ${on ? 'text-muted line-through decoration-blush' : ''}`}>{title}</div>
+        <div className={`text-[14px] ${on ? 'text-muted line-through decoration-blush' : ''}`}>{title}</div>
         {sub && <div className="text-[13px] text-muted">{sub}</div>}
       </div>
       {right}
@@ -128,7 +128,7 @@ export function Sheet({ open, onClose, title, children, footer }: { open: boolea
           <div className="w-10 h-1.5 rounded-full bg-blush" />
           <button aria-label="Close" onClick={onClose} className="w-10 h-10 grid place-items-center rounded-full bg-petal text-deep"><X size={18} /></button>
         </div>
-        <h2 className="h-serif text-[22px] px-5 pb-2 leading-tight">{title}</h2>
+        <h2 className="h-serif text-[19px] px-5 pb-2 leading-tight">{title}</h2>
         <div className="overflow-y-auto px-5 pb-5 flex-1">{children}</div>
         {footer && <div className="px-5 pt-3 pb-4 border-t border-line safe-bottom bg-bg">{footer}</div>}
       </div>
@@ -160,7 +160,7 @@ export function Empty({ icon, title, sub, action }: { icon: ReactNode; title: st
   return (
     <div className="text-center py-8 px-4">
       <div className="mx-auto w-14 h-14 rounded-full bg-petal text-deep grid place-items-center mb-3">{icon}</div>
-      <div className="h-serif text-[19px]">{title}</div>
+      <div className="h-serif text-[17px]">{title}</div>
       {sub && <p className="text-muted text-[14px] mt-1 max-w-[300px] mx-auto">{sub}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
@@ -178,7 +178,7 @@ export function Toaster() {
   useEffect(() => { if (!msg) return; setVis(true); const t = setTimeout(() => setVis(false), 2400); return () => clearTimeout(t); }, [key, msg]);
   if (!vis || !msg) return null;
   return (
-    <div className="fixed left-0 right-0 z-[60] flex justify-center px-4 pointer-events-none" style={{ bottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
+    <div className="fixed left-0 right-0 z-[60] flex justify-center px-4 pointer-events-none" style={{ bottom: 'calc(68px + env(safe-area-inset-bottom))' }}>
       <div key={key} className="rise rounded-full bg-ink text-bg px-5 py-3 text-[14px] shadow-soft">{msg}</div>
     </div>
   );

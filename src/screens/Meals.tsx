@@ -48,12 +48,12 @@ function WeekPlan() {
   return (
     <>
       <div className="flex items-center justify-between mb-3">
-        <button aria-label="Previous week" className="w-11 h-11 rounded-full bg-petal grid place-items-center text-deep" onClick={() => shift(-1)}><ChevronLeft size={20} /></button>
+        <button aria-label="Previous week" className="w-10 h-10 rounded-full bg-petal grid place-items-center text-deep" onClick={() => shift(-1)}><ChevronLeft size={20} /></button>
         <div className="text-center">
           <div className="font-semibold">{fmtShort(monday)} – {fmtShort(addDays(monday, 6))}</div>
           {monday !== weekStart(today) && <button className="text-[13px] text-deep" onClick={() => { setMonday(weekStart(today)); setDay(today); }}>Back to this week</button>}
         </div>
-        <button aria-label="Next week" className="w-11 h-11 rounded-full bg-petal grid place-items-center text-deep" onClick={() => shift(1)}><ChevronRight size={20} /></button>
+        <button aria-label="Next week" className="w-10 h-10 rounded-full bg-petal grid place-items-center text-deep" onClick={() => shift(1)}><ChevronRight size={20} /></button>
       </div>
       <div className="grid grid-cols-7 gap-1.5 mb-4">
         {days.map((d) => {
@@ -62,7 +62,7 @@ function WeekPlan() {
             <button key={d} onClick={() => setDay(d)} aria-pressed={d === day}
               className={`rounded-2xl py-2 text-center border transition ${d === day ? 'bg-deep text-white border-deep' : d === today ? 'border-rose bg-card' : 'border-line bg-card'}`}>
               <div className="text-[12px] opacity-80">{fmtDow(d).slice(0, 3)}</div>
-              <div className="font-semibold text-[15px]">{fromKey(d).getDate()}</div>
+              <div className="font-semibold text-[14px]">{fromKey(d).getDate()}</div>
               <div className={`text-[11px] tabular-nums ${d === day ? 'opacity-90' : 'text-muted'}`}>{cal || '—'}</div>
             </button>
           );
@@ -73,7 +73,7 @@ function WeekPlan() {
         <div className="flex justify-between items-center">
           <div>
             <div className="text-[13px] text-muted">{fmtDow(day)} plan</div>
-            <div className="font-semibold text-[16px]">≈ {p.cal} cal · {p.protein} g protein</div>
+            <div className="font-semibold text-[15px]">≈ {p.cal} cal · {p.protein} g protein</div>
             <div className="text-[13px] text-muted">Logged {c.cal} cal · {c.protein} g · target {s.settings.calTarget}</div>
           </div>
           <button className="btn-soft btn-sm" onClick={() => setTools(true)}><Wand2 size={16} />Plan</button>
@@ -84,7 +84,7 @@ function WeekPlan() {
         {SLOTS.map((slot) => (
           <div key={slot}>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="h-serif text-[18px]">{SLOT_LABEL[slot]}</h3>
+              <h3 className="h-serif text-[16px]">{SLOT_LABEL[slot]}</h3>
               <button className="text-deep text-[14px] font-medium inline-flex items-center gap-1 min-h-[40px]" onClick={() => setAdd(slot)}><Plus size={16} />Add</button>
             </div>
             <div className="space-y-2">
@@ -188,11 +188,11 @@ function Desserts() {
                 <div className="text-[13px] mt-1 tabular-nums">≈ {m.cal} cal · {m.protein} g</div>
               </button>
               <div className="flex gap-1.5 mt-auto pt-3">
-                <button aria-label={fav ? 'Unfavorite' : 'Favorite'} className={`w-11 h-11 shrink-0 rounded-full grid place-items-center border border-line ${fav ? 'text-rose' : 'text-muted'}`}
+                <button aria-label={fav ? 'Unfavorite' : 'Favorite'} className={`w-10 h-10 shrink-0 rounded-full grid place-items-center border border-line ${fav ? 'text-rose' : 'text-muted'}`}
                   onClick={() => s.set((st) => { st.favorites = fav ? st.favorites.filter((x) => x !== r.id) : [...st.favorites, r.id]; })}>
                   <Heart size={18} fill={fav ? 'currentColor' : 'none'} />
                 </button>
-                <button aria-label={`Share ${r.name}`} className="w-11 h-11 shrink-0 rounded-full grid place-items-center border border-line text-muted" onClick={() => canShare() && setShareD(r.id)}><Share2 size={17} /></button>
+                <button aria-label={`Share ${r.name}`} className="w-10 h-10 shrink-0 rounded-full grid place-items-center border border-line text-muted" onClick={() => canShare() && setShareD(r.id)}><Share2 size={17} /></button>
                 <button className="btn-primary btn-sm flex-1 !px-2 text-[13px]" onClick={() => addTonight(r.id, true)}>Tonight</button>
               </div>
             </div>
@@ -222,7 +222,7 @@ function Recipes() {
         if (!list.length) return null;
         return (
           <div key={slot} className="mb-5">
-            <h3 className="h-serif text-[18px] mb-2">{SLOT_LABEL[slot]}</h3>
+            <h3 className="h-serif text-[16px] mb-2">{SLOT_LABEL[slot]}</h3>
             <div className="space-y-2">
               {list.map((r) => {
                 const m = round(recipeMacros(s.foods, r));
@@ -234,8 +234,8 @@ function Recipes() {
                       <div className="min-w-0"><div className="font-medium">{r.name}</div><div className="text-[13px] text-muted">{r.servingLabel} · ≈ {m.cal} cal · {m.protein} g protein</div>
                         <div className="flex flex-wrap gap-1 mt-1">{dietBadges(r, s.foods).map((b) => <span key={b} className="text-[11px] rounded-full bg-petal text-deep px-2 py-0.5">{b}</span>)}{conflicts(r, s.foods, s.settings.diets).length > 0 && <span className="text-[11px] rounded-full border border-blush text-muted px-2 py-0.5">Doesn’t fit my diet</span>}</div></div>
                     </button>
-                    <button aria-label={`Share ${r.name}`} className="w-11 h-11 rounded-full grid place-items-center text-muted" onClick={() => canShare() && setShare(r.id)}><Share2 size={18} /></button>
-                    <button aria-label={fav ? 'Unfavorite' : 'Favorite'} className={`w-11 h-11 rounded-full grid place-items-center ${fav ? 'text-rose' : 'text-muted'}`}
+                    <button aria-label={`Share ${r.name}`} className="w-10 h-10 rounded-full grid place-items-center text-muted" onClick={() => canShare() && setShare(r.id)}><Share2 size={18} /></button>
+                    <button aria-label={fav ? 'Unfavorite' : 'Favorite'} className={`w-10 h-10 rounded-full grid place-items-center ${fav ? 'text-rose' : 'text-muted'}`}
                       onClick={() => s.set((st) => { st.favorites = fav ? st.favorites.filter((x) => x !== r.id) : [...st.favorites, r.id]; })}>
                       <Heart size={19} fill={fav ? 'currentColor' : 'none'} />
                     </button>

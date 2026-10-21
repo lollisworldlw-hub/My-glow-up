@@ -118,7 +118,7 @@ export default function Settings() {
         {st.quotes.map((q, i) => (
           <div key={i} className="flex gap-2 mb-2">
             <input className="field flex-1" value={q} aria-label="Message" onChange={(e) => set({ quotes: st.quotes.map((x, j) => (j === i ? e.target.value : x)) })} />
-            <button aria-label="Remove" className="w-11 h-11 grid place-items-center text-muted" onClick={() => set({ quotes: st.quotes.filter((_, j) => j !== i) })}><Trash2 size={17} /></button>
+            <button aria-label="Remove" className="w-10 h-10 grid place-items-center text-muted" onClick={() => set({ quotes: st.quotes.filter((_, j) => j !== i) })}><Trash2 size={17} /></button>
           </div>
         ))}
         <div className="flex gap-2">
@@ -151,7 +151,7 @@ export default function Settings() {
 export function Toggle({ label, on, onChange }: { label: string; on: boolean; onChange: (v: boolean) => void }) {
   return (
     <button role="switch" aria-checked={on} className="w-full flex items-center justify-between py-2.5 text-left" onClick={() => onChange(!on)}>
-      <span className="text-[15px] pr-3">{label}</span>
+      <span className="text-[14px] pr-3">{label}</span>
       <span className={`w-[52px] h-[32px] rounded-full p-1 transition shrink-0 ${on ? 'bg-deep' : 'bg-line'}`}><span className={`block w-6 h-6 rounded-full bg-white shadow transition ${on ? 'translate-x-5' : ''}`} /></span>
     </button>
   );
