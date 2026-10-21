@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Copy, Heart, Plus, Shuffle, Sparkles, Trash2, Wand2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Copy, Heart, Plus, Share2, Shuffle, Sparkles, Trash2, Wand2 } from 'lucide-react';
 import { useStore, emptyDay } from '../lib/store';
 import { SLOT_LABEL, SLOTS } from '../lib/types';
 import type { Slot } from '../lib/types';
@@ -11,6 +11,7 @@ import { LogFoodSheet, MealCard, SwapSheet } from '../components/MealParts';
 import { RecipeEditor } from '../components/RecipeEditor';
 import { FoodArt } from '../components/Art';
 import { useUI } from '../lib/ui';
+import { FoodPhotos, ShareRecipeSheet, useCanShare } from '../components/ShareParts';
 import { conflicts, dietBadges } from '../lib/diet';
 
 export default function Meals() {
@@ -104,6 +105,7 @@ function WeekPlan() {
         ))}
       </div>
 
+      <div className="mt-4"><FoodPhotos date={day} /></div>
       {add && <SwapSheet date={day} slot={add} onClose={() => setAdd(null)} />}
       {log && <LogFoodSheet date={day} onClose={() => setLog(false)} />}
       {tools && (
@@ -150,6 +152,8 @@ function Desserts() {
   const desserts = Object.values(s.recipes).filter((r) => r.slot === 'dessert' && conflicts(r, s.foods, s.settings.diets).length === 0)
     .sort((a, b) => Number(s.favorites.includes(b.id)) - Number(s.favorites.includes(a.id)));
   const tonight = s.plans[today]?.dessert ?? [];
+  const [shareD, setShareD] = useState<string | null>(null);
+  const canShare = useCanShare();
 
   const addTonight = (id: string, replace: boolean) => {
     s.set((st) => {
@@ -188,6 +192,7 @@ function Desserts() {
                   onClick={() => s.set((st) => { st.favorites = fav ? st.favorites.filter((x) => x !== r.id) : [...st.favorites, r.id]; })}>
                   <Heart size={18} fill={fav ? 'currentColor' : 'none'} />
                 </button>
+                <button aria-label={`Share ${r.name}`} className="w-11 h-11 shrink-0 rounded-full grid place-items-center border border-line text-muted" onClick={() => canShare() && setShareD(r.id)}><Share2 size={17} /></button>
                 <button className="btn-primary btn-sm flex-1 !px-2 text-[14px]" onClick={() => addTonight(r.id, true)}>Tonight</button>
               </div>
             </div>
@@ -199,6 +204,7 @@ function Desserts() {
       </div>
       <p className="text-[14px] text-muted mt-4">Tap a dessert to adjust its portion or ingredients. “Tonight” swaps it into today’s plan.</p>
       {edit && <RecipeEditor recipeId={edit === 'new' ? undefined : edit} slot="dessert" onClose={() => setEdit(null)} />}
+      {shareD && s.recipes[shareD] && <ShareRecipeSheet recipe={s.recipes[shareD]} onClose={() => setShareD(null)} />}
     </>
   );
 }
@@ -206,6 +212,8 @@ function Desserts() {
 function Recipes() {
   const s = useStore();
   const [edit, setEdit] = useState<string | null | 'new'>(null);
+  const [share, setShare] = useState<string | null>(null);
+  const canShare = useCanShare();
   return (
     <>
       <button className="btn-primary w-full mb-5" onClick={() => setEdit('new')}><Plus size={18} />New recipe</button>
@@ -226,6 +234,7 @@ function Recipes() {
                       <div className="min-w-0"><div className="font-medium">{r.name}</div><div className="text-[14px] text-muted">{r.servingLabel} · ≈ {m.cal} cal · {m.protein} g protein</div>
                         <div className="flex flex-wrap gap-1 mt-1">{dietBadges(r, s.foods).map((b) => <span key={b} className="text-[11px] rounded-full bg-petal text-deep px-2 py-0.5">{b}</span>)}{conflicts(r, s.foods, s.settings.diets).length > 0 && <span className="text-[11px] rounded-full border border-blush text-muted px-2 py-0.5">Doesn’t fit my diet</span>}</div></div>
                     </button>
+                    <button aria-label={`Share ${r.name}`} className="w-11 h-11 rounded-full grid place-items-center text-muted" onClick={() => canShare() && setShare(r.id)}><Share2 size={18} /></button>
                     <button aria-label={fav ? 'Unfavorite' : 'Favorite'} className={`w-11 h-11 rounded-full grid place-items-center ${fav ? 'text-rose' : 'text-muted'}`}
                       onClick={() => s.set((st) => { st.favorites = fav ? st.favorites.filter((x) => x !== r.id) : [...st.favorites, r.id]; })}>
                       <Heart size={19} fill={fav ? 'currentColor' : 'none'} />
@@ -238,6 +247,7 @@ function Recipes() {
         );
       })}
       {edit && <RecipeEditor recipeId={edit === 'new' ? undefined : edit} onClose={() => setEdit(null)} />}
+      {share && s.recipes[share] && <ShareRecipeSheet recipe={s.recipes[share]} onClose={() => setShare(null)} />}
     </>
   );
 }

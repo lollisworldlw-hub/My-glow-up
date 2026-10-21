@@ -40,7 +40,7 @@ const dataUrlToBlob = async (d: string) => (await fetch(d)).blob();
 export async function exportData(state: State, includePhotos: boolean) {
   const photos: Record<string, string> = {};
   if (includePhotos) {
-    for (const p of state.photos) {
+    for (const p of [...state.photos, ...(state.foodPhotos ?? [])]) {
       const b = await loadPhoto(p.id);
       if (b) photos[p.id] = await blobToDataUrl(b);
     }

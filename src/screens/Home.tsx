@@ -10,6 +10,7 @@ import { Bar, Card, CheckRow, Ring, SectionTitle, toast } from '../components/ui
 import { LogFoodSheet, MealCard, SwapSheet } from '../components/MealParts';
 import { WeightSheet, showW } from '../components/WeightSheet';
 import { useUI } from '../lib/ui';
+import { FoodPhotos } from '../components/ShareParts';
 import { CheckReminders, CheckinCard, CycleChip, DessertBudget, LogDayButton, ProteinFixer } from '../components/HomeExtras';
 
 export const HOME_LABEL: Record<string, string> = { strength: 'Full-body strength', bike: 'Stationary bike', 'bike-easy': 'Easy bike (optional)', rest: 'Rest & recover' };
@@ -179,6 +180,8 @@ export default function Home() {
           </div>
         ) : <p className="text-[14px] text-muted mt-1">Hungry? Add a snack anytime — fueling well helps you stick with it.</p>}
       </div>
+
+      <FoodPhotos date={today} />
 
       {sheet === 'weight' && <WeightSheet onClose={() => setSheet(null)} />}
       {sheet === 'log' && <LogFoodSheet date={today} onClose={() => setSheet(null)} />}

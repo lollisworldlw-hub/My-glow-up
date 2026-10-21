@@ -237,3 +237,5 @@ export interface Checkin {
 export type Flow = 'spotting' | 'light' | 'medium' | 'heavy';
 export interface Period { id: string; start: string; end?: string }
 export interface CycleDay { flow?: Flow; symptoms: string[] }
+
+export interface FoodPhoto { id: string; date: string; slot?: Slot; caption: string; w: number; h: number; sharedAt?: number }

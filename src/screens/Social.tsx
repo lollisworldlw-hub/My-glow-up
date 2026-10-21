@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronLeft, Copy, Lock, LogOut, Send, Share2, Smile, Trophy, Trash2, UserPlus } from 'lucide-react';
+import { ChevronLeft, Copy, ImagePlus, Lock, LogOut, Send, Share2, Smile, Trophy, Trash2, UserPlus } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { useSync } from '../lib/sync';
 import { useSocial, loadSocial, startLive, send, removeMessage, toggleReaction, updateProfile, createInvite, myInvites, leaveGroup, markRead, type Message } from '../lib/social';
@@ -7,9 +7,15 @@ import { computeAchievements, type Achievement } from '../lib/achievements';
 import { useToday } from '../lib/derived';
 import { Card, Empty, Field, Header, Segmented, Sheet, toast } from '../components/ui';
 import { AccountForm } from '../components/CloudCard';
+import { useMediaUrl, uploadMedia, gifUrl } from '../lib/media';
+import { importRecipe, type RecipePayload } from '../lib/recipeShare';
+import { SLOT_LABEL } from '../lib/types';
+import { fmtIngredient } from '../lib/nutrition';
+import { FoodArt } from '../components/Art';
+import { GifPicker, GIPHY_KEY } from '../components/GifPicker';
 import { useUI } from '../lib/ui';
 
-const REACTIONS = ['❤️', '👏', '🔥', '💪'];
+const REACTIONS = ['❤️', '😂', '😍', '👏', '🔥', '💪', '🥹', '😮'];
 const EMOJIS = ['🌸', '🌷', '🦋', '🌙', '⭐', '🍓', '🐝', '🌻', '🍒', '🦩', '🐚', '🌈', '💎', '🎀', '🐱', '🐶'];
 
 const timeLabel = (iso: string) => {
@@ -58,32 +64,105 @@ export default function Social() {
   );
 }
 
+function MediaImg({ image, onOpen }: { image: { path: string; w: number; h: number }; onOpen?: (url: string) => void }) {
+  const url = useMediaUrl(image.path);
+  const ratio = image.w && image.h ? image.h / image.w : 1;
+  return url
+    ? <img src={url} alt="" onClick={() => onOpen?.(url)} className="w-full rounded-2xl object-cover bg-petal" style={{ maxHeight: 360, aspectRatio: `${image.w} / ${image.h}` }} />
+    : <div className="w-full rounded-2xl bg-petal animate-pulse" style={{ aspectRatio: `1 / ${Math.min(1.3, ratio)}` }} />;
+}
+
+function RecipeCard({ m, me, mine }: { m: Message; me: string; mine: boolean }) {
+  const s = useStore();
+  const sender = useSocial((x) => x.members[m.sender]);
+  const [open, setOpen] = useState(false);
+  const p: RecipePayload | undefined = m.meta?.payload;
+  if (!p?.recipe) return <div className="rounded-3xl border border-line bg-card px-4 py-3">{m.body}</div>;
+  const foods = Object.fromEntries(p.foods.map((f) => [f.id, f]));
+  const save = () => {
+    const r = importRecipe(s, p, sender?.display_name ?? 'a friend');
+    s.set((x) => { x.recipes = r.recipes as any; x.foods = r.foods as any; });
+    toast(r.existed ? 'Already in your recipes' : `Saved “${p.recipe.name}” to your recipes ♡`);
+  };
+  return (
+    <div className="rounded-3xl border border-blush bg-card overflow-hidden shadow-soft w-full">
+      {m.meta?.image && <MediaImg image={m.meta.image} />}
+      <button className="w-full text-left px-4 pt-3" onClick={() => setOpen(true)}>
+        {m.body && <div className="text-[15px] mb-2">{m.body}</div>}
+        <div className="flex items-center gap-3">
+          {!m.meta?.image && <FoodArt art={p.recipe.art} size={48} />}
+          <div className="min-w-0"><div className="eyebrow !text-[11px]">Recipe · {SLOT_LABEL[p.recipe.slot]}</div>
+            <div className="font-semibold leading-snug">{p.recipe.name}</div>
+            <div className="text-[13px] text-muted">{p.recipe.servingLabel} · ≈ {p.macros.cal} cal · {p.macros.protein} g protein</div></div>
+        </div>
+      </button>
+      <div className="flex gap-2 px-4 pb-3 pt-3">
+        <button className="btn-soft btn-sm flex-1" onClick={() => setOpen(true)}>View</button>
+        {!mine && <button className="btn-primary btn-sm flex-1" onClick={save}>Save to my recipes</button>}
+      </div>
+      {open && (
+        <Sheet open onClose={() => setOpen(false)} title={p.recipe.name} footer={!mine ? <button className="btn-primary w-full" onClick={() => { save(); setOpen(false); }}>Save to my recipes</button> : undefined}>
+          {m.meta?.image && <div className="mb-3"><MediaImg image={m.meta.image} /></div>}
+          <div className="text-[15px] mb-3">{p.recipe.servingLabel} · ≈ {p.macros.cal} cal · {p.macros.protein} g protein</div>
+          <h3 className="h-serif text-[20px] mb-1">Ingredients</h3>
+          <ul className="list-disc pl-5 mb-3 text-[15px]">{p.recipe.ingredients.map((i, k) => <li key={k}>{fmtIngredient(foods[i.foodId], i)}</li>)}</ul>
+          <h3 className="h-serif text-[20px] mb-1">Steps</h3>
+          <ol className="list-decimal pl-5 text-[15px] space-y-1">{p.recipe.instructions.map((t, k) => <li key={k}>{t}</li>)}</ol>
+          {p.recipe.note && <p className="text-[14px] text-muted mt-2">{p.recipe.note}</p>}
+        </Sheet>
+      )}
+    </div>
+  );
+}
+
 function Bubble({ m, me, onLong }: { m: Message; me: string; onLong: () => void }) {
   const member = useSocial((s) => s.members[m.sender]);
   const reactions = useSocial((s) => s.reactions.filter((r) => r.message_id === m.id));
   const [picker, setPicker] = useState(false);
+  const [zoom, setZoom] = useState<string | null>(null);
   const mine = m.sender === me;
-  const counts = REACTIONS.map((e) => ({ e, n: reactions.filter((r) => r.emoji === e).length, mine: reactions.some((r) => r.emoji === e && r.user_id === me) })).filter((x) => x.n);
+  const counts = REACTIONS.map((e) => ({ e, n: reactions.filter((r) => r.emoji === e).length, mine: reactions.some((r) => r.emoji === e && r.user_id === me), who: reactions.filter((r) => r.emoji === e).map((r) => r.user_id) })).filter((x) => x.n);
+  const gif = m.kind === 'text' && !m.meta?.image ? gifUrl(m.body) : null;
+  const caption = m.meta?.image && (m.body === '📷' || m.body === 'GIF') ? '' : m.body;
+
+  let content: JSX.Element;
+  if (m.kind === 'recipe') content = <RecipeCard m={m} me={me} mine={mine} />;
+  else if (m.kind === 'achievement') content = (
+    <div className="rounded-3xl border border-blush bg-card px-4 py-3 text-left shadow-soft">
+      <div className="flex items-center gap-3"><span className="text-[30px]">{m.meta?.icon ?? '🏆'}</span>
+        <div><div className="eyebrow !text-[11px]">Achievement</div><div className="font-semibold text-[16px] leading-snug">{m.body}</div></div></div>
+    </div>
+  );
+  else if (m.kind === 'photo' || m.meta?.image || gif) content = (
+    <div className={`rounded-3xl overflow-hidden ${mine ? 'bg-deep text-white' : 'bg-card border border-line'} w-full`}>
+      {gif ? <img src={gif} alt="GIF" className="w-full rounded-2xl" style={{ maxHeight: 300, objectFit: 'cover' }} /> : <MediaImg image={m.meta.image} onOpen={setZoom} />}
+      {m.kind === 'photo' && m.meta?.slot && <div className={`px-4 pt-2 text-[12px] uppercase tracking-wider ${mine ? 'text-white/80' : 'text-muted'}`}>{SLOT_LABEL[m.meta.slot as keyof typeof SLOT_LABEL]}</div>}
+      {caption && !gif && <div className="px-4 py-2 text-[15px] whitespace-pre-wrap break-words">{caption}</div>}
+    </div>
+  );
+  else content = <div className={`rounded-3xl px-4 py-2.5 text-left text-[16px] whitespace-pre-wrap break-words ${mine ? 'bg-deep text-white rounded-br-lg' : 'bg-card border border-line rounded-bl-lg'}`}>{m.body}</div>;
 
   return (
     <div className={`flex gap-2 ${mine ? 'justify-end' : ''}`}>
       {!mine && <div className="w-9 h-9 rounded-full bg-petal grid place-items-center text-[18px] shrink-0 mt-5" aria-hidden>{member?.emoji ?? '🌸'}</div>}
-      <div className={`max-w-[80%] min-w-0 ${mine ? 'items-end' : ''} flex flex-col`}>
+      <div className={`${m.kind === 'text' && !m.meta?.image && !gif ? 'max-w-[80%]' : 'w-[80%]'} min-w-0 flex flex-col ${mine ? 'items-end' : ''}`}>
         <div className={`text-[12px] text-muted mb-1 ${mine ? 'text-right' : ''}`}>{mine ? 'You' : member?.display_name ?? 'Friend'} · {timeLabel(m.created_at)}</div>
-        {m.kind === 'achievement' ? (
-          <button onClick={mine ? onLong : () => setPicker(!picker)} className="rounded-3xl border border-blush bg-card px-4 py-3 text-left shadow-soft">
-            <div className="flex items-center gap-3"><span className="text-[30px]">{m.meta?.icon ?? '🏆'}</span>
-              <div><div className="eyebrow !text-[11px]">Achievement</div><div className="font-semibold text-[16px] leading-snug">{m.body}</div></div></div>
-          </button>
-        ) : (
-          <button onClick={mine ? onLong : () => setPicker(!picker)} className={`rounded-3xl px-4 py-2.5 text-left text-[16px] whitespace-pre-wrap break-words ${mine ? 'bg-deep text-white rounded-br-lg' : 'bg-card border border-line rounded-bl-lg'}`}>{m.body}</button>
-        )}
-        <div className={`flex flex-wrap gap-1 mt-1 ${mine ? 'justify-end' : ''}`}>
-          {counts.map((c) => <button key={c.e} onClick={() => toggleReaction(m.id, c.e)} className={`rounded-full px-2 py-0.5 text-[13px] border ${c.mine ? 'border-rose bg-petal' : 'border-line bg-card'}`}>{c.e} {c.n}</button>)}
-          {!picker && <button aria-label="React" onClick={() => setPicker(true)} className="rounded-full px-2 py-0.5 text-muted border border-line bg-card"><Smile size={14} /></button>}
-          {picker && REACTIONS.map((e) => <button key={e} onClick={() => { toggleReaction(m.id, e); setPicker(false); }} className="rounded-full w-9 h-8 text-[16px] bg-petal">{e}</button>)}
+        <div className="w-full flex flex-col" style={{ alignItems: mine ? 'flex-end' : 'flex-start' }} onDoubleClick={() => toggleReaction(m.id, '❤️')}
+          onContextMenu={(e) => { e.preventDefault(); mine ? onLong() : setPicker(true); }}>
+          {content}
         </div>
+        <div className={`flex flex-wrap items-center gap-1 mt-1 ${mine ? 'justify-end' : ''}`}>
+          {counts.map((c) => <button key={c.e} title={c.who.map((u) => useSocial.getState().members[u]?.display_name ?? '').join(', ')} onClick={() => toggleReaction(m.id, c.e)} className={`rounded-full px-2 py-0.5 text-[13px] border ${c.mine ? 'border-rose bg-petal' : 'border-line bg-card'}`}>{c.e} {c.n}</button>)}
+          <button aria-label="Add reaction" onClick={() => setPicker(!picker)} className="rounded-full px-2.5 py-1 text-muted border border-line bg-card inline-flex items-center gap-1 text-[12px]"><Smile size={14} />React</button>
+          {mine && <button aria-label="Message options" onClick={onLong} className="rounded-full px-2 py-1 text-muted text-[12px]">•••</button>}
+        </div>
+        {picker && (
+          <div className={`flex flex-wrap gap-1 mt-1 p-1.5 rounded-2xl bg-card border border-line shadow-soft ${mine ? 'self-end' : ''}`}>
+            {REACTIONS.map((e) => <button key={e} aria-label={`React ${e}`} onClick={() => { toggleReaction(m.id, e); setPicker(false); }} className="w-10 h-10 rounded-full text-[20px] hover:bg-petal">{e}</button>)}
+          </div>
+        )}
       </div>
+      {zoom && <Sheet open onClose={() => setZoom(null)} title=""><img src={zoom} alt="" className="w-full rounded-2xl" /></Sheet>}
     </div>
   );
 }
@@ -96,6 +175,8 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
   const [share, setShare] = useState(false);
   const [del, setDel] = useState<Message | null>(null);
   const end = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [gifs, setGifs] = useState(false);
   useEffect(() => { end.current?.scrollIntoView({ block: 'end' }); markRead(peer ?? 'group'); }, [msgs.length]);
 
   const post = async () => {
@@ -115,12 +196,23 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
       <div className="fixed inset-x-0 z-30 bg-bg/95 backdrop-blur border-t border-line" style={{ bottom: 'calc(63px + env(safe-area-inset-bottom))' }}>
         <div className="mx-auto max-w-[640px] px-3 py-2 flex gap-2 items-end">
           {peer === null && <button aria-label="Share an achievement" className="w-11 h-11 shrink-0 rounded-full bg-petal text-deep grid place-items-center" onClick={() => setShare(true)}><Trophy size={19} /></button>}
-          <textarea aria-label="Message" rows={1} className="field py-2.5 min-h-[44px] max-h-32 flex-1 resize-none" placeholder={peer ? 'Message' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
+          {GIPHY_KEY && <button aria-label="Search GIFs" className="h-11 px-3 shrink-0 rounded-full bg-petal text-deep font-bold text-[13px]" onClick={() => setGifs(true)}>GIF</button>}
+          <button aria-label="Send a photo or GIF" disabled={busy} className="w-11 h-11 shrink-0 rounded-full bg-petal text-deep grid place-items-center" onClick={() => fileRef.current?.click()}><ImagePlus size={19} /></button>
+          <input ref={fileRef} type="file" accept="image/*,image/gif" className="hidden" onChange={async (e) => {
+            const f = e.target.files?.[0]; e.target.value = '';
+            if (!f) return;
+            setBusy(true);
+            try { const image = await uploadMedia(f); await send(text.trim() || (image.gif ? 'GIF' : '📷'), peer, 'text', { image }); setText(''); }
+            catch (err: any) { toast(err?.message ?? 'Couldn’t send that'); }
+            setBusy(false);
+          }} />
+          <textarea aria-label="Message" rows={1} className="field py-2.5 min-h-[44px] max-h-32 flex-1 resize-none" placeholder={peer ? 'Message or paste a GIF link' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(pointer: fine)').matches) { e.preventDefault(); post(); } }} />
           <button aria-label="Send" disabled={busy || !text.trim()} className="w-11 h-11 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-50" onClick={post}><Send size={18} /></button>
         </div>
       </div>
       {share && <ShareSheet onClose={() => setShare(false)} />}
+      {gifs && <GifPicker onClose={() => setGifs(false)} onPick={async (url) => { setGifs(false); try { await send(url, peer); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); } }} />}
       {del && (
         <Sheet open onClose={() => setDel(null)} title="Your message">
           <p className="text-[15px] mb-4 whitespace-pre-wrap">{del.body}</p>

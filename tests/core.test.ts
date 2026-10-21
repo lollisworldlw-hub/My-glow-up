@@ -187,3 +187,25 @@ describe('migration', () => {
     expect(migrate(m).water['2026-10-20']).toBe(40); // idempotent
   });
 });
+
+import { recipePayload, importRecipe } from '../src/lib/recipeShare';
+import { gifUrl } from '../src/lib/media';
+describe('recipe sharing', () => {
+  it('round-trips a recipe with a custom food', () => {
+    const st: any = initialState();
+    const custom = { ...foods['egg'], id: 'my-food', name: 'Magic sauce', custom: true };
+    const r = { id: 'my-r', name: 'Magic Bowl', slot: 'lunch', servingLabel: '1 bowl', art: 'bowl', custom: true, instructions: ['Mix'], ingredients: [{ foodId: 'my-food', amount: 2, unit: 'each' }, { foodId: 'rice-cooked', amount: 0.5, unit: 'cup' }] };
+    const p = recipePayload(r as any, { ...st.foods, 'my-food': custom });
+    const out = importRecipe(st, JSON.parse(JSON.stringify(p)), 'Jen');
+    expect(out.existed).toBe(false);
+    expect(out.foods['my-food'].name).toBe('Magic sauce');
+    expect(out.recipes[out.id].note).toContain('Jen');
+    const again = importRecipe({ ...st, recipes: out.recipes, foods: out.foods }, p, 'Jen');
+    expect(again.existed).toBe(true);
+  });
+  it('detects GIF links', () => {
+    expect(gifUrl('https://media.giphy.com/media/abc/giphy.gif')).toBeTruthy();
+    expect(gifUrl('https://media1.tenor.com/m/x/y.gif')).toBeTruthy();
+    expect(gifUrl('hello https://x.com/a.gif')).toBeNull();
+  });
+});

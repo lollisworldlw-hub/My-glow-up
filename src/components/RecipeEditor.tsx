@@ -6,6 +6,7 @@ import { SLOT_LABEL, SLOTS } from '../lib/types';
 import { ingredientMacros, round, sumIngredients, unitsFor } from '../lib/nutrition';
 import { uid } from '../lib/date';
 import { Field, NumberInput, Sheet, toast } from './ui';
+import { ShareRecipeSheet, useCanShare } from './ShareParts';
 
 export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?: string; slot?: Slot; onClose: () => void }) {
   const s = useStore();
@@ -14,6 +15,8 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
     id: uid(), name: '', slot, servingLabel: '1 serving', ingredients: [], instructions: [''], art: slot === 'dessert' ? 'choc-berry' : 'custom', custom: true
   });
   const [addFood, setAddFood] = useState('');
+  const [sharing, setSharing] = useState(false);
+  const canShare = useCanShare();
   const foods = Object.values(s.foods).sort((a, b) => a.name.localeCompare(b.name));
   const mac = round(sumIngredients(s.foods, r.ingredients));
   const setIng = (i: number, p: Partial<Ingredient>) => setR({ ...r, ingredients: r.ingredients.map((x, j) => (j === i ? { ...x, ...p } : x)) });
@@ -32,6 +35,7 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
           s.set((st) => { delete st.recipes[r.id]; st.favorites = st.favorites.filter((x) => x !== r.id); });
           toast('Recipe deleted'); onClose();
         }}><Trash2 size={16} />Delete</button>}
+        {orig && <button className="btn-soft flex-1" onClick={() => canShare() && setSharing(true)}>Share</button>}
         <button className="btn-primary flex-[2]" onClick={save}>Save recipe</button>
       </div>}>
       <Field label="Name"><input className="field" value={r.name} onChange={(e) => setR({ ...r, name: e.target.value })} placeholder="e.g. Chocolate banana bites" /></Field>
@@ -83,6 +87,7 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
       ))}
       <button className="btn-ghost btn-sm mb-4" onClick={() => setR({ ...r, instructions: [...r.instructions, ''] })}><Plus size={16} />Add step</button>
       <Field label="Note (optional)"><input className="field" value={r.note ?? ''} onChange={(e) => setR({ ...r, note: e.target.value })} /></Field>
+      {sharing && <ShareRecipeSheet recipe={r} onClose={() => setSharing(false)} />}
     </Sheet>
   );
 }

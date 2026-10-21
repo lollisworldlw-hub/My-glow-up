@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeftRight, BookOpen, Copy, Heart, MoveRight, Plus, RotateCcw, Save, Search, Trash2 } from 'lucide-react';
+import { ArrowLeftRight, BookOpen, Copy, Heart, MoveRight, Plus, RotateCcw, Save, Search, Share2, Trash2 } from 'lucide-react';
 import { useStore, findItem, emptyDay } from '../lib/store';
 import type { Ingredient, PlanItem, Slot, Unit } from '../lib/types';
 import { SLOT_LABEL, SLOTS } from '../lib/types';
@@ -11,6 +11,7 @@ import { addDays, fmtDow, fmtShort, uid, weekDays, weekStart } from '../lib/date
 import { CheckCircle, Field, NumberInput, Segmented, Sheet, Stepper, toast } from './ui';
 import { FoodArt } from './Art';
 import { conflicts, dietBadges } from '../lib/diet';
+import { ShareRecipeSheet, useCanShare } from './ShareParts';
 
 export const fmtServ = (n: number) => (n === 1 ? '' : ` × ${fmtAmount(n)}`);
 
@@ -101,7 +102,8 @@ const UNIT_OPTS: Unit[] = ['each', 'g', 'oz', 'cup', 'tbsp', 'tsp'];
 export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => void }) {
   const s = useStore();
   const found = findItem(s, itemId);
-  const [mode, setMode] = useState<null | 'move' | 'copy' | 'swap'>(null);
+  const [mode, setMode] = useState<null | 'move' | 'copy' | 'swap' | 'share'>(null);
+  const canShare = useCanShare();
   if (!found) return null;
   const { date, slot, item } = found;
   const recipe = item.recipeId ? s.recipes[item.recipeId] : undefined;
@@ -219,6 +221,7 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
             st.favorites = fav ? st.favorites.filter((x) => x !== item.recipeId) : [...st.favorites, item.recipeId!];
           })}><Heart size={16} fill={fav ? 'currentColor' : 'none'} />{fav ? 'Favorited' : 'Favorite'}</button>
         )}
+        {recipe && <button className="btn-ghost btn-sm" onClick={() => canShare() && setMode('share')}><Share2 size={16} />Share recipe</button>}
         <button className="btn-ghost btn-sm" onClick={() => setMode('move')}><MoveRight size={16} />Move</button>
         <button className="btn-ghost btn-sm" onClick={() => setMode('copy')}><Copy size={16} />Copy to days</button>
         <button className="btn-ghost btn-sm text-deep" onClick={() => {
@@ -227,6 +230,7 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
         }}><Trash2 size={16} />Remove</button>
       </div>
 
+      {mode === 'share' && recipe && <ShareRecipeSheet recipe={recipe} onClose={() => setMode(null)} />}
       {mode === 'swap' && <SwapSheet date={date} slot={slot} itemId={itemId} onClose={() => setMode(null)} />}
       {(mode === 'move' || mode === 'copy') && (
         <DayPicker multi={mode === 'copy'} from={date} title={mode === 'move' ? 'Move to which day?' : 'Copy to which days?'}

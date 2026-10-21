@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { supabase, useSync } from './sync';
 
 export interface Member { user_id: string; display_name: string; emoji: string; bio: string; joined_at: string }
-export interface Message { id: number; sender: string; recipient: string | null; kind: 'text' | 'achievement'; body: string; meta: any; created_at: string }
+export interface Message { id: number; sender: string; recipient: string | null; kind: 'text' | 'achievement' | 'recipe' | 'photo'; body: string; meta: any; created_at: string }
 export interface Reaction { message_id: number; user_id: string; emoji: string }
 
 interface SocialState {
@@ -55,7 +55,7 @@ export function stopLive() {
   if (poll) { clearInterval(poll); poll = null; }
 }
 
-export async function send(body: string, recipient: string | null, kind: 'text' | 'achievement' = 'text', meta: any = {}) {
+export async function send(body: string, recipient: string | null, kind: Message['kind'] = 'text', meta: any = {}) {
   const uid = useSync.getState().userId;
   if (!uid) throw new Error('Please sign in');
   const text = body.trim().slice(0, 2000);
@@ -66,7 +66,9 @@ export async function send(body: string, recipient: string | null, kind: 'text' 
 }
 
 export async function removeMessage(id: number) {
+  const msg = useSocial.getState().messages.find((m) => m.id === id);
   const { error } = await supabase.from('glowup_messages').delete().eq('id', id);
+  if (!error && msg?.meta?.image?.path) supabase.storage.from('glowup-media').remove([msg.meta.image.path]).catch(() => {});
   if (error) throw error;
   useSocial.setState((s) => ({ messages: s.messages.filter((m) => m.id !== id) }));
 }

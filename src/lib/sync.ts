@@ -19,7 +19,7 @@ export const useSync = create<{ status: SyncStatus; email: string | null; userId
   status: 'off', email: null, userId: null, member: null, lastSynced: null, error: null, recovery: false
 }));
 
-const LOCAL_ONLY: (keyof State)[] = ['session', 'photos', 'reminderSeen'];
+const LOCAL_ONLY: (keyof State)[] = ['session', 'photos', 'reminderSeen', 'foodPhotos'];
 function payload(): Partial<State> {
   const st: any = { ...stateOnly(useStore.getState()) };
   for (const k of LOCAL_ONLY) delete st[k];
@@ -33,7 +33,7 @@ let busy = false;
 function applyRemote(data: Partial<State>) {
   applying = true;
   const cur = useStore.getState();
-  cur.replaceAll({ ...stateOnly(cur), ...data, session: cur.session, photos: cur.photos, reminderSeen: cur.reminderSeen } as State);
+  cur.replaceAll({ ...stateOnly(cur), ...data, session: cur.session, photos: cur.photos, reminderSeen: cur.reminderSeen, foodPhotos: cur.foodPhotos } as State);
   setTimeout(() => { applying = false; }, 0);
 }
 

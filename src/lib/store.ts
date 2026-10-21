@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { get as idbGet, set as idbSet, del as idbDel } from 'idb-keyval';
 import type {
-  Checkin, CleanTask, CycleDay, DayPlan, Food, MindGoal, MoodEntry, Period, GroceryItem, Habit, LogEntry, MeasureEntry, PhotoMeta, PlanItem, PrepTask, Recipe,
+  Checkin, CleanTask, CycleDay, DayPlan, Food, FoodPhoto, MindGoal, MoodEntry, Period, GroceryItem, Habit, LogEntry, MeasureEntry, PhotoMeta, PlanItem, PrepTask, Recipe,
   ScheduleDay, Settings, Slot, WeightEntry, WorkoutLog, Macros
 } from './types';
 import { SLOTS } from './types';
@@ -55,6 +55,7 @@ export interface State {
   rooms: string[];
   cleanDone: Record<string, string[]>;
   shared: string[];
+  foodPhotos: FoodPhoto[];
 }
 
 const byId = <T extends { id: string }>(a: T[]) => Object.fromEntries(a.map((x) => [x.id, x])) as Record<string, T>;
@@ -96,7 +97,8 @@ export const initialState = (): State => ({
   cleanTasks: SEED_CLEAN,
   rooms: SEED_ROOMS,
   cleanDone: {},
-  shared: []
+  shared: [],
+  foodPhotos: []
 });
 
 export const emptyDay = (): DayPlan => ({ breakfast: [], lunch: [], dinner: [], snack: [], dessert: [] });
