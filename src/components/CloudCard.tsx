@@ -24,6 +24,7 @@ export function AccountForm({ compact, onDone }: { compact?: boolean; onDone?: (
   const [em, setEm] = useState('');
   const [pw, setPw] = useState('');
   const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
 
   useEffect(() => { if (email && member && onDone) onDone(); }, [email, member]);
 
@@ -51,7 +52,7 @@ export function AccountForm({ compact, onDone }: { compact?: boolean; onDone?: (
       if (mode === 'up') {
         rememberJoin(code.trim(), name.trim());
         const r = await signUp(em.trim(), pw);
-        if (r.needsConfirm) { toast('Check your email to confirm, then sign in here'); setMode('in'); }
+        if (r.needsConfirm) { setSent(true); setMode('in'); }
         else toast('Account created ♡');
       } else { await signIn(em.trim(), pw); toast('Signed in ♡'); }
       setPw('');
@@ -61,6 +62,11 @@ export function AccountForm({ compact, onDone }: { compact?: boolean; onDone?: (
 
   return (
     <div>
+      {sent && (
+        <div className="rounded-2xl bg-petal px-4 py-3 mb-4 text-[15px]">
+          <b>Almost done!</b> We emailed a confirmation link to {em || 'you'}. Tap it (it may open in Safari — that’s fine), then come back here and sign in with the same email and password. You’ll join the group automatically.
+        </div>
+      )}
       {mode === 'up' && (
         <>
           <Field label="Your name (friends see this)"><input className="field" value={name} onChange={(e) => setName(e.target.value)} /></Field>
