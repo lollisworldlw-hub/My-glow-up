@@ -182,7 +182,7 @@ export default function App() {
       <InstallBanner />
       <div className="relative" ref={wrapRef}>
       {tab !== 'home' && <div className="band absolute inset-x-0 top-0" style={{ height: bandH || 'calc(56px + env(safe-area-inset-top))' }} aria-hidden />}
-      <header className="absolute inset-x-0 top-0 z-30 app-header top-safe on-dark">
+      <header className="absolute inset-x-0 top-0 z-30 app-header top-safe mt-3 on-dark">
         <div className="mx-auto max-w-[640px] px-5 h-14 flex items-center justify-between">
           <button className="flex items-center gap-2 min-h-[44px]" aria-label="Home" onClick={() => go('home')}>
             <img src="/icons/icon-192.png" alt="" className="w-7 h-7 rounded-full" />
@@ -193,7 +193,7 @@ export default function App() {
           </button>
         </div>
       </header>
-      <main ref={mainRef} className={`relative mx-auto max-w-[640px] px-3 pb-nav ${tab === 'home' ? '' : 'pt-[calc(60px+env(safe-area-inset-top))]'}`}>
+      <main ref={mainRef} className={`relative mx-auto max-w-[640px] px-3 pb-nav ${tab === 'home' ? '' : 'pt-[calc(72px+env(safe-area-inset-top))]'}`}>
         <ErrorBoundary resetKey={tab}>
         <div key={tab} className="fade">
           {tab === 'home' && <Home />}

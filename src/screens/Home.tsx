@@ -55,7 +55,7 @@ export default function Home() {
 
   return (
     <div className="space-y-2">
-      <div className="band on-dark -mx-3 px-3 pb-5 pt-[calc(66px+env(safe-area-inset-top))] space-y-0">
+      <div className="band on-dark -mx-3 px-3 pb-5 pt-[calc(78px+env(safe-area-inset-top))] space-y-0">
       <div className="pt-2 pb-5 px-2">
         <div className="text-[13px] text-muted">{fmtLong(today)}</div>
         <h1 className="h-serif text-[34px] leading-[1.08] mt-1">{greeting()}{st.name ? `, ${st.name}` : ''}.</h1>
