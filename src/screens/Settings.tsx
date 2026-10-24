@@ -104,11 +104,9 @@ export default function Settings() {
 
       <SectionTitle>Look & units</SectionTitle>
       <Card>
-        <div className="label">Theme</div>
-        <div className="mb-3"><Segmented value={st.theme} onChange={(v) => set({ theme: v })} options={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }, { value: 'system', label: 'Auto' }]} /></div>
         <div className="label">Color</div>
         <div className="grid grid-cols-3 gap-2 mb-3">
-          {([['euca', 'Eucalyptus', '#23312B', '#E6CFA4'], ['sage', 'Forest', '#1F3B2E', '#A88A5C'], ['noir', 'Noir', '#121212', '#A88A5C'], ['ocean', 'Midnight', '#1B3550', '#86A8C8'], ['sand', 'Sand', '#4A3727', '#C9A988'], ['lavender', 'Plum', '#36284A', '#B3A1D0'], ['rose', 'Mauve', '#5A2E3A', '#D49AAA']] as const).map(([v, l, c, c2]) => {
+          {([['euca', 'Eucalyptus', '#2F4239', '#E6CFA4'], ['noir', 'Onyx', '#2A2826', '#D9C3A0'], ['ocean', 'Midnight', '#24364A', '#DCC8A4'], ['sand', 'Espresso', '#3A2D24', '#E2C29A'], ['lavender', 'Plum', '#362A44', '#E4C9B0'], ['rose', 'Wine', '#45282F', '#EBC9C0']] as const).map(([v, l, c, c2]) => {
             const on = (st.palette ?? 'euca') === v;
             return (
               <button key={v} aria-pressed={on} onClick={() => set({ palette: v })} className={`rounded-[10px] p-2 flex items-center gap-2 border text-left ${on ? 'border-ink' : 'border-line'}`}>

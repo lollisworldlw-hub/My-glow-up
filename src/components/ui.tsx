@@ -74,7 +74,7 @@ export function Ring({ pct, size = 150, stroke = 6, color = 'var(--rose)', ghost
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <defs><linearGradient id="goldRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F0DDB6" /><stop offset="100%" stopColor="#B08A55" /></linearGradient></defs>
+        <defs><linearGradient id="goldRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style={{ stopColor: 'var(--accent-light)' }} /><stop offset="100%" style={{ stopColor: 'var(--accent-2)' }} /></linearGradient></defs>
         <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--petal)" strokeWidth={stroke} fill="none" />
         {ghostPct > 0 && <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--blush)" strokeOpacity={0.9} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off(ghostPct)} className="ring-anim" />}
         <circle cx={size / 2} cy={size / 2} r={r} stroke={color} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off(shown)} className="ring-anim" />

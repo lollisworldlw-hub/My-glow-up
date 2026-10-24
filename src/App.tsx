@@ -97,6 +97,7 @@ export default function App() {
   const tab = useUI((u) => u.tab);
   const go = useUI((u) => u.go);
   const hasSession = useStore((s) => !!s.session);
+  const name = useStore((s) => s.settings.name);
   const onboarded = useStore((s) => s.settings.onboarded);
   const bottom = bottomTabs(useStore((s) => s.settings.navTabs));
   const { userId, member } = useSync();
@@ -130,11 +131,14 @@ export default function App() {
   return (
     <div className="min-h-full">
       <InstallBanner />
-      <header className="sticky top-0 z-30 bg-bg bar-bg border-b border-line top-safe">
-        <div className="mx-auto max-w-[640px] px-5 h-12 flex items-center justify-between">
+      <header className="relative z-30 app-header top-safe">
+        <div className="mx-auto max-w-[640px] px-5 h-14 flex items-center justify-between">
           <button className="flex items-center gap-2 min-h-[44px]" aria-label="Home" onClick={() => go('home')}>
             <img src="/icons/icon-192.png" alt="" className="w-7 h-7 rounded-full" />
             <span className={`h-serif text-[19px] leading-none ${tab === 'home' ? 'text-ink' : 'text-muted'}`}>Glow-Up</span>
+          </button>
+          <button aria-label="Settings" onClick={() => go('settings')} className="w-9 h-9 rounded-full p-[2px]" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--accent-2))' }}>
+            <span className="w-full h-full rounded-full grid place-items-center text-[13px] font-semibold text-gold" style={{ background: 'var(--grad-2)' }}>{(name || 'G').slice(0, 1).toUpperCase()}</span>
           </button>
         </div>
       </header>
@@ -162,10 +166,10 @@ export default function App() {
             const Icon = n.icon;
             return (
               <button key={n.id} onClick={() => go(n.id)} aria-current={on ? 'page' : undefined}
-                className={`relative flex-1 flex flex-col items-center justify-center gap-1 pt-2 pb-1 min-h-[48px] transition-colors nav-btn ${on ? 'text-ink nav-on' : 'text-muted'}`}>
+                className={`relative flex items-center justify-center gap-1.5 min-h-[46px] transition-all nav-btn ${on ? 'flex-[2.2] nav-on' : 'flex-1 text-muted'}`}>
                 {n.id === 'social' && unread > 0 && <span className="absolute top-1.5 left-1/2 ml-2 min-w-[18px] h-[18px] px-1 rounded-full bg-deep text-white text-[11px] grid place-items-center" aria-label={`${unread} unread`}>{unread > 9 ? '9+' : unread}</span>}
-                <Icon size={19} strokeWidth={on ? 1.9 : 1.5} />
-                <span className={`text-[10.5px] leading-none ${on ? 'font-medium' : ''}`}>{n.label}</span>
+                <Icon size={19} strokeWidth={on ? 1.8 : 1.5} />
+                {on ? <span className="text-[13px] font-semibold leading-none">{n.label}</span> : <span className="sr-only">{n.label}</span>}
               </button>
             );
           })}
