@@ -3,6 +3,7 @@ import { Cloud, CloudOff, LogOut, RefreshCcw } from 'lucide-react';
 import { authLinkError, joinGroup, rememberJoin, resetPassword, signIn, signOut, signUp, syncNow, updatePassword, useSync } from '../lib/sync';
 import { useStore } from '../lib/store';
 import { Card, Field, Sheet, toast } from './ui';
+import { AuthForm } from './Auth';
 
 const ago = (t: number | null) => {
   if (!t) return 'not yet';
@@ -10,79 +11,8 @@ const ago = (t: number | null) => {
   return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago`;
 };
 
-export const inviteFromUrl = () => {
-  try { return new URLSearchParams(window.location.search).get('invite')?.toUpperCase() ?? ''; } catch { return ''; }
-};
-
-/** Sign in / create account (invite-only) / join the group. Used in Settings, Social and onboarding. */
-export function AccountForm({ compact, onDone }: { compact?: boolean; onDone?: () => void }) {
-  const name0 = useStore((s) => s.settings.name);
-  const { email, member } = useSync();
-  const [mode, setMode] = useState<'up' | 'in'>(inviteFromUrl() ? 'up' : 'up');
-  const [code, setCode] = useState(inviteFromUrl());
-  const [name, setName] = useState(name0 && name0 !== 'beautiful' ? name0 : '');
-  const [em, setEm] = useState('');
-  const [pw, setPw] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [sent, setSent] = useState(false);
-
-  useEffect(() => { if (email && member && onDone) onDone(); }, [email, member]);
-
-  if (email && member === false) {
-    return (
-      <div>
-        <p className="text-[14px] mb-3">You’re signed in as {email}. Enter an invite code from a friend to join the group.</p>
-        <Field label="Your name (friends see this)"><input className="field" value={name} onChange={(e) => setName(e.target.value)} /></Field>
-        <Field label="Invite code"><input className="field uppercase" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="GLOW-XXXXXX" /></Field>
-        <button className="btn-primary w-full" disabled={busy || !code || !name.trim()} onClick={async () => {
-          setBusy(true);
-          try { await joinGroup(code, name.trim()); toast('Welcome to the group'); } catch (e: any) { toast(e?.message ?? 'That code didn’t work'); }
-          setBusy(false);
-        }}>Join</button>
-      </div>
-    );
-  }
-  if (email) return null;
-
-  const go = async () => {
-    if (!em.includes('@') || pw.length < 8) { toast('Use your email and a password of 8+ characters'); return; }
-    if (mode === 'up' && (!code.trim() || !name.trim())) { toast('Add your name and invite code'); return; }
-    setBusy(true);
-    try {
-      if (mode === 'up') {
-        rememberJoin(code.trim(), name.trim());
-        const r = await signUp(em.trim(), pw, code.trim(), name.trim());
-        if (r.needsConfirm) { setSent(true); setMode('in'); }
-        else toast('Account created');
-      } else { await signIn(em.trim(), pw); toast('Signed in'); }
-      setPw('');
-    } catch (e: any) { toast(e?.message ?? 'That didn’t work — try again'); }
-    setBusy(false);
-  };
-
-  return (
-    <div>
-      {sent && (
-        <div className="rounded-2xl bg-petal px-3 py-2 mb-3 text-[14px]">
-          <b>Almost done!</b> We emailed a confirmation link to {em || 'you'}. Tap it (it may open in Safari — that’s fine), then come back here and sign in with the same email and password. You’ll join the group automatically.
-        </div>
-      )}
-      {mode === 'up' && (
-        <>
-          <Field label="Your name (friends see this)"><input className="field" value={name} onChange={(e) => setName(e.target.value)} /></Field>
-          <Field label="Invite code"><input className="field uppercase" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="GLOW-XXXXXX" /></Field>
-        </>
-      )}
-      <Field label="Email"><input className="field" type="email" autoComplete="email" inputMode="email" value={em} onChange={(e) => setEm(e.target.value)} /></Field>
-      <Field label={mode === 'up' ? 'Create a password (8+ characters)' : 'Password'}><input className="field" type="password" autoComplete={mode === 'up' ? 'new-password' : 'current-password'} value={pw} onChange={(e) => setPw(e.target.value)} /></Field>
-      <button className="btn-primary w-full" disabled={busy} onClick={go}>{busy ? 'One moment…' : mode === 'up' ? 'Create my account' : 'Sign in'}</button>
-      <div className={`flex justify-between mt-3 text-[13px] ${compact ? '' : ''}`}>
-        <button className="text-deep font-medium min-h-[40px]" onClick={() => setMode(mode === 'up' ? 'in' : 'up')}>{mode === 'up' ? 'I already have an account' : 'I have an invite code'}</button>
-        {mode === 'in' && <button className="text-muted min-h-[40px]" onClick={async () => { if (!em.includes('@')) { toast('Enter your email first'); return; } try { await resetPassword(em.trim()); toast('Password reset email sent'); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); } }}>Forgot password?</button>}
-      </div>
-    </div>
-  );
-}
+export { inviteFromUrl } from './Auth';
+export { AuthForm as AccountForm } from './Auth';
 
 export function CloudCard() {
   const { status, email, lastSynced, error, recovery, member } = useSync();
@@ -107,7 +37,7 @@ export function CloudCard() {
         </div>
       ) : (
         <>
-          <AccountForm />
+          <AuthForm start="signin" />
           {email && <button className="btn-ghost btn-sm w-full mt-3" onClick={() => signOut()}><LogOut size={16} />Sign out</button>}
         </>
       )}
