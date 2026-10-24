@@ -129,7 +129,7 @@ export default function App() {
       const top0 = wrap.getBoundingClientRect().top;
       // pages with no box near the top (like the chat): end the band under the tabs instead
       const tabs = main.querySelector('[role=tablist]') as HTMLElement | null;
-      if (tabs && (!card || card.getBoundingClientRect().top - top0 > 420)) {
+      if (tabs && (tabs.closest('.sticky') || !card || card.getBoundingClientRect().top - top0 > 420)) {
         let el: HTMLElement | null = tabs;
         while (el && el !== main) {
           if (!el.classList.contains('on-dark')) el.classList.add('on-dark', 'auto-dark');
