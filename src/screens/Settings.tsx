@@ -130,7 +130,7 @@ export default function Settings() {
       <Card>
         <button className="btn-soft w-full mb-3" onClick={() => setSheet('nav' as any)}>Customize the bottom bar</button>
         <div className="label">Daily message style</div>
-        <p className="text-[13px] text-muted mb-2">A new message shows on Home every day.</p>
+        <p className="text-[13px] text-muted mb-2">Home shows a message that fits the time of day and what you still need to do, like water, food or your workout. It changes through the day.</p>
         <div className="space-y-2">
           {QUOTE_STYLES.map((q) => {
             const on = (st.quoteStyle ?? 'motivational') === q.v;

@@ -5,7 +5,7 @@ import { SLOTS, SLOT_LABEL } from '../lib/types';
 import { itemMacros } from '../lib/nutrition';
 import { consumed, dayHabitStats, habitAuto, habitDone, planned, useToday } from '../lib/derived';
 import { fmtLong, greeting, weekStart, daysBetween, weekday } from '../lib/date';
-import { dailyQuote } from '../lib/quotes';
+import { momentQuote } from '../lib/quotes';
 import { latest, progress } from '../lib/weight';
 import { Bar, Card, CheckRow, Ring, SectionTitle, toast } from '../components/ui';
 import { LogFoodSheet, MealCard, SwapSheet } from '../components/MealParts';
@@ -34,7 +34,20 @@ export default function Home() {
   const sched = s.schedule[weekday(today)];
   const water = s.water[today] ?? 0;
   const extras = s.logs.filter((l) => l.date === today && !l.planItemId);
-  const msg = dailyQuote(st.quoteStyle, daysBetween('2026-01-01', today));
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const t = () => tick((n) => n + 1);
+    const iv = setInterval(t, 5 * 60000);
+    document.addEventListener('visibilitychange', t);
+    return () => { clearInterval(iv); document.removeEventListener('visibilitychange', t); };
+  }, []);
+  const now = new Date();
+  const hourSeed = daysBetween('2026-01-01', today) * 24 + now.getHours();
+  const msg = momentQuote(st.quoteStyle, {
+    hour: now.getHours(), waterPct: water / Math.max(1, st.waterTarget), ate: s.logs.some((l) => l.date === today),
+    breakfast: s.logs.some((l) => l.date === today && l.slot === 'breakfast'), proteinPct: eaten.protein / Math.max(1, st.proteinMin),
+    workoutDue: (sched?.home ?? 'rest') !== 'rest' && !sched?.homeOptional && !s.workouts.some((w) => w.date === today && w.type !== 'walk' && w.completed)
+  }, hourSeed);
   const loggedIds = new Set(s.logs.filter((l) => l.date === today && l.planItemId).map((l) => l.planItemId));
   const next = (() => {
     for (const slot of SLOTS) for (const item of (day?.[slot] ?? [])) {

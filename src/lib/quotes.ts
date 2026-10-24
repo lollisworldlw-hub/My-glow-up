@@ -111,3 +111,62 @@ export function dailyQuote(style: QuoteStyle | undefined, dayIndex: number): str
   const list = QUOTES[style ?? 'motivational'] ?? QUOTES.motivational;
   return list[((dayIndex % list.length) + list.length) % list.length];
 }
+
+// --- Messages that react to the time of day and what's been logged ---
+export type Moment = 'morning' | 'breakfast' | 'water' | 'log' | 'move' | 'protein' | 'evening' | 'ontrack' | 'night';
+
+const CTX: Record<QuoteStyle, Record<Moment, string[]>> = {
+  motivational: {
+    morning: ['Good morning. Set the tone with one healthy choice.', 'New day, clean slate. Let’s make it count.', 'Start strong: water, protein, a little movement.'],
+    breakfast: ['Fuel up. A protein-packed breakfast sets up the whole day.', 'Breakfast first, then conquer the day.', 'Don’t run on empty. Log a good breakfast.'],
+    water: ['You’re behind on water. A full glass right now gets you back on track.', 'Hydration check: grab a glass and sip.', 'Water first. Your energy will thank you.'],
+    log: ['Nothing logged yet today. A quick log keeps you on track.', 'What gets tracked gets done. Log your first meal.', 'Take 30 seconds and log what you’ve eaten.'],
+    move: ['Your workout is still waiting. Even 10 minutes counts.', 'Time to move. Future you will be glad you did.', 'A quick walk or your workout now makes tonight feel great.'],
+    protein: ['Protein is running low. A high-protein dinner closes the gap.', 'Add some protein tonight to stay strong and full.', 'Almost there on protein. A yogurt or eggs would do it.'],
+    evening: ['Strong day. Finish it with a calm evening.', 'Look at you showing up. Keep it steady tonight.', 'You put in the work today. Be proud.'],
+    ontrack: ['You’re right on track. Keep this energy going.', 'Everything’s lining up today. Nice work.', 'On pace and looking good. Keep going.'],
+    night: ['Rest well. Tomorrow you go again.', 'Sleep is part of the plan. Wind down.', 'Good night. Today counted.']
+  },
+  whip: {
+    morning: ['Rise and grind, sleepyhead. The day isn’t going to crush itself.', 'Morning. Coffee is not a meal plan. Get moving.', 'Up and at ’em. Your goals woke up before you did.'],
+    breakfast: ['Skipping breakfast isn’t a strategy. Eat something with protein.', 'Feed the beast. Log breakfast.', 'Your stomach is filing a complaint. Eat.'],
+    water: ['You’re basically a raisin. Drink some damn water.', 'Water. Now. I’m not asking.', 'Your water bottle is lonely and so is your hydration. Chug.'],
+    log: ['Zero food logged? Either you’re a cactus or you’re hiding snacks. Log it.', 'Log your food. The cookies count too.', 'If you ate it, track it. Stop playing.'],
+    move: ['Your workout is waiting and you’re over here scrolling. Move your ass.', 'Shoes on. Excuses off. Go.', 'The couch has had enough of you today. Get up.'],
+    protein: ['Your protein is pathetic today. Fix it at dinner.', 'Muscles don’t build on vibes. Eat protein.', 'Eggs, chicken, yogurt. Pick one and handle it.'],
+    evening: ['Not bad. Don’t ruin it with a midnight snack attack.', 'You earned the couch tonight. Barely.', 'Solid day. Now don’t undo it in the pantry.'],
+    ontrack: ['Look at you doing everything right. Suspicious, but keep it up.', 'On track? Who are you and what did you do with the old you?', 'Crushing it. Don’t get cocky.'],
+    night: ['Go to bed. Scrolling at midnight won’t make you skinny.', 'Lights out. Tomorrow I’m coming for you again.', 'Sleep. Champions recover.']
+  },
+  soft: {
+    morning: ['Good morning, love. Today is a fresh, gentle start.', 'Rise softly. You’ve got a beautiful day ahead.', 'Morning, sunshine. Take it one kind step at a time.'],
+    breakfast: ['Treat yourself to a nourishing breakfast. You deserve it.', 'A warm, filling breakfast is a lovely way to care for you.', 'Fuel your body with something good this morning.'],
+    water: ['A little water would feel so good right now.', 'Sip, sip. Your body will love you for it.', 'Take a moment and drink some water, sweet one.'],
+    log: ['Whenever you’re ready, log what you’ve eaten. No pressure.', 'A quick log helps you see how well you’re caring for yourself.', 'Jot down your meals when you can. Every bit helps.'],
+    move: ['A gentle walk could feel really nice right now.', 'Your body would love a little movement today.', 'Even a short stretch is a gift to yourself.'],
+    protein: ['Something cozy and protein-rich for dinner would be perfect.', 'Let’s nourish those muscles tonight with a little extra protein.', 'You’re close on protein. A yummy snack would round out your day.'],
+    evening: ['You did so well today. Rest easy.', 'What a lovely day of caring for yourself.', 'Proud of you. Enjoy a calm, cozy evening.'],
+    ontrack: ['Everything’s flowing so nicely today. Keep shining.', 'You’re doing beautifully. Truly.', 'Right on track, and glowing.'],
+    night: ['Sweet dreams. You were wonderful today.', 'Rest your body and your heart. You earned it.', 'Good night. Tomorrow is yours.']
+  }
+};
+
+/** Pick a message that fits the moment. Changes with the time of day and what's been logged. */
+export function momentQuote(style: QuoteStyle | undefined, m: { hour: number; waterPct: number; ate: boolean; breakfast: boolean; proteinPct: number; workoutDue: boolean }, seed: number): string {
+  const st = style ?? 'motivational';
+  const h = m.hour;
+  let k: Moment;
+  if (h >= 22 || h < 4) k = 'night';
+  else if (h < 11 && !m.breakfast) k = h < 7 ? 'morning' : 'breakfast';
+  else if (h >= 12 && !m.ate) k = 'log';
+  else if (h >= 10 && m.waterPct < Math.min(1, (h - 7) / 13) * 0.6) k = 'water';
+  else if (h >= 14 && h < 21 && m.workoutDue) k = 'move';
+  else if (h >= 17 && m.proteinPct < 0.6) k = 'protein';
+  else if (h >= 19) k = 'evening';
+  else if (h < 11) k = 'morning';
+  else k = 'ontrack';
+  // a general quote now and then so it doesn't feel robotic
+  if (seed % 4 === 3 && k !== 'night') return dailyQuote(st, seed);
+  const list = CTX[st][k];
+  return list[seed % list.length];
+}
