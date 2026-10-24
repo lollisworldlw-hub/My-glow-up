@@ -152,7 +152,7 @@ function FoodPhotoSheet({ id, onClose }: { id: string; onClose: () => void }) {
     setBusy(true);
     try {
       const blob = await loadPhoto(id);
-      if (!blob) throw new Error('Photo not found on this phone');
+      if (!blob) throw new Error('Photo not found');
       const image = await uploadMedia(blob);
       await send(p.caption || `My ${p.slot ? SLOT_LABEL[p.slot].toLowerCase() : 'food'} today`, null, 'photo', { image, slot: p.slot });
       s.set((x) => { const f = x.foodPhotos.find((y) => y.id === id); if (f) f.sharedAt = Date.now(); });
@@ -163,7 +163,7 @@ function FoodPhotoSheet({ id, onClose }: { id: string; onClose: () => void }) {
   };
   return (
     <Sheet open onClose={onClose} title={p.slot ? SLOT_LABEL[p.slot] : 'Food photo'} footer={<div className="flex gap-2">
-      <button className="btn-ghost flex-1" onClick={async () => { await deletePhoto(id); s.set((x) => { x.foodPhotos = x.foodPhotos.filter((y) => y.id !== id); }); toast('Photo deleted from this phone'); onClose(); }}><Trash2 size={16} />Delete</button>
+      <button className="btn-ghost flex-1" onClick={async () => { await deletePhoto(id); s.set((x) => { x.foodPhotos = x.foodPhotos.filter((y) => y.id !== id); }); toast('Photo deleted'); onClose(); }}><Trash2 size={16} />Delete</button>
       <button className="btn-primary flex-[1.4]" disabled={busy} onClick={share}><Share2 size={16} />{p.sharedAt ? 'Share again' : 'Share to group'}</button></div>}>
       <LocalImg id={id} className="w-full rounded-2xl mb-3" />
       <Field label="Caption"><input className="field" value={p.caption} onChange={(e) => s.set((x) => { const f = x.foodPhotos.find((y) => y.id === id); if (f) f.caption = e.target.value; })} /></Field>

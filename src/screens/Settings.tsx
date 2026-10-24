@@ -151,7 +151,7 @@ export default function Settings() {
 
       <DataSection onDelete={() => setSheet('delete')} />
 
-      <p className="text-center text-[13px] text-muted mt-8 mb-2">My Glow-Up · private, on-device · made with</p>
+      <p className="text-center text-[13px] text-muted mt-8 mb-2">My Glow-Up · private to you · made with</p>
 
       {sheet === 'weight' && <WeightSheet onClose={() => setSheet(null)} />}
       {sheet === 'schedule' && <ScheduleEditor onClose={() => setSheet(null)} />}

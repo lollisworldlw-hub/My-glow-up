@@ -155,7 +155,7 @@ export function CheckReminders({ today }: { today: string }) {
     items.push({ key: 'measure', icon: <Ruler size={18} />, title: lastM ? 'Time for a waist check' : 'Take your starting measurements', sub: lastM ? `Last measured ${fmtShort(lastM.date)}. Your waist often changes before the scale.` : 'Waist at the belly button is the one to watch.', action: () => go('progress', 'body') });
   const lastP = [...s.photos].sort((a, b) => b.date.localeCompare(a.date))[0];
   if ((!lastP && startedDays >= 0) || (lastP && daysBetween(lastP.date, today) >= 30))
-    items.push({ key: 'photo', icon: <Camera size={18} />, title: lastP ? 'Monthly progress photos' : 'Take your “day one” photos', sub: 'Private, on this phone only. Same spot and light each time.', action: () => go('progress', 'photos') });
+    items.push({ key: 'photo', icon: <Camera size={18} />, title: lastP ? 'Monthly progress photos' : 'Take your “day one” photos', sub: 'Private to you. Same spot and light each time.', action: () => go('progress', 'photos') });
   const visible = items.filter((i) => !(s.snoozes[i.key] && s.snoozes[i.key] > today));
   if (!visible.length) return null;
   return (

@@ -3,9 +3,52 @@ import type { State } from './store';
 
 const photoStore = createStore('glowup-photos', 'blobs');
 
-export const savePhoto = (id: string, blob: Blob) => set(id, blob, photoStore);
-export const loadPhoto = (id: string) => get<Blob>(id, photoStore);
-export const deletePhoto = (id: string) => del(id, photoStore);
+// Photos live on the phone for speed and in the person's private cloud folder so a new phone gets them back.
+const BUCKET = 'glowup-private';
+async function cloud() {
+  const { supabase } = await import('./sync');
+  const { data } = await supabase.auth.getSession();
+  const uid = data.session?.user.id;
+  return uid ? { supabase, uid } : null;
+}
+async function uploadPhoto(id: string, blob: Blob) {
+  try {
+    const c = await cloud(); if (!c) return;
+    await c.supabase.storage.from(BUCKET).upload(`${c.uid}/${id}`, blob, { upsert: true, contentType: blob.type || 'image/jpeg' });
+  } catch { /* retried by syncPhotos */ }
+}
+export const savePhoto = async (id: string, blob: Blob) => { await set(id, blob, photoStore); uploadPhoto(id, blob); };
+export async function loadPhoto(id: string): Promise<Blob | undefined> {
+  const local = await get<Blob>(id, photoStore);
+  if (local) return local;
+  try {
+    const c = await cloud(); if (!c) return undefined;
+    const { data } = await c.supabase.storage.from(BUCKET).download(`${c.uid}/${id}`);
+    if (data) { await set(id, data, photoStore); return data; }
+  } catch { /* offline */ }
+  return undefined;
+}
+export const deletePhoto = async (id: string) => {
+  await del(id, photoStore);
+  try { const c = await cloud(); if (c) await c.supabase.storage.from(BUCKET).remove([`${c.uid}/${id}`]); } catch { /* */ }
+};
+/** Upload any photos this phone has that the account doesn't yet. */
+let photoSyncing = false;
+export async function syncPhotos(ids: string[]) {
+  if (photoSyncing || !ids.length) return;
+  photoSyncing = true;
+  try {
+    const c = await cloud(); if (!c) return;
+    const { data: remote, error } = await c.supabase.storage.from(BUCKET).list(c.uid, { limit: 1000 });
+    if (error) return;
+    const have = new Set((remote ?? []).map((f) => f.name));
+    for (const id of ids) {
+      if (have.has(id)) continue;
+      const b = await get<Blob>(id, photoStore);
+      if (b) await c.supabase.storage.from(BUCKET).upload(`${c.uid}/${id}`, b, { upsert: true, contentType: b.type || 'image/jpeg' });
+    }
+  } catch { /* try again next sync */ } finally { photoSyncing = false; }
+}
 export const clearPhotos = () => clear(photoStore);
 
 /** Resize to keep storage small while staying sharp on a phone. Stays on-device. */

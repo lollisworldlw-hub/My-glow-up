@@ -27,7 +27,7 @@ supabase.auth.onAuthStateChange((e) => { if (e === 'PASSWORD_RECOVERY') useSync.
 const linkErr = /error_description=([^&]+)/.exec(LINK_INFO)?.[1];
 export const authLinkError = linkErr ? decodeURIComponent(linkErr.replace(/\+/g, ' ')) : null;
 
-const LOCAL_ONLY: (keyof State)[] = ['session', 'photos', 'reminderSeen', 'foodPhotos'];
+const LOCAL_ONLY: (keyof State)[] = ['session', 'reminderSeen'];
 function payload(): Partial<State> {
   const st: any = { ...stateOnly(useStore.getState()) };
   for (const k of LOCAL_ONLY) delete st[k];
@@ -41,7 +41,7 @@ let busy = false;
 function applyRemote(data: Partial<State>) {
   applying = true;
   const cur = useStore.getState();
-  cur.replaceAll({ ...stateOnly(cur), ...data, session: cur.session, photos: cur.photos, reminderSeen: cur.reminderSeen, foodPhotos: cur.foodPhotos } as State);
+  cur.replaceAll({ ...stateOnly(cur), ...data, session: cur.session, photos: data.photos ?? cur.photos, reminderSeen: cur.reminderSeen, foodPhotos: data.foodPhotos ?? cur.foodPhotos } as State);
   setTimeout(() => { applying = false; }, 0);
 }
 
@@ -93,6 +93,8 @@ export async function syncNow(): Promise<void> {
     meta.lastSynced = Date.now();
     await saveMeta();
     useSync.setState({ status: 'idle', lastSynced: meta.lastSynced });
+    const st = useStore.getState();
+    import('./backup').then((b) => b.syncPhotos([...(st.photos ?? []).map((p: any) => p.id), ...(st.foodPhotos ?? []).map((p: any) => p.id)]));
   } catch (e: any) {
     useSync.setState({ status: navigator.onLine ? 'error' : 'offline', error: e?.message ?? String(e) });
   } finally {
