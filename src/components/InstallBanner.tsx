@@ -1,3 +1,4 @@
+import { Logo } from './Art';
 import { useEffect, useState } from 'react';
 import { Download, Share, X } from 'lucide-react';
 
@@ -32,7 +33,7 @@ export function InstallBanner() {
   return (
     <div className="fixed inset-x-3 z-[70] install-bar rounded-[20px] shadow-[0_14px_40px_rgba(0,0,0,0.28)] fade" style={{ bottom: 'calc(var(--nav-h) + 12px)' }} role="region" aria-label="Install the app">
       <div className="mx-auto max-w-[620px] px-3.5 py-3 flex items-start gap-2.5">
-        <img src="/icons/icon-192.png" alt="" className="w-9 h-9 rounded-[9px] shrink-0" />
+        <Logo size={36} />
         <div className="flex-1 min-w-0 text-[13px] leading-snug">
           <div className="font-semibold text-[14px]">Get the My Glow-Up app</div>
           {canPrompt ? (

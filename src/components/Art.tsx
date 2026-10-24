@@ -28,3 +28,17 @@ export function ExerciseArt({ id, size = 120 }: { id?: string; size?: number }) 
   const Icon = MOVE[id ?? 'walk'] ?? Activity;
   return <Icon size={Math.round(size * 0.5)} strokeWidth={1.2} className="text-muted" aria-hidden />;
 }
+
+/** The Glow-Up mark, drawn in the current color theme. */
+export function Logo({ size = 28, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" className={`shrink-0 ${className}`} aria-hidden>
+      <defs>
+        <radialGradient id="logoBg" cx="35%" cy="30%" r="80%"><stop offset="0%" style={{ stopColor: 'var(--band-1)' }} /><stop offset="100%" style={{ stopColor: 'var(--band-2)' }} /></radialGradient>
+      </defs>
+      <circle cx="32" cy="32" r="31" fill="url(#logoBg)" stroke="rgba(255,255,255,0.14)" strokeWidth="1.5" />
+      <path d="M37.5 15.9 A17 17 0 1 1 26.5 15.9" fill="none" style={{ stroke: 'var(--accent)' }} strokeWidth="3" strokeLinecap="round" />
+      <circle cx="32" cy="15" r="2.4" style={{ fill: 'var(--accent)' }} />
+    </svg>
+  );
+}

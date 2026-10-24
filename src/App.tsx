@@ -11,6 +11,7 @@ import Groceries from './screens/Groceries';
 import Settings from './screens/Settings';
 import { Celebration, Toaster, toast } from './components/ui';
 import { WorkoutPlayer } from './components/WorkoutPlayer';
+import { Logo } from './components/Art';
 import { startSync, useSync } from './lib/sync';
 import { InstallBanner } from './components/InstallBanner';
 import { RecoverySheet } from './components/CloudCard';
@@ -185,7 +186,7 @@ export default function App() {
       <header className="absolute inset-x-0 top-0 z-30 app-header top-safe mt-3 on-dark">
         <div className="mx-auto max-w-[640px] px-5 h-14 flex items-center justify-between">
           <button className="flex items-center gap-2 min-h-[44px]" aria-label="Home" onClick={() => go('home')}>
-            <img src="/icons/icon-192.png" alt="" className="w-7 h-7 rounded-full" />
+            <Logo size={28} />
             <span className="h-serif text-[19px] leading-none text-ink">Glow-Up</span>
           </button>
           <button aria-label="Settings" onClick={() => go('settings')} className="w-9 h-9 rounded-full p-[2px]" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--accent-2))' }}>

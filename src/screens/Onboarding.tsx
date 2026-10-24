@@ -11,6 +11,7 @@ import { Field, NumberInput, Segmented, toast } from '../components/ui';
 import { AuthForm, ErrorNote, inviteFromUrl } from '../components/Auth';
 import { syncNow, useSync } from '../lib/sync';
 import { InstallBanner } from '../components/InstallBanner';
+import { Logo } from '../components/Art';
 
 const SETUP = ['about', 'move', 'food', 'targets'];
 
@@ -100,7 +101,7 @@ export default function Onboarding() {
       <InstallBanner />
       <div className="band on-dark flex-1 min-h-[58vh] flex flex-col justify-end pt-[calc(env(safe-area-inset-top)+40px)] pb-12">
         <div className="mx-auto w-full max-w-[520px] px-7">
-          <img src="/icons/icon-192.png" alt="" className="w-16 h-16 rounded-full mb-8" />
+          <Logo size={64} className="mb-8" />
           <h1 className="h-serif text-[46px] leading-[1.02]">My Glow-Up</h1>
           <p className="text-[16px] text-muted mt-3 leading-relaxed max-w-[320px]">Meals, movement and calm, planned around you. Better with friends.</p>
         </div>
