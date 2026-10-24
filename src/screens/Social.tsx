@@ -57,9 +57,8 @@ export default function Social() {
 
   return (
     <div>
-      <div className="sticky z-30 on-dark" style={{ top: 'calc(env(safe-area-inset-top) + 72px)' }}>
-      <Header eyebrow="Friends & cheering" title="Social" />
-      <div className="mb-7">
+      <div className="sticky z-30 on-dark pt-1" style={{ top: 'calc(env(safe-area-inset-top) + 72px)' }}>
+      <div className="mb-5">
         <Segmented value={sub} onChange={(v) => setSub('social', v)} options={[
           { value: 'group', label: 'Group', dot: groupUnread > 0 && sub !== 'group' },
           { value: 'challenges', label: 'Challenges' },
