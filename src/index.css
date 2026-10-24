@@ -109,7 +109,7 @@ nav.bar-bg::after { content: ''; position: absolute; left: 0; right: 0; top: 100
 .status-cap { position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top); background: var(--band-2); z-index: 60; pointer-events: none; }
 html { background: var(--bg); }
 .app-root { min-height: calc(100vh + env(safe-area-inset-top)); }
-.install-bar { background: var(--band-2) !important; color: #EEF1EC !important; }
+.install-bar { background: linear-gradient(170deg, var(--band-1), var(--band-2)) !important; color: #EEF1EC !important; }
 .toast { background: var(--band-2) !important; color: var(--accent) !important; border-radius: 999px !important; padding-left: 18px !important; padding-right: 18px !important; }
 
 html, body, #root { height: 100%; }
