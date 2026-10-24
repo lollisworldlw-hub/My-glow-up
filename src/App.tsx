@@ -13,6 +13,7 @@ import { Celebration, Toaster, toast } from './components/ui';
 import { WorkoutPlayer } from './components/WorkoutPlayer';
 import { startSync, useSync } from './lib/sync';
 import { InstallBanner } from './components/InstallBanner';
+import { RecoverySheet } from './components/CloudCard';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import Social from './screens/Social';
 import Mind from './screens/Mind';
@@ -35,17 +36,20 @@ function useHydrated() {
 
 function useTheme() {
   const theme = useStore((s) => s.settings.theme);
+  const palette = useStore((s) => s.settings.palette ?? 'sage');
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const apply = () => {
       const dark = theme === 'dark' || (theme === 'system' && mq.matches);
       document.documentElement.classList.toggle('dark', dark);
-      document.querySelector('meta[name=theme-color]')?.setAttribute('content', dark ? '#1D171C' : '#FFF9F7');
+      document.documentElement.dataset.palette = palette;
+      const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      document.querySelector('meta[name=theme-color]')?.setAttribute('content', bg || '#F6F7F4');
     };
     apply();
     mq.addEventListener('change', apply);
     return () => mq.removeEventListener('change', apply);
-  }, [theme]);
+  }, [theme, palette]);
 }
 
 function useReminders() {
@@ -121,7 +125,7 @@ export default function App() {
     return <div className="h-full grid place-items-center"><div className="h-serif text-[18px] text-deep animate-pulse">My Glow-Up ♡</div></div>;
   }
 
-  if (!onboarded) return <><Onboarding /><Toaster /></>;
+  if (!onboarded) return <><Onboarding /><RecoverySheet /><Toaster /></>;
 
   return (
     <div className="min-h-full">
@@ -169,6 +173,7 @@ export default function App() {
       </nav>
 
       {hasSession && <WorkoutPlayer />}
+      <RecoverySheet />
       <Toaster />
       <Celebration />
     </div>

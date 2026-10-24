@@ -106,6 +106,18 @@ export default function Settings() {
       <Card>
         <div className="label">Theme</div>
         <div className="mb-3"><Segmented value={st.theme} onChange={(v) => set({ theme: v })} options={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }, { value: 'system', label: 'Auto' }]} /></div>
+        <div className="label">Color</div>
+        <div className="grid grid-cols-5 gap-2 mb-3">
+          {([['sage', 'Sage', '#7FA088', '#E7EFE8'], ['ocean', 'Ocean', '#6A9CC4', '#E5EEF5'], ['sand', 'Sand', '#B5936F', '#F2EBE2'], ['lavender', 'Lavender', '#9688C9', '#EDEAF7'], ['rose', 'Rose', '#C87893', '#F9E8EF']] as const).map(([v, l, c, bg]) => {
+            const on = (st.palette ?? 'sage') === v;
+            return (
+              <button key={v} aria-pressed={on} onClick={() => set({ palette: v })} className={`rounded-xl py-2 flex flex-col items-center gap-1 border ${on ? 'border-ink' : 'border-line'}`} style={{ background: bg }}>
+                <span className="w-6 h-6 rounded-full" style={{ background: c }} />
+                <span className="text-[11px] text-[#333]">{l}</span>
+              </button>
+            );
+          })}
+        </div>
         <div className="label">Weight</div>
         <div className="mb-3"><Segmented value={st.weightUnit} onChange={(v) => set({ weightUnit: v })} options={[{ value: 'lb', label: 'Pounds' }, { value: 'kg', label: 'Kilograms' }]} /></div>
         <div className="label">Measurements</div>

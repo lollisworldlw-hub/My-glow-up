@@ -14,7 +14,7 @@ export default {
         sans: ['"DM Sans"', 'system-ui', '-apple-system', 'sans-serif']
       },
       borderRadius: { '2xl': '1.25rem', '3xl': '1.75rem' },
-      boxShadow: { soft: '0 6px 24px -10px rgba(120, 60, 90, 0.22)' }
+      boxShadow: { soft: '0 6px 24px -10px rgba(30, 40, 35, 0.16)' }
     }
   },
   plugins: []

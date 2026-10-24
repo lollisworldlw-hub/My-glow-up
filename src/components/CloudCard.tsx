@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Cloud, CloudOff, LogOut, RefreshCcw } from 'lucide-react';
-import { joinGroup, rememberJoin, resetPassword, signIn, signOut, signUp, syncNow, updatePassword, useSync } from '../lib/sync';
+import { authLinkError, joinGroup, rememberJoin, resetPassword, signIn, signOut, signUp, syncNow, updatePassword, useSync } from '../lib/sync';
 import { useStore } from '../lib/store';
 import { Card, Field, Sheet, toast } from './ui';
 
@@ -110,12 +110,48 @@ export function CloudCard() {
           {email && <button className="btn-ghost btn-sm w-full mt-3" onClick={() => signOut()}><LogOut size={16} />Sign out</button>}
         </>
       )}
-      {recovery && (
-        <Sheet open onClose={() => useSync.setState({ recovery: false })} title="Set a new password">
-          <Field label="New password (8+ characters)"><input className="field" type="password" autoComplete="new-password" value={newPw} onChange={(e) => setNewPw(e.target.value)} /></Field>
-          <button className="btn-primary w-full" disabled={newPw.length < 8} onClick={async () => { try { await updatePassword(newPw); toast('Password updated ♡'); } catch (e: any) { toast(e?.message ?? 'Couldn’t update'); } }}>Save password</button>
-        </Sheet>
-      )}
     </Card>
+  );
+}
+
+/** Shown anywhere in the app when someone opens a password-reset link (or an expired one). */
+export function RecoverySheet() {
+  const recovery = useSync((x) => x.recovery);
+  const [pw, setPw] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+  const [linkErr, setLinkErr] = useState<string | null>(authLinkError);
+  const [em, setEm] = useState('');
+  if (linkErr && !recovery) return (
+    <Sheet open onClose={() => setLinkErr(null)} title="That link has expired">
+      <p className="text-[14px] text-muted mb-3">Email links only work once and expire after a while. Enter your email to get a fresh one, then tap it right away.</p>
+      <Field label="Email"><input className="field" type="email" inputMode="email" autoComplete="email" value={em} onChange={(e) => setEm(e.target.value)} /></Field>
+      <button className="btn-primary w-full" disabled={busy || !em.includes('@')} onClick={async () => {
+        setBusy(true);
+        try { await resetPassword(em.trim()); toast('New reset email sent ♡'); setLinkErr(null); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); }
+        setBusy(false);
+      }}>Send a new reset link</button>
+    </Sheet>
+  );
+  if (!recovery) return null;
+  return (
+    <Sheet open onClose={() => useSync.setState({ recovery: false })} title={done ? 'Password updated ♡' : 'Set a new password'}>
+      {done ? (
+        <>
+          <p className="text-[14px] mb-3">You’re all set. Open My Glow-Up from your Home Screen icon and sign in with your new password.</p>
+          <button className="btn-primary w-full" onClick={() => useSync.setState({ recovery: false })}>Done</button>
+        </>
+      ) : (
+        <>
+          <Field label="New password (8+ characters)"><input className="field" type="password" autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} /></Field>
+          <button className="btn-primary w-full" disabled={busy || pw.length < 8} onClick={async () => {
+            setBusy(true);
+            try { await updatePassword(pw); setDone(true); }
+            catch (e: any) { toast(e?.message ?? 'Couldn’t update — request a new reset link'); }
+            setBusy(false);
+          }}>Save new password</button>
+        </>
+      )}
+    </Sheet>
   );
 }

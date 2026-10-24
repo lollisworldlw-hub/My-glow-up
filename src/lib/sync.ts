@@ -5,6 +5,8 @@ import { get as idbGet, set as idbSet } from 'idb-keyval';
 import { create } from 'zustand';
 import { useStore, stateOnly, type State } from './store';
 
+// read the link details before the auth client consumes them
+const LINK_INFO = typeof location !== 'undefined' ? location.hash + '&' + location.search : '';
 const URL = 'https://faqgsczbjrdkriaqytsc.supabase.co';
 const KEY = 'sb_publishable_sow0jzcrbqCOIxwZfGJGvg_i5kLpC_Z'; // publishable key — safe in the browser; RLS protects data
 export const supabase = createClient(URL, KEY, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'glowup-auth' } });
@@ -18,6 +20,12 @@ export type SyncStatus = 'off' | 'idle' | 'syncing' | 'error' | 'offline' | 'nee
 export const useSync = create<{ status: SyncStatus; email: string | null; userId: string | null; member: boolean | null; lastSynced: number | null; error: string | null; recovery: boolean }>(() => ({
   status: 'off', email: null, userId: null, member: null, lastSynced: null, error: null, recovery: false
 }));
+
+// Password-reset links: catch them right away (even before sign-in/onboarding loads).
+if (/type=recovery/.test(LINK_INFO)) useSync.setState({ recovery: true });
+supabase.auth.onAuthStateChange((e) => { if (e === 'PASSWORD_RECOVERY') useSync.setState({ recovery: true }); });
+const linkErr = /error_description=([^&]+)/.exec(LINK_INFO)?.[1];
+export const authLinkError = linkErr ? decodeURIComponent(linkErr.replace(/\+/g, ' ')) : null;
 
 const LOCAL_ONLY: (keyof State)[] = ['session', 'photos', 'reminderSeen', 'foodPhotos'];
 function payload(): Partial<State> {
@@ -154,7 +162,6 @@ export async function resetPassword(email: string) {
 export async function updatePassword(password: string) {
   const { error } = await supabase.auth.updateUser({ password });
   if (error) throw error;
-  useSync.setState({ recovery: false });
 }
 
 const PENDING = 'glowup-pending-join';

@@ -121,7 +121,7 @@ export function Sheet({ open, onClose, title, children, footer }: { open: boolea
   if (!open) return null;
   return createPortal(
     <div className="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label={title}>
-      <div className="absolute inset-0 bg-[#392C36]/30 backdrop-blur-[2px] fade" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px] fade" onClick={onClose} />
       <div className="absolute inset-x-0 bottom-0 max-h-[90vh] flex flex-col bg-bg rounded-t-[28px] sheet mx-auto max-w-[640px]">
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
           <div className="w-10" />
