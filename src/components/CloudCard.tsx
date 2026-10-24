@@ -102,6 +102,7 @@ export function CloudCard() {
       {email && member ? (
         <div className="grid grid-cols-2 gap-2">
           <button className="btn-soft btn-sm" onClick={async () => { await syncNow(); toast('Synced'); }}><RefreshCcw size={16} />Sync now</button>
+          <button className="btn-ghost btn-sm" onClick={() => useSync.setState({ recovery: true })}>Change password</button>
           <button className="btn-ghost btn-sm" onClick={async () => { await signOut(); toast('Signed out — data stays on this phone'); }}><LogOut size={16} />Sign out</button>
         </div>
       ) : (

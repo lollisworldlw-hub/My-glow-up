@@ -13,6 +13,7 @@ import { kgToLb, latest, lbToKg } from '../lib/weight';
 import { Card, Field, Header, NumberInput, SectionTitle, Segmented, Sheet, toast } from '../components/ui';
 import { WeightSheet } from '../components/WeightSheet';
 import { CloudCard } from '../components/CloudCard';
+import { AdminCard } from '../components/AdminPanel';
 import { useSync } from '../lib/sync';
 import { disablePush, enablePush, isIOS, isStandaloneApp, sendTest } from '../lib/push';
 
@@ -30,6 +31,7 @@ export default function Settings() {
   return (
     <div>
       <Header eyebrow="Make it yours" title="Settings" />
+      <AdminCard />
 
       <SectionTitle>Me & my goals</SectionTitle>
       <Card>
