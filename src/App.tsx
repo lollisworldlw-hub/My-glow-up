@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { NAV, MORE, bottomTabs } from './lib/nav';
 import { useStore } from './lib/store';
 import { useUI, type Tab } from './lib/ui';
@@ -43,8 +43,8 @@ function useTheme() {
       const dark = theme === 'dark' || (theme === 'system' && mq.matches);
       document.documentElement.classList.toggle('dark', dark);
       document.documentElement.dataset.palette = palette;
-      const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-      document.querySelector('meta[name=theme-color]')?.setAttribute('content', bg || '#F2F3F1');
+      const bg = getComputedStyle(document.documentElement).getPropertyValue('--band-2').trim();
+      document.querySelector('meta[name=theme-color]')?.setAttribute('content', bg || '#23312B');
     };
     apply();
     mq.addEventListener('change', apply);
@@ -116,6 +116,39 @@ export default function App() {
   useTheme();
   useReminders();
 
+  // The dark band runs from the top of the page down to the first card; everything above that card is styled for the dark.
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+  const [bandH, setBandH] = useState(0);
+  useLayoutEffect(() => {
+    const main = mainRef.current, wrap = wrapRef.current;
+    if (!main || !wrap) return;
+    let raf = 0;
+    const calc = () => {
+      main.querySelectorAll('.auto-dark').forEach((e) => e.classList.remove('on-dark', 'auto-dark'));
+      if (tab === 'home') { setBandH(0); return; }
+      const card = main.querySelector('.card') as HTMLElement | null;
+      if (!card) { setBandH(0); return; }
+      let el: HTMLElement | null = card;
+      while (el && el !== main) {
+        let sib = el.previousElementSibling as HTMLElement | null;
+        while (sib) { if (!sib.classList.contains('on-dark')) sib.classList.add('on-dark', 'auto-dark'); sib = sib.previousElementSibling as HTMLElement | null; }
+        el = el.parentElement;
+      }
+      setBandH(Math.round(card.getBoundingClientRect().top - wrap.getBoundingClientRect().top + 30));
+    };
+    calc();
+    const mo = new MutationObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(calc); });
+    mo.observe(main, { childList: true, subtree: true });
+    const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(calc); };
+    const ro = new ResizeObserver(later);
+    ro.observe(main);
+    document.fonts?.ready.then(later);
+    const timers = [120, 400, 1000].map((ms) => setTimeout(later, ms));
+    window.addEventListener('resize', later);
+    return () => { mo.disconnect(); ro.disconnect(); timers.forEach(clearTimeout); cancelAnimationFrame(raf); window.removeEventListener('resize', later); };
+  }, [tab, hydrated, onboarded]);
+
   useEffect(() => {
     if (!hydrated) return;
     navigator.storage?.persist?.().catch(() => {});
@@ -131,8 +164,8 @@ export default function App() {
   return (
     <div className="min-h-full">
       <InstallBanner />
-      <div className="relative">
-      {tab !== 'home' && <div className="band absolute inset-x-0 top-0 h-[calc(56px+env(safe-area-inset-top))] !rounded-b-[26px]" aria-hidden />}
+      <div className="relative" ref={wrapRef}>
+      {tab !== 'home' && <div className="band absolute inset-x-0 top-0" style={{ height: bandH || 'calc(56px + env(safe-area-inset-top))' }} aria-hidden />}
       <header className="absolute inset-x-0 top-0 z-30 app-header top-safe on-dark">
         <div className="mx-auto max-w-[640px] px-5 h-14 flex items-center justify-between">
           <button className="flex items-center gap-2 min-h-[44px]" aria-label="Home" onClick={() => go('home')}>
@@ -144,7 +177,7 @@ export default function App() {
           </button>
         </div>
       </header>
-      <main className={`mx-auto max-w-[640px] px-3 pb-nav ${tab === 'home' ? '' : 'pt-[calc(68px+env(safe-area-inset-top))]'}`}>
+      <main ref={mainRef} className={`relative mx-auto max-w-[640px] px-3 pb-nav ${tab === 'home' ? '' : 'pt-[calc(60px+env(safe-area-inset-top))]'}`}>
         <ErrorBoundary resetKey={tab}>
         <div key={tab} className="fade">
           {tab === 'home' && <Home />}
