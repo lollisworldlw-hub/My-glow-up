@@ -11,93 +11,93 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Color themes: every palette is a rich dark "spa" look. Eucalyptus is the default; pick another in Settings → Look. */
+/* Color themes: dark band on top, soft cream below. Eucalyptus is the default; pick another in Settings → Look. */
 :root[data-palette="euca"], :root {
-  --bg: #1D2A24; --card: #26352E; --ink: #EEF1EC; --muted: #A2B2A9;
-  --accent: #E6CFA4; --accent-2: #CDAE7C; --accent-light: #EBD8B2; --on-accent: #1D2A24;
-  --rose: #E6CFA4; --rose-deep: #E6CFA4; --gold: #E6CFA4; --petal: #2E3F37; --blush: #445A4F; --sage: #9FC0B0; --sage-deep: #EEF1EC;
-  --line: color-mix(in srgb, #E6CFA4 15%, transparent);
-  --grad-1: #2F4239; --grad-2: #213029; --grad-3: #1A2620; --glow: rgba(214,184,138,.42); --glow-2: rgba(122,156,138,.16); --nav: rgba(16,24,20,.94);
-  color-scheme: dark;
+  --bg: #EFEDE6; --card: #FFFFFF; --ink: #23312B; --muted: #7A877F;
+  --band-1: #34483F; --band-2: #23312B; --accent: #E6CFA4; --accent-light: #EBD8B2; --accent-2: #C9A675; --glow: rgba(214,184,138,.5);
+  --rose: #23312B; --rose-deep: #23312B; --gold: #C9A675; --sage: #6FA08A; --sage-deep: #23312B;
+  --petal: color-mix(in srgb, #23312B 6%, #EFEDE6); --blush: color-mix(in srgb, #23312B 16%, #EFEDE6);
+  --line: color-mix(in srgb, #23312B 9%, transparent);
+  color-scheme: light;
 }
 :root[data-palette="noir"] {
-  --bg: #151515; --card: #1F1F1F; --ink: #F1EFEA; --muted: #A8A49C;
-  --accent: #D9C3A0; --accent-2: #B8996B; --accent-light: #E8D7B8; --on-accent: #151515;
-  --rose: #D9C3A0; --rose-deep: #D9C3A0; --gold: #D9C3A0; --petal: #262626; --blush: #3D3D3B; --sage: #A9BFB0; --sage-deep: #F1EFEA;
-  --line: color-mix(in srgb, #D9C3A0 15%, transparent);
-  --grad-1: #2A2826; --grad-2: #1B1A19; --grad-3: #121212; --glow: rgba(217,195,160,.30); --glow-2: rgba(140,140,140,.10); --nav: rgba(12,12,12,.94);
-  color-scheme: dark;
+  --bg: #F1EFEB; --card: #FFFFFF; --ink: #1A1A1A; --muted: #7A766F;
+  --band-1: #2E2C2A; --band-2: #161616; --accent: #D9C3A0; --accent-light: #E8D7B8; --accent-2: #B8996B; --glow: rgba(217,195,160,.38);
+  --rose: #161616; --rose-deep: #161616; --gold: #B8996B; --sage: #7E9A88; --sage-deep: #161616;
+  --petal: color-mix(in srgb, #1A1A1A 6%, #F1EFEB); --blush: color-mix(in srgb, #1A1A1A 16%, #F1EFEB);
+  --line: color-mix(in srgb, #1A1A1A 9%, transparent);
+  color-scheme: light;
 }
 :root[data-palette="ocean"] {
-  --bg: #16202C; --card: #1F2B38; --ink: #EEF2F6; --muted: #9FB0C2;
-  --accent: #DCC8A4; --accent-2: #B39B6E; --accent-light: #EAD9B9; --on-accent: #16202C;
-  --rose: #DCC8A4; --rose-deep: #DCC8A4; --gold: #DCC8A4; --petal: #253342; --blush: #3A4C60; --sage: #9DC0D6; --sage-deep: #EEF2F6;
-  --line: color-mix(in srgb, #DCC8A4 15%, transparent);
-  --grad-1: #24364A; --grad-2: #1A2734; --grad-3: #121B25; --glow: rgba(150,185,225,.30); --glow-2: rgba(220,200,164,.14); --nav: rgba(12,18,26,.94);
-  color-scheme: dark;
+  --bg: #EEF0F2; --card: #FFFFFF; --ink: #16202C; --muted: #6E7C8A;
+  --band-1: #2A3E55; --band-2: #16202C; --accent: #DCC8A4; --accent-light: #EAD9B9; --accent-2: #B39B6E; --glow: rgba(150,185,225,.40);
+  --rose: #16202C; --rose-deep: #16202C; --gold: #B39B6E; --sage: #5E8FB0; --sage-deep: #16202C;
+  --petal: color-mix(in srgb, #16202C 6%, #EEF0F2); --blush: color-mix(in srgb, #16202C 16%, #EEF0F2);
+  --line: color-mix(in srgb, #16202C 9%, transparent);
+  color-scheme: light;
 }
 :root[data-palette="sand"] {
-  --bg: #241C17; --card: #2F2620; --ink: #F4ECE3; --muted: #B9A898;
-  --accent: #E2C29A; --accent-2: #C29A6C; --accent-light: #EDD5B4; --on-accent: #241C17;
-  --rose: #E2C29A; --rose-deep: #E2C29A; --gold: #E2C29A; --petal: #382E27; --blush: #54463B; --sage: #B7C2A3; --sage-deep: #F4ECE3;
-  --line: color-mix(in srgb, #E2C29A 15%, transparent);
-  --grad-1: #3A2D24; --grad-2: #2A211B; --grad-3: #1C1612; --glow: rgba(226,170,120,.34); --glow-2: rgba(150,120,90,.14); --nav: rgba(20,15,12,.94);
-  color-scheme: dark;
+  --bg: #F2EDE6; --card: #FFFFFF; --ink: #2A211B; --muted: #8A7B6D;
+  --band-1: #45362B; --band-2: #241C17; --accent: #E2C29A; --accent-light: #EDD5B4; --accent-2: #C29A6C; --glow: rgba(226,170,120,.45);
+  --rose: #241C17; --rose-deep: #241C17; --gold: #C29A6C; --sage: #8C9A74; --sage-deep: #241C17;
+  --petal: color-mix(in srgb, #2A211B 6%, #F2EDE6); --blush: color-mix(in srgb, #2A211B 16%, #F2EDE6);
+  --line: color-mix(in srgb, #2A211B 9%, transparent);
+  color-scheme: light;
 }
 :root[data-palette="lavender"] {
-  --bg: #221A2B; --card: #2C2337; --ink: #F2EDF6; --muted: #B3A6C2;
-  --accent: #E4C9B0; --accent-2: #C49E86; --accent-light: #EED8C4; --on-accent: #221A2B;
-  --rose: #E4C9B0; --rose-deep: #E4C9B0; --gold: #E4C9B0; --petal: #352B41; --blush: #4F4260; --sage: #B9A6D6; --sage-deep: #F2EDF6;
-  --line: color-mix(in srgb, #E4C9B0 15%, transparent);
-  --grad-1: #362A44; --grad-2: #261E31; --grad-3: #1A1422; --glow: rgba(200,160,225,.32); --glow-2: rgba(228,201,176,.14); --nav: rgba(18,13,24,.94);
-  color-scheme: dark;
+  --bg: #F0EDF2; --card: #FFFFFF; --ink: #261E31; --muted: #7E7489;
+  --band-1: #3E3050; --band-2: #221A2B; --accent: #E4C9B0; --accent-light: #EED8C4; --accent-2: #C49E86; --glow: rgba(200,160,225,.42);
+  --rose: #221A2B; --rose-deep: #221A2B; --gold: #C49E86; --sage: #8E7BB3; --sage-deep: #221A2B;
+  --petal: color-mix(in srgb, #261E31 6%, #F0EDF2); --blush: color-mix(in srgb, #261E31 16%, #F0EDF2);
+  --line: color-mix(in srgb, #261E31 9%, transparent);
+  color-scheme: light;
 }
 :root[data-palette="rose"] {
-  --bg: #2A1A1F; --card: #36242A; --ink: #F6ECEE; --muted: #C3A7AE;
-  --accent: #EBC9C0; --accent-2: #C99A90; --accent-light: #F2DAD3; --on-accent: #2A1A1F;
-  --rose: #EBC9C0; --rose-deep: #EBC9C0; --gold: #EBC9C0; --petal: #3F2B31; --blush: #5C4249; --sage: #D9A7B3; --sage-deep: #F6ECEE;
-  --line: color-mix(in srgb, #EBC9C0 15%, transparent);
-  --grad-1: #45282F; --grad-2: #301D23; --grad-3: #1F1317; --glow: rgba(235,165,165,.32); --glow-2: rgba(200,140,160,.14); --nav: rgba(24,13,17,.94);
-  color-scheme: dark;
+  --bg: #F3ECEC; --card: #FFFFFF; --ink: #301D23; --muted: #8C7378;
+  --band-1: #4F2E36; --band-2: #2A1A1F; --accent: #EBC9C0; --accent-light: #F2DAD3; --accent-2: #C99A90; --glow: rgba(235,165,165,.42);
+  --rose: #2A1A1F; --rose-deep: #2A1A1F; --gold: #C99A90; --sage: #B07885; --sage-deep: #2A1A1F;
+  --petal: color-mix(in srgb, #301D23 6%, #F3ECEC); --blush: color-mix(in srgb, #301D23 16%, #F3ECEC);
+  --line: color-mix(in srgb, #301D23 9%, transparent);
+  color-scheme: light;
 }
-:root body { background: var(--grad-3); font-family: 'Hanken Grotesk', system-ui, -apple-system, sans-serif; letter-spacing: 0; }
-body::before {
-  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background:
-    radial-gradient(560px 560px at 100% -6%, var(--glow), transparent 62%),
-    radial-gradient(480px 480px at -20% 95%, var(--glow-2), transparent 65%),
-    linear-gradient(170deg, var(--grad-1) 0%, var(--grad-2) 55%, var(--grad-3) 100%);
+/* anything placed on the dark band */
+.on-dark {
+  --ink: #EEF1EC; --muted: rgba(238, 241, 236, 0.64); --petal: rgba(238, 241, 236, 0.10); --blush: rgba(238, 241, 236, 0.2);
+  --line: color-mix(in srgb, var(--accent) 22%, transparent); --gold: var(--accent);
+  color: var(--ink);
 }
-body::after {
-  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .16; mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-.card {
-  background: linear-gradient(160deg, color-mix(in srgb, var(--ink) 9%, transparent), color-mix(in srgb, var(--ink) 3.5%, transparent)) !important;
-  border-color: color-mix(in srgb, var(--accent) 17%, transparent) !important; border-radius: 22px !important;
+:root body { background: var(--bg); font-family: 'Hanken Grotesk', system-ui, -apple-system, sans-serif; letter-spacing: 0; }
+.band { position: relative; isolation: isolate; overflow: hidden; background: linear-gradient(170deg, var(--band-1) 0%, var(--band-2) 100%); border-radius: 0 0 34px 34px; }
+.band::before { content: ''; position: absolute; z-index: -1; top: -140px; right: -150px; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, var(--glow), transparent 62%); filter: blur(22px); pointer-events: none; }
+.band::after { content: ''; position: absolute; z-index: -1; inset: 0; opacity: .18; mix-blend-mode: overlay; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.card { background: #FFFFFF !important; border: 0 !important; border-radius: 20px !important; box-shadow: 0 10px 28px color-mix(in srgb, var(--band-2) 8%, transparent); }
+.on-dark .card {
+  background: linear-gradient(160deg, rgba(238, 241, 236, 0.11), rgba(238, 241, 236, 0.04)) !important;
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent) !important; border-radius: 26px !important; box-shadow: none;
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
 }
-.card-gold { background: linear-gradient(150deg, var(--accent-light), var(--accent-2)) !important; color: var(--on-accent); border: 0 !important; }
-.card-gold .text-muted { color: color-mix(in srgb, var(--on-accent) 72%, transparent); }
-.btn-primary, .bg-deep.text-white, .bg-deep { color: var(--on-accent) !important; }
-.btn-primary { border-radius: 999px !important; background: linear-gradient(150deg, var(--accent-light), var(--accent-2)) !important; }
-.btn-soft { border-radius: 999px !important; background: color-mix(in srgb, var(--ink) 8%, transparent) !important; }
-.btn-ghost { border-radius: 999px !important; background: transparent !important; border-color: color-mix(in srgb, var(--ink) 18%, transparent) !important; }
-.chip { border-radius: 999px !important; background: color-mix(in srgb, var(--ink) 6%, transparent) !important; border-color: color-mix(in srgb, var(--ink) 13%, transparent) !important; }
-.chip-on { background: var(--accent) !important; color: var(--on-accent) !important; border-color: var(--accent) !important; }
-.field { background: rgba(0, 0, 0, 0.18) !important; border-color: color-mix(in srgb, var(--ink) 14%, transparent) !important; border-radius: 14px !important; }
-.field:focus { border-color: var(--accent) !important; }
-select.field option { background: var(--card); color: var(--ink); }
-.h-serif { font-family: 'Newsreader Variable', Georgia, serif !important; font-weight: 350 !important; letter-spacing: -0.005em !important; }
+.card-gold { background: linear-gradient(135deg, var(--accent-light), var(--accent-2)) !important; color: var(--band-2); }
+.card-gold .text-muted { color: color-mix(in srgb, var(--band-2) 70%, transparent); }
+.btn-primary, .bg-deep.text-white, .bg-deep { color: #F3F1EA !important; }
+.btn-primary { border-radius: 999px !important; background: var(--band-2) !important; }
+.on-dark .btn-primary { background: linear-gradient(150deg, var(--accent-light), var(--accent-2)) !important; color: var(--band-2) !important; }
+.btn-soft { border-radius: 999px !important; background: var(--petal) !important; }
+.btn-ghost { border-radius: 999px !important; background: transparent !important; border-color: var(--blush) !important; }
+.chip { border-radius: 999px !important; background: var(--petal) !important; border-color: transparent !important; }
+.chip-on { background: var(--band-2) !important; color: #F3F1EA !important; border-color: var(--band-2) !important; }
+.field { background: #FFFFFF !important; border-color: var(--line) !important; border-radius: 14px !important; }
+.field:focus { border-color: var(--band-2) !important; }
+.h-serif { font-family: 'Newsreader Variable', Georgia, serif !important; font-weight: 380 !important; letter-spacing: -0.005em !important; }
 .num { font-family: 'Newsreader Variable', Georgia, serif; font-weight: 300; letter-spacing: -0.02em; }
 .app-header { background: transparent; border: 0; }
-nav.bar-bg { background: linear-gradient(to bottom, transparent, var(--grad-3) 45%); border: 0; }
-.nav-pill-wrap { margin: 0 14px 10px; padding: 6px; background: var(--nav); border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent); border-radius: 32px; box-shadow: 0 14px 34px rgba(0,0,0,.35); }
-.nav-btn { border-radius: 26px; min-height: 46px; }
-.nav-on { background: color-mix(in srgb, var(--accent) 17%, transparent); color: var(--accent) !important; }
+nav.bar-bg { background: linear-gradient(to bottom, transparent, var(--bg) 45%); border: 0; }
+.nav-pill-wrap { margin: 0 14px 10px; padding: 6px; background: var(--band-2); border-radius: 32px; box-shadow: 0 14px 30px color-mix(in srgb, var(--band-2) 30%, transparent); }
+.nav-btn { border-radius: 26px; min-height: 46px; color: rgba(238, 241, 236, 0.55); }
+.nav-on { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent) !important; }
 .pb-nav { padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important; }
-.install-bar { background: var(--grad-3) !important; color: var(--ink) !important; border-bottom: 1px solid var(--line); }
-.toast { background: var(--accent) !important; color: var(--on-accent) !important; border-radius: 999px !important; padding-left: 18px !important; padding-right: 18px !important; }
+.install-bar { background: var(--band-2) !important; color: #EEF1EC !important; }
+.toast { background: var(--band-2) !important; color: var(--accent) !important; border-radius: 999px !important; padding-left: 18px !important; padding-right: 18px !important; }
 
 html, body, #root { height: 100%; }
 body {

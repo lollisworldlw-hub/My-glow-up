@@ -55,7 +55,8 @@ export default function Home() {
 
   return (
     <div className="space-y-2">
-      <div className="pt-4 pb-3 px-1">
+      <div className="band on-dark -mx-3 px-3 pb-5 pt-[calc(66px+env(safe-area-inset-top))] space-y-0">
+      <div className="pt-2 pb-5 px-2">
         <div className="text-[13px] text-muted">{fmtLong(today)}</div>
         <h1 className="h-serif text-[34px] leading-[1.08] mt-1">{greeting()}{st.name ? `, ${st.name}` : ''}.</h1>
         <p className="text-[14px] text-muted mt-2 leading-snug">
@@ -88,28 +89,29 @@ export default function Home() {
         <div className="text-[12px] text-muted mt-4 tabular-nums">{Math.round(eaten.cal).toLocaleString()} eaten of {st.calTarget.toLocaleString()}, {Math.round(plan.cal).toLocaleString()} planned</div>
         <ProteinFixer today={today} />
       </section>
-
-      {/* up next + movement */}
-      <div className="grid grid-cols-2 gap-2">
-        {next ? (
-          <button className="card card-gold p-4 h-[136px] flex flex-col justify-between text-left" onClick={() => s.logItem(today, next.slot, next.item.id)}>
-            <div className="flex justify-between w-full text-[12px] text-muted"><span>{SLOT_LABEL[next.slot]}</span><span className="tabular-nums">{Math.round(next.cal)} cal</span></div>
-            <div>
-              <div className="h-serif text-[20px] leading-[1.15] line-clamp-2">{next.name}</div>
-              <div className="text-[12px] text-muted mt-1">Tap to log</div>
-            </div>
-          </button>
-        ) : (
-          <button className="card card-gold p-4 h-[136px] flex flex-col justify-between text-left" onClick={() => setSheet('log')}>
-            <div className="text-[12px] text-muted">All meals logged</div>
-            <div className="h-serif text-[20px] leading-[1.15]">Log a snack</div>
-          </button>
-        )}
-        <button className="card p-4 h-[136px] flex flex-col justify-between text-left" onClick={() => go('workouts')}>
-          <div className="flex justify-between items-center w-full text-[12px] text-muted"><span>{moveDone ? 'Done today' : 'Movement'}</span><Play size={13} className="text-gold" fill="currentColor" /></div>
-          <div className="h-serif text-[20px] leading-[1.15]">{HOME_LABEL[sched?.home ?? 'rest']}</div>
-        </button>
       </div>
+      <div className="pt-1" />
+
+      {/* today's plan */}
+      <div className="text-[13px] text-muted px-1 pt-1">Today’s plan</div>
+      <div className="card p-3.5 flex items-center gap-3.5">
+        <div className="w-[50px] h-[50px] rounded-[14px] shrink-0" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--accent-2))' }} />
+        <div className="flex-1 min-w-0">
+          <div className="h-serif text-[18px] leading-tight truncate">{next ? next.name : 'All meals logged'}</div>
+          <div className="text-[12px] text-muted mt-0.5">{next ? `${SLOT_LABEL[next.slot]}, ${Math.round(next.cal)} cal` : 'Add a snack anytime'}</div>
+        </div>
+        {next
+          ? <button className="btn-primary btn-sm !px-4" onClick={() => s.logItem(today, next.slot, next.item.id)}>Log</button>
+          : <button className="btn-primary btn-sm !px-4" onClick={() => setSheet('log')}>Add</button>}
+      </div>
+      <button className="card p-3.5 flex items-center gap-3.5 w-full text-left" onClick={() => go('workouts')}>
+        <div className="w-[50px] h-[50px] rounded-[14px] shrink-0" style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--sage) 45%, white), var(--sage))' }} />
+        <div className="flex-1 min-w-0">
+          <div className="h-serif text-[18px] leading-tight truncate">{HOME_LABEL[sched?.home ?? 'rest']}</div>
+          <div className="text-[12px] text-muted mt-0.5">{moveDone ? 'Done today' : sched?.home === 'rest' ? 'Enjoy the rest' : `${st.workoutMinutes} min at home`}</div>
+        </div>
+        <span className="w-9 h-9 rounded-full border border-ink grid place-items-center shrink-0"><Play size={12} fill="currentColor" /></span>
+      </button>
 
       {/* water */}
       <div className="card px-4 py-3 flex items-center justify-between gap-2">

@@ -131,18 +131,20 @@ export default function App() {
   return (
     <div className="min-h-full">
       <InstallBanner />
-      <header className="relative z-30 app-header top-safe">
+      <div className="relative">
+      {tab !== 'home' && <div className="band absolute inset-x-0 top-0 h-[calc(56px+env(safe-area-inset-top))] !rounded-b-[26px]" aria-hidden />}
+      <header className="absolute inset-x-0 top-0 z-30 app-header top-safe on-dark">
         <div className="mx-auto max-w-[640px] px-5 h-14 flex items-center justify-between">
           <button className="flex items-center gap-2 min-h-[44px]" aria-label="Home" onClick={() => go('home')}>
             <img src="/icons/icon-192.png" alt="" className="w-7 h-7 rounded-full" />
             <span className={`h-serif text-[19px] leading-none ${tab === 'home' ? 'text-ink' : 'text-muted'}`}>Glow-Up</span>
           </button>
           <button aria-label="Settings" onClick={() => go('settings')} className="w-9 h-9 rounded-full p-[2px]" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--accent-2))' }}>
-            <span className="w-full h-full rounded-full grid place-items-center text-[13px] font-semibold text-gold" style={{ background: 'var(--grad-2)' }}>{(name || 'G').slice(0, 1).toUpperCase()}</span>
+            <span className="w-full h-full rounded-full grid place-items-center text-[13px] font-semibold text-gold" style={{ background: 'var(--band-2)' }}>{(name || 'G').slice(0, 1).toUpperCase()}</span>
           </button>
         </div>
       </header>
-      <main className="mx-auto max-w-[640px] px-3 pt-2.5 pb-nav">
+      <main className={`mx-auto max-w-[640px] px-3 pb-nav ${tab === 'home' ? '' : 'pt-[calc(68px+env(safe-area-inset-top))]'}`}>
         <ErrorBoundary resetKey={tab}>
         <div key={tab} className="fade">
           {tab === 'home' && <Home />}
@@ -158,6 +160,7 @@ export default function App() {
         </div>
         </ErrorBoundary>
       </main>
+      </div>
 
       <nav className="fixed bottom-0 inset-x-0 z-40 bg-bg bar-bg border-t border-line safe-bottom" aria-label="Main">
         <div className="mx-auto max-w-[640px] flex nav-pill-wrap">
