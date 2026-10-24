@@ -162,7 +162,7 @@ export default function App() {
   if (!onboarded) return <><Onboarding /><RecoverySheet /><Toaster /></>;
 
   return (
-    <div className="min-h-full">
+    <div className="min-h-full app-root">
       <InstallBanner />
       <div className="relative" ref={wrapRef}>
       {tab !== 'home' && <div className="band absolute inset-x-0 top-0" style={{ height: bandH || 'calc(56px + env(safe-area-inset-top))' }} aria-hidden />}
