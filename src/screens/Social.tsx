@@ -34,6 +34,7 @@ export default function Social() {
   const error = useSocial((s) => s.error);
   const msgs = useSocial((s) => s.messages);
   const lastRead = useSocial((s) => s.lastRead);
+  useEffect(() => { window.scrollTo({ top: 0 }); }, [sub]);
   const groupUnread = userId ? msgs.filter((m) => m.recipient === null && m.sender !== userId && m.id > (lastRead.group ?? 0)).length : 0;
   const dmUnread = userId ? msgs.filter((m) => m.recipient === userId && m.id > (lastRead[m.sender] ?? 0)).length : 0;
 
