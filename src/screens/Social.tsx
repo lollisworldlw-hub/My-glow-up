@@ -191,8 +191,13 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
   const [gifs, setGifs] = useState(false);
   useEffect(() => {
     // scroll the page (not the visual viewport) to the newest message; scrollIntoView can shift iOS's fixed bars
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    if (max > 0) window.scrollTo({ top: max });
+    // only scroll when the newest message would be hidden behind the chat bar
+    const el = end.current;
+    if (el) {
+      const limit = window.innerHeight - 160;
+      const over = el.getBoundingClientRect().bottom - limit;
+      if (over > 0) window.scrollBy({ top: over });
+    }
     markRead(peer ?? 'group');
   }, [msgs.length]);
 
@@ -210,11 +215,11 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
         {msgs.map((m) => <Bubble key={m.id} m={m} me={me} onLong={() => setDel(m)} />)}
         <div ref={end} />
       </div>
-      <div className="fixed inset-x-0 z-30 px-3 pb-2.5 pt-6 composer-fade" style={{ bottom: 'var(--nav-h)' }}>
-        <div className="mx-auto max-w-[640px] flex gap-1 items-end rounded-[26px] bg-card p-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.10)]">
-          {peer === null && <button aria-label="Share an achievement" className="w-9 h-9 shrink-0 rounded-full text-muted grid place-items-center" onClick={() => setShare(true)}><Trophy size={19} strokeWidth={1.7} /></button>}
-          {GIPHY_KEY && <button aria-label="Search GIFs" className="h-9 px-2 shrink-0 rounded-full text-muted font-semibold text-[13px]" onClick={() => setGifs(true)}>GIF</button>}
-          <button aria-label="Send a photo or GIF" disabled={busy} className="w-9 h-9 shrink-0 rounded-full text-muted grid place-items-center" onClick={() => fileRef.current?.click()}><ImagePlus size={19} strokeWidth={1.7} /></button>
+      <div className="fixed inset-x-0 z-30 px-4 pb-2 pt-5 composer-fade" style={{ bottom: 'var(--nav-h)' }}>
+        <div className="mx-auto max-w-[560px] flex gap-0.5 items-end rounded-[22px] bg-card p-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
+          {peer === null && <button aria-label="Share an achievement" className="w-8 h-8 shrink-0 rounded-full text-muted grid place-items-center" onClick={() => setShare(true)}><Trophy size={17} strokeWidth={1.7} /></button>}
+          {GIPHY_KEY && <button aria-label="Search GIFs" className="h-8 px-1.5 shrink-0 rounded-full text-muted font-semibold text-[12px]" onClick={() => setGifs(true)}>GIF</button>}
+          <button aria-label="Send a photo or GIF" disabled={busy} className="w-8 h-8 shrink-0 rounded-full text-muted grid place-items-center" onClick={() => fileRef.current?.click()}><ImagePlus size={17} strokeWidth={1.7} /></button>
           <input ref={fileRef} type="file" accept="image/*,image/gif" className="hidden" onChange={async (e) => {
             const f = e.target.files?.[0]; e.target.value = '';
             if (!f) return;
@@ -223,9 +228,9 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
             catch (err: any) { toast(err?.message ?? 'Couldn’t send that'); }
             setBusy(false);
           }} />
-          <textarea aria-label="Message" rows={1} className="flex-1 min-w-0 bg-transparent outline-none border-0 px-2 py-[7px] min-h-[36px] max-h-32 resize-none text-[16px] leading-[22px]" placeholder={peer ? 'Message or paste a GIF link' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
+          <textarea aria-label="Message" rows={1} className="flex-1 min-w-0 bg-transparent outline-none border-0 px-2 py-[5px] min-h-[32px] max-h-32 resize-none text-[16px] leading-[22px]" placeholder={peer ? 'Message or paste a GIF link' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(pointer: fine)').matches) { e.preventDefault(); post(); } }} />
-          <button aria-label="Send" disabled={busy || !text.trim()} className="w-9 h-9 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-40" onClick={post}><Send size={18} /></button>
+          <button aria-label="Send" disabled={busy || !text.trim()} className="w-8 h-8 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-40" onClick={post}><Send size={15} /></button>
         </div>
       </div>
       {share && <ShareSheet onClose={() => setShare(false)} />}

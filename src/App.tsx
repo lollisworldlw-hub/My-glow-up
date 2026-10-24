@@ -185,7 +185,7 @@ export default function App() {
         <div className="mx-auto max-w-[640px] px-5 h-14 flex items-center justify-between">
           <button className="flex items-center gap-2 min-h-[44px]" aria-label="Home" onClick={() => go('home')}>
             <img src="/icons/icon-192.png" alt="" className="w-7 h-7 rounded-full" />
-            <span className={`h-serif text-[19px] leading-none ${tab === 'home' ? 'text-ink' : 'text-muted'}`}>Glow-Up</span>
+            <span className="h-serif text-[19px] leading-none text-ink">Glow-Up</span>
           </button>
           <button aria-label="Settings" onClick={() => go('settings')} className="w-9 h-9 rounded-full p-[2px]" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--accent-2))' }}>
             <span className="w-full h-full rounded-full grid place-items-center text-[13px] font-semibold text-gold" style={{ background: 'var(--band-2)' }}>{(name || 'G').slice(0, 1).toUpperCase()}</span>
