@@ -402,27 +402,11 @@ function DataSection({ onDelete }: { onDelete: () => void }) {
 
   return (
     <>
-      <SectionTitle>Your data</SectionTitle>
+      <SectionTitle>Account</SectionTitle>
       <div className="mb-3"><CloudCard /></div>
       <div className="mb-3"><JoinGroupCard /></div>
       <Card>
-        <div className="flex items-start gap-2 mb-3"><Database className="text-deep shrink-0 mt-0.5" size={20} />
-          <p className="text-[13px]">Everything is saved privately on this device (IndexedDB). It can be lost if you clear Safari’s website data, delete the Home Screen app, or switch phones — so download a backup now and then and keep it in Files or iCloud Drive.</p>
-        </div>
-        <div className="text-[13px] text-muted mb-3">
-          {days == null ? 'No backup yet.' : days === 0 ? 'Last backup: today.' : `Last backup: ${days} day${days === 1 ? '' : 's'} ago.`}
-          {persisted === true ? ' Storage is protected from automatic cleanup.' : ''} {usage}
-        </div>
-        {days != null && days > 14 && <div className="rounded-2xl bg-petal px-3 py-2 text-[13px] mb-3">It’s been a while — a fresh backup is a good idea.</div>}
-        <Toggle label="Include progress photos in backups" on={photos} onChange={setPhotos} />
-        <div className="grid grid-cols-2 gap-2 mt-2">
-          <button className="btn-primary btn-sm" onClick={doExport}><Download size={16} />Export backup</button>
-          <button className="btn-soft btn-sm" onClick={() => file.current?.click()}><Upload size={16} />Import backup</button>
-        </div>
-        <input ref={file} type="file" accept="application/json,.json" className="hidden" onChange={(e) => { doImport(e.target.files?.[0]); e.target.value = ''; }} />
-        {persisted === false && navigator.storage?.persist && (
-          <button className="btn-ghost btn-sm w-full mt-2" onClick={async () => { const ok = await navigator.storage.persist(); setPersisted(ok); toast(ok ? 'Storage protected' : 'The browser decided not to — backups are your safety net'); }}>Ask the browser to keep my data</button>
-        )}
+        <button className="btn-ghost btn-sm w-full" onClick={doExport}><Download size={16} />Download a copy of my data</button>
         <button className="btn-ghost btn-sm w-full mt-2 text-deep" onClick={onDelete}><Trash2 size={16} />Delete data…</button>
       </Card>
     </>
@@ -435,7 +419,7 @@ function DeleteAll({ onClose }: { onClose: () => void }) {
   const keep = (fn: (x: any) => void, msg: string) => { s.set(fn); toast(msg); onClose(); };
   return (
     <Sheet open onClose={onClose} title="Delete data">
-      <p className="text-muted text-[14px] mb-3">These can’t be undone. If cloud backup is on, the cloud copy updates too. Export a backup first if you might want this later.</p>
+      <p className="text-muted text-[14px] mb-3">These can’t be undone, and they also apply to your account.</p>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.logs = []; }, 'Food log cleared')}>Clear food log</button>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.weights = []; x.measures = []; }, 'Weight & measurements cleared')}>Clear weight & measurements</button>
       <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.workouts = []; }, 'Workout history cleared')}>Clear workout history</button>

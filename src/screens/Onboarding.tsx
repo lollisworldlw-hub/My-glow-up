@@ -106,10 +106,6 @@ export default function Onboarding() {
       <div className="mx-auto w-full max-w-[520px] px-5 pt-7 pb-[calc(env(safe-area-inset-bottom)+24px)]">
         <button className="btn-primary w-full !min-h-[54px] !text-[16px]" onClick={() => setStep('join')}>Create account</button>
         <button className="btn-ghost w-full !min-h-[54px] !text-[16px] mt-3" onClick={() => setStep('signin')}>Sign in</button>
-        <div className="flex justify-center gap-5 mt-5 text-[13px] text-muted">
-          <button className="min-h-[40px]" onClick={() => setStep('about')}>Use without an account</button>
-          <button className="min-h-[40px]" onClick={() => fileRef.current?.click()}>Restore a backup</button>
-        </div>
       </div>
       <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={async (e) => {
         const f = e.target.files?.[0]; e.target.value = '';

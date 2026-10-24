@@ -116,7 +116,6 @@ export async function leaveGroup() {
   const uid = useSync.getState().userId;
   if (!uid) return;
   await supabase.from('glowup_messages').delete().eq('sender', uid);
-  await supabase.from('glowup_state').delete().eq('user_id', uid);
   const { error } = await supabase.from('glowup_members').delete().eq('user_id', uid);
   if (error) throw error;
   useSync.setState({ member: false });

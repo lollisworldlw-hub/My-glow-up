@@ -266,7 +266,7 @@ function PhotosView() {
   return (
     <div className="space-y-2">
       <Card>
-        <div className="text-[13px] text-muted mb-3">Photos stay on this iPhone only — never uploaded anywhere. Include them in backups if you want to keep them.</div>
+        <div className="text-[13px] text-muted mb-3">Progress photos stay on this phone only, for privacy. They’re never uploaded.</div>
         <Segmented small value={pose} onChange={setPose} options={POSES} />
         <div className="flex gap-2 mt-3 items-end">
           <div className="flex-1"><span className="label">Photo date</span><input type="date" className="field" value={date} max={todayKey()} onChange={(e) => e.target.value && setDate(e.target.value)} /></div>

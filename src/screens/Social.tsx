@@ -385,7 +385,7 @@ function Friends({ me }: { me: string }) {
       <button className="btn-ghost w-full" onClick={() => setLeaving(true)}><LogOut size={16} />Leave the group</button>
       {leaving && (
         <Sheet open onClose={() => setLeaving(false)} title="Leave the group?">
-          <p className="text-[14px] mb-3">This removes your profile and all your messages, and deletes your cloud backup. Data on this phone stays. You’d need a new invite code to rejoin.</p>
+          <p className="text-[14px] mb-3">This removes your group profile and all your messages. Your own plan and logs stay in your account. You’d need a new invite code to rejoin.</p>
           <button className="btn-primary w-full" onClick={async () => { try { await leaveGroup(); toast('You left the group'); } catch (e: any) { toast(e?.message ?? 'Couldn’t leave'); } setLeaving(false); }}>Leave & delete my group data</button>
         </Sheet>
       )}

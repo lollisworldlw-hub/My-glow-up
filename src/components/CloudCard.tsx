@@ -19,26 +19,25 @@ export function CloudCard() {
   const [newPw, setNewPw] = useState('');
   return (
     <Card>
-      <div className="flex items-start gap-2 mb-3">
-        {email ? <Cloud className="text-deep shrink-0" size={22} /> : <CloudOff className="text-muted shrink-0" size={22} />}
-        <div>
-          <div className="font-semibold">{email ? 'Your account & cloud backup' : 'Account & cloud backup'}</div>
-          <p className="text-[13px] text-muted">{email
-            ? `Signed in as ${email}. Last synced ${ago(lastSynced)}${status === 'syncing' ? ' · syncing…' : status === 'offline' ? ' · waiting for internet' : status === 'error' ? ' · will retry' : ''}.`
-            : 'Your account backs up everything except photos to a private cloud space only you can open, and unlocks the Social tab. Sign in or create one to back up your plan.'}</p>
-          {status === 'error' && error && <p className="text-[13px] text-deep mt-1">{error}</p>}
-        </div>
-      </div>
       {email ? (
-        <div className="grid grid-cols-2 gap-2">
-          <button className="btn-soft btn-sm" onClick={async () => { await syncNow(); toast('Synced'); }}><RefreshCcw size={16} />Sync now</button>
-          <button className="btn-ghost btn-sm" onClick={() => useSync.setState({ recovery: true })}>Change password</button>
-          <button className="btn-ghost btn-sm" onClick={async () => { await signOut(); toast('Signed out — data stays on this phone'); }}><LogOut size={16} />Sign out</button>
-        </div>
+        <>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full grid place-items-center text-[15px] font-semibold shrink-0" style={{ background: 'var(--petal)' }}>{email.slice(0, 1).toUpperCase()}</div>
+            <div className="min-w-0">
+              <div className="font-semibold truncate">{email}</div>
+              <div className="text-[13px] text-muted">{status === 'syncing' ? 'Saving…' : status === 'offline' ? 'Offline. Changes save when you’re back online.' : status === 'error' ? 'Couldn’t save just now. Trying again soon.' : 'Everything saves to your account automatically.'}</div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button className="btn-ghost btn-sm" onClick={() => useSync.setState({ recovery: true })}>Change password</button>
+            <button className="btn-ghost btn-sm" onClick={async () => { await syncNow(); await signOut(); toast('Signed out'); }}><LogOut size={16} />Sign out</button>
+          </div>
+        </>
       ) : (
         <>
+          <div className="font-semibold mb-1">Sign in to save your plan</div>
+          <p className="text-[13px] text-muted mb-4">Your plan, logs and chats save to your account so they’re on any phone you sign in on.</p>
           <AuthForm start="signin" />
-          {email && <button className="btn-ghost btn-sm w-full mt-3" onClick={() => signOut()}><LogOut size={16} />Sign out</button>}
         </>
       )}
     </Card>
