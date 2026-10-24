@@ -411,17 +411,26 @@ function DataSection({ onDelete }: { onDelete: () => void }) {
 function DeleteAll({ onClose }: { onClose: () => void }) {
   const s = useStore();
   const [txt, setTxt] = useState('');
+  const [ask, setAsk] = useState<{ label: string; run: () => void | Promise<void> } | null>(null);
   const keep = (fn: (x: any) => void, msg: string) => { s.set(fn); toast(msg); onClose(); };
+  if (ask) return (
+    <Sheet open onClose={() => setAsk(null)} title="Are you sure?">
+      <p className="text-[15px] mb-1">{ask.label}?</p>
+      <p className="text-[14px] text-muted mb-4">This can’t be undone, and it also removes it from your account on every phone.</p>
+      <button className="btn-primary w-full mb-2" onClick={async () => { await ask.run(); setAsk(null); }}>Yes, {ask.label.toLowerCase()}</button>
+      <button className="btn-ghost w-full" onClick={() => setAsk(null)}>Cancel</button>
+    </Sheet>
+  );
   return (
     <Sheet open onClose={onClose} title="Delete data">
       <p className="text-muted text-[14px] mb-3">These can’t be undone, and they also apply to your account.</p>
-      <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.logs = []; }, 'Food log cleared')}>Clear food log</button>
-      <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.weights = []; x.measures = []; }, 'Weight & measurements cleared')}>Clear weight & measurements</button>
-      <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.workouts = []; }, 'Workout history cleared')}>Clear workout history</button>
-      <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.habitChecks = {}; x.water = {}; x.notes = {}; }, 'Habits cleared')}>Clear habit history</button>
-      <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.periods = []; x.cycleDays = {}; }, 'Cycle data cleared')}>Clear cycle data</button>
-      <button className="btn-ghost w-full mb-2" onClick={() => keep((x) => { x.checkins = []; x.steps = {}; }, 'Check-ins & steps cleared')}>Clear check-ins & steps</button>
-      <button className="btn-ghost w-full mb-3" onClick={async () => { await clearPhotos(); keep((x) => { x.photos = []; }, 'Photos deleted'); }}>Delete all photos</button>
+      <button className="btn-ghost w-full mb-2" onClick={() => setAsk({ label: 'Clear food log', run: () => keep((x) => { x.logs = []; }, 'Food log cleared') })}>Clear food log</button>
+      <button className="btn-ghost w-full mb-2" onClick={() => setAsk({ label: 'Clear weight & measurements', run: () => keep((x) => { x.weights = []; x.measures = []; }, 'Weight & measurements cleared') })}>Clear weight & measurements</button>
+      <button className="btn-ghost w-full mb-2" onClick={() => setAsk({ label: 'Clear workout history', run: () => keep((x) => { x.workouts = []; }, 'Workout history cleared') })}>Clear workout history</button>
+      <button className="btn-ghost w-full mb-2" onClick={() => setAsk({ label: 'Clear habit history', run: () => keep((x) => { x.habitChecks = {}; x.water = {}; x.notes = {}; }, 'Habits cleared') })}>Clear habit history</button>
+      <button className="btn-ghost w-full mb-2" onClick={() => setAsk({ label: 'Clear cycle data', run: () => keep((x) => { x.periods = []; x.cycleDays = {}; }, 'Cycle data cleared') })}>Clear cycle data</button>
+      <button className="btn-ghost w-full mb-2" onClick={() => setAsk({ label: 'Clear check-ins & steps', run: () => keep((x) => { x.checkins = []; x.steps = {}; }, 'Check-ins & steps cleared') })}>Clear check-ins & steps</button>
+      <button className="btn-ghost w-full mb-3" onClick={() => setAsk({ label: 'Delete all photos', run: async () => { await clearPhotos(); keep((x) => { x.photos = []; }, 'Photos deleted'); } })}>Delete all photos</button>
       <div className="rounded-2xl border border-blush p-3">
         <div className="font-medium mb-2">Start completely fresh</div>
         <p className="text-[13px] text-muted mb-2">Type DELETE to erase everything and restore the starting recipes.</p>
