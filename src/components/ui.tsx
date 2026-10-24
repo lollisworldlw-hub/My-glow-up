@@ -180,7 +180,7 @@ export function Toaster() {
   useEffect(() => { if (!msg) return; setVis(true); const t = setTimeout(() => setVis(false), 2400); return () => clearTimeout(t); }, [key, msg]);
   if (!vis || !msg) return null;
   return (
-    <div className="fixed left-0 right-0 z-[75] flex justify-center px-4 pointer-events-none" style={{ bottom: 'calc(96px + env(safe-area-inset-bottom))' }}>
+    <div className="fixed left-0 right-0 z-[75] flex justify-center px-4 pointer-events-none" style={{ bottom: 'calc(var(--nav-h) + 12px)' }}>
       <div key={key} className="fade toast rounded-[10px] bg-ink text-bg px-4 py-2.5 text-[13.5px] shadow-soft">{msg}</div>
     </div>
   );

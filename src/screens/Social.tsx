@@ -205,10 +205,10 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
         {msgs.map((m) => <Bubble key={m.id} m={m} me={me} onLong={() => setDel(m)} />)}
         <div ref={end} />
       </div>
-      <div className="fixed inset-x-0 z-30 bg-bg border-t border-line" style={{ bottom: 'calc(47px + env(safe-area-inset-bottom))' }}>
+      <div className="fixed inset-x-0 z-30 bg-bg border-t border-line" style={{ bottom: 'var(--nav-h)' }}>
         <div className="mx-auto max-w-[640px] px-2.5 py-1.5 flex gap-1.5 items-end">
           {peer === null && <button aria-label="Share an achievement" className="w-9 h-9 shrink-0 rounded-full bg-petal text-deep grid place-items-center" onClick={() => setShare(true)}><Trophy size={19} /></button>}
-          {GIPHY_KEY && <button aria-label="Search GIFs" className="h-11 px-3 shrink-0 rounded-full bg-petal text-deep font-bold text-[13px]" onClick={() => setGifs(true)}>GIF</button>}
+          {GIPHY_KEY && <button aria-label="Search GIFs" className="h-9 px-3 shrink-0 rounded-full bg-petal text-deep font-bold text-[13px]" onClick={() => setGifs(true)}>GIF</button>}
           <button aria-label="Send a photo or GIF" disabled={busy} className="w-9 h-9 shrink-0 rounded-full bg-petal text-deep grid place-items-center" onClick={() => fileRef.current?.click()}><ImagePlus size={19} /></button>
           <input ref={fileRef} type="file" accept="image/*,image/gif" className="hidden" onChange={async (e) => {
             const f = e.target.files?.[0]; e.target.value = '';
