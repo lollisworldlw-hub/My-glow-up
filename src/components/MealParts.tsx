@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Camera, Sparkles, ArrowLeftRight, BookOpen, Copy, Heart, MoveRight, Plus, RotateCcw, Save, Search, Share2, Trash2 } from 'lucide-react';
+import { ArrowLeftRight, BookOpen, Copy, Heart, MoveRight, Plus, RotateCcw, Save, Search, Share2, Trash2 } from 'lucide-react';
 import { useStore, findItem, emptyDay } from '../lib/store';
 import type { Ingredient, Macros, PlanItem, Slot, Unit } from '../lib/types';
 import { SLOT_LABEL, SLOTS } from '../lib/types';
@@ -11,8 +11,6 @@ import { addDays, fmtDow, fmtShort, uid, weekDays, weekStart } from '../lib/date
 import { CheckCircle, Field, NumberInput, Segmented, Sheet, Stepper, toast } from './ui';
 import { FoodArt } from './Art';
 import { BarcodeScanner, ProductAmount, lookupBarcode, saveProductAsFood, type Product } from './Scan';
-import { estimateFoods, type AiFood } from '../lib/ai';
-import { resizeImage } from '../lib/backup';
 import { conflicts, dietBadges } from '../lib/diet';
 import { ShareRecipeSheet, useCanShare } from './ShareParts';
 
@@ -335,24 +333,11 @@ export function SwapSheet({ date, slot, itemId, onClose }: { date: string; slot:
 /** Log foods that aren't in the plan: quick add, from food library, or from a recipe */
 export function LogFoodSheet({ date, onClose, defaultSlot = 'snack' }: { date: string; onClose: () => void; defaultSlot?: Slot }) {
   const s = useStore();
-  const [tab, setTab] = useState<'ai' | 'scan' | 'food' | 'recipe' | 'quick'>('ai');
-  const [aiText, setAiText] = useState('');
-  const [aiImg, setAiImg] = useState<Blob | null>(null);
-  const [aiImgUrl, setAiImgUrl] = useState('');
-  const [aiBusy, setAiBusy] = useState(false);
-  const [aiErr, setAiErr] = useState('');
-  const [aiItems, setAiItems] = useState<(AiFood & { on: boolean })[]>([]);
-  const [aiNote, setAiNote] = useState('');
+  const [tab, setTab] = useState<'scan' | 'food' | 'recipe' | 'quick'>('food');
   const [scanCode, setScanCode] = useState<string | null>(null);
   const [product, setProduct] = useState<Product | null>(null);
   const [prodMac, setProdMac] = useState<(Macros & { label: string }) | null>(null);
   const [scanErr, setScanErr] = useState('');
-  const runAi = async () => {
-    setAiErr(''); setAiBusy(true); setAiItems([]);
-    try { const r = await estimateFoods(aiText.trim(), aiImg ?? undefined); setAiItems(r.items.map((i) => ({ ...i, on: true }))); setAiNote(r.note ?? ''); if (!r.items.length) setAiErr(r.note || 'Couldn’t spot any food. Try a clearer photo or add a few words.'); }
-    catch (e) { setAiErr((e as Error).message); }
-    setAiBusy(false);
-  };
   const onCode = async (code: string) => {
     setScanCode(code); setScanErr(''); setProduct(null);
     try { const p = await lookupBarcode(code); if (p) setProduct(p); else setScanErr('That product isn’t in the database yet. Try Quick add instead.'); }
@@ -373,12 +358,7 @@ export function LogFoodSheet({ date, onClose, defaultSlot = 'snack' }: { date: s
   const recipe = recipeId ? s.recipes[recipeId] : null;
   const recMac = recipe ? round(itemMacros({ id: 'x', recipeId: recipe.id, servings: serv }, s.recipes, s.foods)) : null;
 
-  const aiPicked = aiItems.filter((i) => i.on);
   const submit = () => {
-    if (tab === 'ai' && aiPicked.length) {
-      for (const i of aiPicked) s.addLog({ date, slot, name: `${i.name} (${i.amount})`, cal: i.cal, protein: i.protein, carbs: i.carbs, fat: i.fat });
-      toast(aiPicked.length === 1 ? 'Added to today’s log' : `Added ${aiPicked.length} items`); onClose(); return;
-    }
     if (tab === 'scan' && product && prodMac) {
       saveProductAsFood(product);
       s.addLog({ date, slot, name: `${product.name} (${prodMac.label})`, cal: prodMac.cal, protein: prodMac.protein, carbs: prodMac.carbs, fat: prodMac.fat });
@@ -391,48 +371,14 @@ export function LogFoodSheet({ date, onClose, defaultSlot = 'snack' }: { date: s
     toast('Added to today’s log');
     onClose();
   };
-  const can = (tab === 'ai' && aiPicked.length > 0) || (tab === 'scan' && !!prodMac && prodMac.cal >= 0 && !!product) || (tab === 'food' && !!foodMac) || (tab === 'recipe' && !!recMac) || (tab === 'quick' && !!quick.name && quick.cal != null);
+  const can = (tab === 'scan' && !!prodMac && prodMac.cal >= 0 && !!product) || (tab === 'food' && !!foodMac) || (tab === 'recipe' && !!recMac) || (tab === 'quick' && !!quick.name && quick.cal != null);
 
   return (
     <Sheet open onClose={onClose} title="Log food" footer={<button className="btn-primary w-full" disabled={!can} onClick={submit}><Plus size={18} />Add to log</button>}>
-      <div className="mb-3"><Segmented value={tab} onChange={setTab} options={[{ value: 'ai', label: 'Snap or say' }, { value: 'scan', label: 'Scan' }, { value: 'food', label: 'Foods' }, { value: 'recipe', label: 'Recipes' }, { value: 'quick', label: 'Quick add' }]} /></div>
+      <div className="mb-3"><Segmented value={tab} onChange={setTab} options={[{ value: 'food', label: 'Foods' }, { value: 'scan', label: 'Scan' }, { value: 'recipe', label: 'Recipes' }, { value: 'quick', label: 'Quick add' }]} /></div>
       <Field label="Meal">
         <select className="field" value={slot} onChange={(e) => setSlot(e.target.value as Slot)}>{SLOTS.map((x) => <option key={x} value={x}>{SLOT_LABEL[x]}</option>)}</select>
       </Field>
-      {tab === 'ai' && (
-        <>
-          <Field label="What did you eat?">
-            <textarea className="field py-2.5 min-h-[76px]" value={aiText} onChange={(e) => setAiText(e.target.value)} placeholder="e.g. two scrambled eggs, a slice of sourdough with butter and a latte" />
-          </Field>
-          <p className="text-[12px] text-muted -mt-2 mb-3">Rather talk? Tap the microphone on your keyboard.</p>
-          <label className="flex items-center gap-3 rounded-[16px] border border-dashed border-blush p-3 mb-3 cursor-pointer">
-            {aiImgUrl ? <img src={aiImgUrl} alt="Your meal" className="w-14 h-14 rounded-[12px] object-cover" /> : <div className="w-14 h-14 rounded-[12px] bg-petal grid place-items-center"><Camera size={22} strokeWidth={1.6} /></div>}
-            <div className="flex-1 text-[14px]">{aiImg ? 'Photo added. Tap to change.' : 'Add a photo of your plate'}<div className="text-[12px] text-muted">Optional. A photo plus a few words is most accurate.</div></div>
-            <input type="file" accept="image/*" capture="environment" className="hidden" onChange={async (e) => {
-              const f = e.target.files?.[0]; e.target.value = '';
-              if (!f) return;
-              const { blob } = await resizeImage(f, 1024);
-              setAiImg(blob); if (aiImgUrl) URL.revokeObjectURL(aiImgUrl); setAiImgUrl(URL.createObjectURL(blob));
-            }} />
-          </label>
-          <button className="btn-soft w-full mb-3" disabled={aiBusy || (!aiText.trim() && !aiImg)} onClick={runAi}><Sparkles size={16} />{aiBusy ? 'Estimating…' : aiItems.length ? 'Estimate again' : 'Estimate'}</button>
-          {aiErr && <p className="text-[13px] text-rose mb-2">{aiErr}</p>}
-          {aiItems.length > 0 && (
-            <div className="rounded-[16px] border border-line divide-y divide-line">
-              {aiItems.map((it, i) => (
-                <label key={i} className="flex items-center gap-3 px-3 py-2.5">
-                  <input type="checkbox" className="w-5 h-5" checked={it.on} onChange={(e) => setAiItems(aiItems.map((x, j) => (j === i ? { ...x, on: e.target.checked } : x)))} />
-                  <div className="flex-1 min-w-0"><div className="text-[14px] truncate">{it.name}</div><div className="text-[12px] text-muted">{it.amount}</div></div>
-                  <div className="text-right text-[13px] tabular-nums"><b>{it.cal}</b> cal<div className="text-muted text-[12px]">{it.protein} g protein</div></div>
-                </label>
-              ))}
-              <div className="px-3 py-2.5 flex justify-between text-[14px]"><span className="text-muted">Total</span><span className="tabular-nums"><b>{aiPicked.reduce((a, b) => a + b.cal, 0)} cal</b>, {aiPicked.reduce((a, b) => a + b.protein, 0)} g protein</span></div>
-            </div>
-          )}
-          {aiNote && aiItems.length > 0 && <p className="text-[12px] text-muted mt-2">{aiNote}</p>}
-          {aiItems.length > 0 && <p className="text-[12px] text-muted mt-1">These are estimates. Untick anything that’s wrong, or use Quick add for exact numbers.</p>}
-        </>
-      )}
       {tab === 'scan' && (
         <>
           {!product && <BarcodeScanner key={scanCode ?? 'scan'} onCode={onCode} />}

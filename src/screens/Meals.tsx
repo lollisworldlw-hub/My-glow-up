@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link2, ChevronLeft, ChevronRight, Copy, Heart, Plus, Share2, Shuffle, Sparkles, Trash2, Wand2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Copy, Heart, Plus, Share2, Shuffle, Sparkles, Trash2, Wand2 } from 'lucide-react';
 import { useStore, emptyDay } from '../lib/store';
 import { SLOT_LABEL, SLOTS } from '../lib/types';
 import type { Slot } from '../lib/types';
@@ -13,7 +13,6 @@ import { FoodArt } from '../components/Art';
 import { useUI } from '../lib/ui';
 import { FoodPhotos, ShareRecipeSheet, useCanShare } from '../components/ShareParts';
 import { conflicts, dietBadges } from '../lib/diet';
-import { importRecipe } from '../lib/ai';
 
 export default function Meals() {
   const sub = (useUI((u) => u.sub.meals) ?? 'week') as 'week' | 'desserts' | 'recipes';
@@ -214,15 +213,10 @@ function Recipes() {
   const s = useStore();
   const [edit, setEdit] = useState<string | null | 'new'>(null);
   const [share, setShare] = useState<string | null>(null);
-  const [importing, setImporting] = useState(false);
   const canShare = useCanShare();
   return (
     <>
-      {importing && <ImportRecipeSheet onClose={() => setImporting(false)} onDone={(id) => { setImporting(false); setEdit(id); }} />}
-      <div className="grid grid-cols-2 gap-2 mb-3">
-        <button className="btn-primary" onClick={() => setEdit('new')}><Plus size={18} />New recipe</button>
-        <button className="btn-soft" onClick={() => setImporting(true)}><Link2 size={17} />From a link</button>
-      </div>
+      <button className="btn-primary w-full mb-3" onClick={() => setEdit('new')}><Plus size={18} />New recipe</button>
       {SLOTS.map((slot) => {
         const list = Object.values(s.recipes).filter((r) => r.slot === slot);
         if (!list.length) return null;
@@ -258,29 +252,3 @@ function Recipes() {
   );
 }
 
-function ImportRecipeSheet({ onClose, onDone }: { onClose: () => void; onDone: (id: string) => void }) {
-  const [url, setUrl] = useState('');
-  const [text, setText] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState('');
-  const go = async () => {
-    setErr(''); setBusy(true);
-    try { const id = await importRecipe(url, text); toast('Recipe added. Check it over and save.'); onDone(id); }
-    catch (e) { setErr((e as Error).message); }
-    setBusy(false);
-  };
-  return (
-    <Sheet open onClose={onClose} title="Add a recipe from a link"
-      footer={<button className="btn-primary w-full" disabled={busy || (!url.trim() && !text.trim())} onClick={go}><Sparkles size={16} />{busy ? 'Reading the recipe…' : 'Add recipe'}</button>}>
-      <p className="text-[14px] text-muted mb-4">Paste a link from a recipe site, TikTok or Instagram. We’ll pull out the ingredients, steps and nutrition per serving.</p>
-      <label className="block mb-3"><span className="label">Link</span>
-        <input className="field" type="url" inputMode="url" autoCapitalize="off" placeholder="https://" value={url} onChange={(e) => setUrl(e.target.value)} />
-      </label>
-      <label className="block mb-2"><span className="label">Caption or recipe text (optional)</span>
-        <textarea className="field py-2.5 min-h-[90px]" value={text} onChange={(e) => setText(e.target.value)} placeholder="For Instagram, copy the caption and paste it here. It often has the full recipe." />
-      </label>
-      {err && <p className="text-[13px] text-rose mt-2">{err}</p>}
-      <p className="text-[12px] text-muted mt-2">Nutrition is estimated. You can edit anything before saving.</p>
-    </Sheet>
-  );
-}

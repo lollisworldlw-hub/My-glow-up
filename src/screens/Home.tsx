@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Camera, Plus, Play, Scale, Sparkles, Trash2 } from 'lucide-react';
+import { Plus, Play, Scale, Sparkles, Trash2 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { SLOTS, SLOT_LABEL } from '../lib/types';
 import { itemMacros } from '../lib/nutrition';
@@ -114,10 +114,10 @@ export default function Home() {
       </button>
 
       <button className="card p-3.5 flex items-center gap-3.5 w-full text-left" onClick={() => setSheet('log')}>
-        <div className="w-[50px] h-[50px] rounded-[14px] shrink-0 grid place-items-center" style={{ background: 'var(--petal)' }}><Camera size={20} strokeWidth={1.6} /></div>
+        <div className="w-[50px] h-[50px] rounded-[14px] shrink-0 grid place-items-center" style={{ background: 'var(--petal)' }}><Plus size={20} strokeWidth={1.6} /></div>
         <div className="flex-1 min-w-0">
           <div className="h-serif text-[18px] leading-tight">Log food</div>
-          <div className="text-[12px] text-muted mt-0.5">Snap a photo, scan a barcode or just say it</div>
+          <div className="text-[12px] text-muted mt-0.5">Search, scan a barcode or quick add</div>
         </div>
         <Plus size={18} className="text-muted" />
       </button>
