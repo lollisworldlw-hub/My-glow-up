@@ -55,11 +55,27 @@ function AdminSheet({ onClose }: { onClose: () => void }) {
   const [pick, setPick] = useState<Person | null>(null);
   const load = () => call({ action: 'list' }).then((d) => setPeople(d.people)).catch((e) => setErr(e.message));
   useEffect(() => { load(); }, []);
+  const [addEmail, setAddEmail] = useState('');
+  const [addName, setAddName] = useState('');
+  const [adding, setAdding] = useState(false);
+  const add = async () => {
+    setAdding(true);
+    try { await call({ action: 'add_by_email', email: addEmail, name: addName }); toast(`${addName || addEmail} added to the group`); setAddEmail(''); setAddName(''); load(); }
+    catch (e) { toast((e as Error).message); }
+    finally { setAdding(false); }
+  };
 
   return (
     <Sheet open onClose={onClose} title="Admin">
       {err && <p className="text-[14px] text-rose mb-3">{err}</p>}
       {!people && !err && <p className="text-muted text-[14px]">Loading people…</p>}
+      <div className="card p-4 mb-4">
+        <div className="font-medium mb-1">Add someone to the group</div>
+        <p className="text-[13px] text-muted mb-3">For a friend who already made an account but isn’t in the group yet.</p>
+        <input className="field mb-2" type="email" inputMode="email" autoCapitalize="off" placeholder="Their email" value={addEmail} onChange={(e) => setAddEmail(e.target.value)} />
+        <input className="field mb-3" placeholder="Name friends will see" value={addName} onChange={(e) => setAddName(e.target.value)} />
+        <button className="btn-primary w-full" disabled={adding || !addEmail.includes('@')} onClick={add}>Add to group</button>
+      </div>
       {people && (
         <>
           <p className="text-[13px] text-muted mb-3">{people.filter((p) => p.member).length} in the group, {people.length} accounts. Tap someone to manage them.</p>
@@ -119,6 +135,10 @@ function PersonSheet({ p, me, onClose, onDone }: { p: Person; me: boolean; onClo
             <ShieldCheck size={16} />{p.admin ? 'Remove admin access' : 'Make admin'}
           </button>
         </>
+      )}
+
+      {!p.member && (
+        <button className="btn-primary w-full mb-5" disabled={busy} onClick={() => run({ action: 'add_member', name: p.email.split('@')[0] }, 'Added to the group')}>Add to group</button>
       )}
 
       {p.member && !me && (
