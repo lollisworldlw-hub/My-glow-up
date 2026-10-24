@@ -164,3 +164,5 @@ input, select, textarea { font-size: 16px; } /* prevents iOS zoom */
 
 /* while typing in chat, the bottom menu steps aside so the chat bar sits on the keyboard */
 body.composing nav[aria-label="Main"] { display: none; }
+
+.rich-input:empty:before { content: attr(data-placeholder); color: var(--muted); pointer-events: none; }

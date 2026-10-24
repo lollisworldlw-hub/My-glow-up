@@ -7,6 +7,7 @@ import { computeAchievements, type Achievement } from '../lib/achievements';
 import { useToday } from '../lib/derived';
 import { Challenges } from '../components/Challenges';
 import { STICKERS, stickerSvg } from '../lib/stickers';
+import { RichInput, type RichInputHandle } from '../components/RichInput';
 import { Card, Empty, Field, Header, Segmented, Sheet, toast } from '../components/ui';
 import { AccountForm } from '../components/CloudCard';
 import { useMediaUrl, uploadMedia, gifUrl } from '../lib/media';
@@ -26,6 +27,20 @@ const timeLabel = (iso: string) => {
   const same = d.toDateString() === today.toDateString();
   return same ? d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 };
+
+/** A message with stickers between the words. Only stickers → shown big, no bubble. */
+function StickerText({ body, mine }: { body: string; mine: boolean }) {
+  const parts = body.split(/(\{\{st:[a-zA-Z]+\}\})/).filter((p) => p !== '');
+  const onlyStickers = parts.every((p) => /^\{\{st:/.test(p) || !p.trim());
+  const count = parts.filter((p) => /^\{\{st:/.test(p)).length;
+  const size = onlyStickers ? (count === 1 ? 112 : count <= 3 ? 84 : 60) : 40;
+  const nodes = parts.map((p, i) => {
+    const m = /^\{\{st:([a-zA-Z]+)\}\}$/.exec(p);
+    return m ? <span key={i} role="img" aria-label="Sticker" className="inline-block align-middle" style={{ width: size, height: size }} dangerouslySetInnerHTML={{ __html: stickerSvg(m[1], size) }} /> : <span key={i}>{p}</span>;
+  });
+  if (onlyStickers) return <div className={`flex flex-wrap gap-0.5 ${mine ? 'justify-end' : ''}`}>{nodes}</div>;
+  return <div className={`rounded-3xl px-4 py-2 text-left text-[14px] leading-[26px] whitespace-pre-wrap break-words ${mine ? 'bg-deep text-white rounded-br-lg' : 'bg-card border border-line rounded-bl-lg'}`}>{nodes}</div>;
+}
 
 // Same feelings as a game chat sticker set, using the phone's own emoji.
 const CHAT_EMOJI = [
@@ -187,6 +202,7 @@ function Bubble({ m, me, onLong }: { m: Message; me: string; onLong: () => void 
       </div>
     );
   }
+  else if (/\{\{st:[a-zA-Z]+\}\}/.test(m.body)) content = <StickerText body={m.body} mine={mine} />;
   else if (/^\s*(\p{Extended_Pictographic}(\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*\s*){1,3}$/u.test(m.body)) content = <div className="text-[44px] leading-none py-1">{m.body}</div>;
   else content = <div className={`rounded-3xl px-4 py-2 text-left text-[14px] whitespace-pre-wrap break-words ${mine ? 'bg-deep text-white rounded-br-lg' : 'bg-card border border-line rounded-bl-lg'}`}>{m.body}</div>;
 
@@ -223,7 +239,7 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
   const [emo, setEmo] = useState(false);
   const [panel, setPanel] = useState<'stickers' | 'emoji'>('stickers');
   const [focused, setFocused] = useState(false);
-  const taRef = useRef<HTMLTextAreaElement>(null);
+  const taRef = useRef<RichInputHandle>(null);
   const [kb, setKb] = useState(0);
   const composing = focused || emo;
   useEffect(() => {
@@ -244,7 +260,6 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [gifs, setGifs] = useState(false);
   const scrolledOnce = useRef(false);
-  const [picked, setPicked] = useState<string[]>([]);
   useEffect(() => {
     // scroll the page (not the visual viewport) to the newest message; scrollIntoView can shift iOS's fixed bars
     // only scroll when the newest message would be hidden behind the chat bar
@@ -259,13 +274,9 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
   }, [msgs.length]);
 
   const post = async () => {
-    if (!text.trim() && !picked.length) return;
+    if (!text.trim()) return;
     setBusy(true);
-    try {
-      if (picked.length) await send(text.trim() || 'Sent stickers', peer, 'text', { stickers: picked, withText: !!text.trim() });
-      else await send(text, peer);
-      setText(''); setPicked([]);
-    } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); }
+    try { await send(text.trim(), peer); taRef.current?.clear(); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); }
     setBusy(false);
   };
 
@@ -277,16 +288,6 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
         <div ref={end} />
       </div>
       <div className={`fixed inset-x-0 z-40 ${composing ? 'px-2 pt-2 bg-bg border-t border-line' : 'px-4 pb-2 pt-5 composer-fade'}`} style={{ bottom: composing ? kb : 'var(--nav-h)', paddingBottom: composing && !kb ? 'calc(env(safe-area-inset-bottom) + 6px)' : composing ? 6 : undefined }}>
-        {picked.length > 0 && (
-          <div className="mx-auto max-w-[560px] mb-1.5 rounded-[18px] bg-card p-1.5 flex gap-1 overflow-x-auto no-scrollbar shadow-[0_6px_18px_rgba(0,0,0,0.06)]">
-            {picked.map((id, i) => (
-              <button key={i} aria-label="Remove sticker" className="relative shrink-0 w-12 h-12" onMouseDown={(ev) => ev.preventDefault()} onClick={() => setPicked(picked.filter((_, j) => j !== i))}>
-                <span className="block w-12 h-12" dangerouslySetInnerHTML={{ __html: stickerSvg(id, 48) }} />
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-ink text-bg text-[10px] leading-4 text-center">×</span>
-              </button>
-            ))}
-          </div>
-        )}
         <div className="mx-auto max-w-[560px] flex gap-0.5 items-end rounded-[22px] bg-card p-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
           {peer === null && <button aria-label="Share an achievement" className="w-8 h-8 shrink-0 rounded-full text-muted grid place-items-center" onClick={() => setShare(true)}><Trophy size={17} strokeWidth={1.7} /></button>}
           {GIPHY_KEY && <button aria-label="Search GIFs" className="h-8 px-1.5 shrink-0 rounded-full text-muted font-semibold text-[12px]" onClick={() => setGifs(true)}>GIF</button>}
@@ -295,14 +296,13 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
             const f = e.target.files?.[0]; e.target.value = '';
             if (!f) return;
             setBusy(true);
-            try { const image = await uploadMedia(f); await send(text.trim() || (image.gif ? 'GIF' : '📷'), peer, 'text', { image }); setText(''); }
+            try { const image = await uploadMedia(f); await send(text.trim() || (image.gif ? 'GIF' : '📷'), peer, 'text', { image }); taRef.current?.clear(); }
             catch (err: any) { toast(err?.message ?? 'Couldn’t send that'); }
             setBusy(false);
           }} />
-          <textarea ref={taRef} onFocus={() => { setFocused(true); setEmo(false); }} onBlur={() => setFocused(false)} aria-label="Message" rows={1} className="flex-1 min-w-0 bg-transparent outline-none border-0 px-2 py-[5px] min-h-[32px] max-h-32 resize-none text-[16px] leading-[22px]" placeholder={peer ? 'Message or paste a GIF link' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(pointer: fine)').matches) { e.preventDefault(); post(); } }} />
+          <RichInput ref={taRef} placeholder={peer ? 'Message' : 'Message the group'} onChange={setText} onFocus={() => { setFocused(true); setEmo(false); }} onBlur={() => setFocused(false)} onEnter={post} />
           <button aria-label="Emoji" className={`w-8 h-8 shrink-0 rounded-full grid place-items-center ${emo ? 'text-ink bg-petal' : 'text-muted'}`} onMouseDown={(ev) => ev.preventDefault()} onClick={() => { if (emo) { setEmo(false); taRef.current?.focus(); } else { setEmo(true); taRef.current?.blur(); } }}><Smile size={18} strokeWidth={1.7} /></button>
-          <button aria-label="Send" disabled={busy || (!text.trim() && !picked.length)} className="w-8 h-8 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-40" onClick={post}><Send size={15} /></button>
+          <button aria-label="Send" disabled={busy || !text.trim()} className="w-8 h-8 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-40" onClick={post}><Send size={15} /></button>
         </div>
         {emo && (
           <div className="mx-auto max-w-[560px] mt-2 rounded-[22px] bg-card overflow-hidden">
@@ -316,13 +316,13 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
                 <div className="grid grid-cols-5 gap-1">
                   {STICKERS.map((st) => (
                     <button key={st.id} aria-label={st.label} className="aspect-square rounded-[14px] active:bg-petal grid place-items-center" onMouseDown={(ev) => ev.preventDefault()}
-                      onClick={() => setPicked((p) => (p.length >= 12 ? p : [...p, st.id]))}
+                      onClick={() => taRef.current?.insertSticker(st.id)}
                       dangerouslySetInnerHTML={{ __html: stickerSvg(st.id, 58) }} />
                   ))}
                 </div>
               ) : (
                 <div className="grid grid-cols-8 gap-0.5">
-                  {CHAT_EMOJI.map((e, i) => <button key={i} className="h-10 text-[25px] rounded-[10px] active:bg-petal" onMouseDown={(ev) => ev.preventDefault()} onClick={() => setText((t) => t + e)}>{e}</button>)}
+                  {CHAT_EMOJI.map((e, i) => <button key={i} className="h-10 text-[25px] rounded-[10px] active:bg-petal" onMouseDown={(ev) => ev.preventDefault()} onClick={() => taRef.current?.insertText(e)}>{e}</button>)}
                 </div>
               )}
             </div>
@@ -415,7 +415,7 @@ function DMList({ me }: { me: string }) {
         return (
           <button key={o.user_id} className="w-full flex items-center gap-2 px-3 py-2 text-left" onClick={() => setPeer(o.user_id)}>
             <Avatar member={o} size={40} />
-            <span className="flex-1 min-w-0"><span className="block font-medium">{o.display_name}</span><span className="block text-[13px] text-muted truncate">{last ? (last.sender === me ? 'You: ' : '') + last.body : 'Say hi'}</span></span>
+            <span className="flex-1 min-w-0"><span className="block font-medium">{o.display_name}</span><span className="block text-[13px] text-muted truncate">{last ? (last.sender === me ? 'You: ' : '') + last.body.replace(/\{\{st:[a-zA-Z]+\}\}/g, '[sticker]') : 'Say hi'}</span></span>
             {unread > 0 && <span className="min-w-[22px] h-[22px] px-1.5 rounded-full bg-deep text-white text-[12px] grid place-items-center">{unread}</span>}
           </button>
         );

@@ -130,13 +130,14 @@ export default function App() {
       // pages with no box near the top (like the chat): end the band under the tabs instead
       const tabs = main.querySelector('[role=tablist]') as HTMLElement | null;
       if (tabs && (tabs.closest('.sticky') || !card || card.getBoundingClientRect().top - top0 > 420)) {
-        let el: HTMLElement | null = tabs;
+        // only the tabs and what sits above them go light-on-dark, never the page content
+        const top = (tabs.closest('.sticky') as HTMLElement | null) ?? tabs;
+        if (!top.classList.contains('on-dark')) top.classList.add('on-dark', 'auto-dark');
+        let el: HTMLElement | null = top;
         while (el && el !== main) {
-          if (!el.classList.contains('on-dark')) el.classList.add('on-dark', 'auto-dark');
           let sib = el.previousElementSibling as HTMLElement | null;
           while (sib) { if (!sib.classList.contains('on-dark')) sib.classList.add('on-dark', 'auto-dark'); sib = sib.previousElementSibling as HTMLElement | null; }
           el = el.parentElement;
-          if (el && el.contains(tabs) && el !== main && el.querySelector('.card, textarea')) break;
         }
         // pinned (sticky) title + tabs: size the band from layout, not the current scroll position
         const sticky = tabs.closest('.sticky') as HTMLElement | null;
