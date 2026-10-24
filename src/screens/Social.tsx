@@ -26,6 +26,16 @@ const timeLabel = (iso: string) => {
   return same ? d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 };
 
+// Same feelings as a game chat sticker set, using the phone's own emoji.
+const CHAT_EMOJI = [
+  '😁','😅','😍','😳','😎','😭','😌','🤐','😴','😆','😂','😡','😲','🙁',
+  '😰','😫','🥶','🤭','🙄','😏','💀','🤤','🤪','🫣','😵‍💫','🤫','🤓','🥺',
+  '😷','🥲','😱','😔','😒','😊','👌','🫡','🌹','😋','😐','🤔','😳','😬',
+  '🥵','🤧','🤕','😈','🙈','🤦‍♀️','😘','💋','❤️','💪','✊','🙏','👍','👎',
+  '✌️','🤝','👊','🔥','💣','🎉','🏆','⭐','💯','👀','🙌','👏','💃','🧘‍♀️',
+  '🏃‍♀️','🏋️‍♀️','🥗','🍓','💧','☕','🍫','🍦','😀','🤢','😢','😖'
+];
+
 export default function Social() {
   const { email, member, userId } = useSync();
   const sub = (useUI((u) => u.sub.social) ?? 'group') as 'group' | 'challenges' | 'messages' | 'friends';
@@ -164,6 +174,7 @@ function Bubble({ m, me, onLong }: { m: Message; me: string; onLong: () => void 
       {caption && !gif && <div className="px-4 py-2 text-[14px] whitespace-pre-wrap break-words">{caption}</div>}
     </div>
   );
+  else if (/^\s*(\p{Extended_Pictographic}(\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*\s*){1,3}$/u.test(m.body)) content = <div className="text-[44px] leading-none py-1">{m.body}</div>;
   else content = <div className={`rounded-3xl px-4 py-2 text-left text-[14px] whitespace-pre-wrap break-words ${mine ? 'bg-deep text-white rounded-br-lg' : 'bg-card border border-line rounded-bl-lg'}`}>{m.body}</div>;
 
   return (
@@ -196,6 +207,7 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
   const msgs = useMemo(() => all.filter((m) => peer === null ? m.recipient === null : (m.sender === me && m.recipient === peer) || (m.sender === peer && m.recipient === me)), [all, peer, me]);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
+  const [emo, setEmo] = useState(false);
   const [share, setShare] = useState(false);
   const [del, setDel] = useState<Message | null>(null);
   const end = useRef<HTMLDivElement>(null);
@@ -222,12 +234,19 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
 
   return (
     <>
-      <div className="space-y-2 pb-24">
+      <div className={`space-y-2 ${emo ? 'pb-[300px]' : 'pb-24'}`}>
         {msgs.length === 0 && <Empty icon={<Send />} title={peer ? 'Say hi!' : 'Start the conversation'} sub={peer ? 'Only the two of you can see these messages.' : 'Share a win, ask for a recipe, or cheer someone on.'} />}
         {msgs.map((m) => <Bubble key={m.id} m={m} me={me} onLong={() => setDel(m)} />)}
         <div ref={end} />
       </div>
       <div className="fixed inset-x-0 z-30 px-4 pb-2 pt-5 composer-fade" style={{ bottom: 'var(--nav-h)' }}>
+        {emo && (
+          <div className="mx-auto max-w-[560px] mb-2 rounded-[22px] bg-card shadow-[0_8px_24px_rgba(0,0,0,0.10)] p-2 max-h-[230px] overflow-y-auto">
+            <div className="grid grid-cols-8 gap-0.5">
+              {CHAT_EMOJI.map((e, i) => <button key={i} className="h-10 text-[24px] rounded-[10px] active:bg-petal" onClick={() => setText((t) => t + e)}>{e}</button>)}
+            </div>
+          </div>
+        )}
         <div className="mx-auto max-w-[560px] flex gap-0.5 items-end rounded-[22px] bg-card p-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
           {peer === null && <button aria-label="Share an achievement" className="w-8 h-8 shrink-0 rounded-full text-muted grid place-items-center" onClick={() => setShare(true)}><Trophy size={17} strokeWidth={1.7} /></button>}
           {GIPHY_KEY && <button aria-label="Search GIFs" className="h-8 px-1.5 shrink-0 rounded-full text-muted font-semibold text-[12px]" onClick={() => setGifs(true)}>GIF</button>}
@@ -242,6 +261,7 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
           }} />
           <textarea aria-label="Message" rows={1} className="flex-1 min-w-0 bg-transparent outline-none border-0 px-2 py-[5px] min-h-[32px] max-h-32 resize-none text-[16px] leading-[22px]" placeholder={peer ? 'Message or paste a GIF link' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(pointer: fine)').matches) { e.preventDefault(); post(); } }} />
+          <button aria-label="Emoji" className={`w-8 h-8 shrink-0 rounded-full grid place-items-center ${emo ? 'text-ink bg-petal' : 'text-muted'}`} onClick={() => setEmo(!emo)}><Smile size={18} strokeWidth={1.7} /></button>
           <button aria-label="Send" disabled={busy || !text.trim()} className="w-8 h-8 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-40" onClick={post}><Send size={15} /></button>
         </div>
       </div>
