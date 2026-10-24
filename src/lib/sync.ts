@@ -94,6 +94,7 @@ export async function syncNow(): Promise<void> {
     await saveMeta();
     useSync.setState({ status: 'idle', lastSynced: meta.lastSynced });
     const st = useStore.getState();
+    if (useSync.getState().member) import('./challenges').then((c) => { if (c.useChallenges.getState().loaded) c.postMyDays(); else c.loadChallenges().then(c.postMyDays); });
     import('./backup').then((b) => b.syncPhotos([...(st.photos ?? []).map((p: any) => p.id), ...(st.foodPhotos ?? []).map((p: any) => p.id)]));
   } catch (e: any) {
     useSync.setState({ status: navigator.onLine ? 'error' : 'offline', error: e?.message ?? String(e) });

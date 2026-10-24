@@ -5,6 +5,7 @@ import { useSync } from '../lib/sync';
 import { useSocial, loadSocial, startLive, send, removeMessage, toggleReaction, updateProfile, createInvite, myInvites, leaveGroup, markRead, type Message } from '../lib/social';
 import { computeAchievements, type Achievement } from '../lib/achievements';
 import { useToday } from '../lib/derived';
+import { Challenges } from '../components/Challenges';
 import { Card, Empty, Field, Header, Segmented, Sheet, toast } from '../components/ui';
 import { AccountForm } from '../components/CloudCard';
 import { useMediaUrl, uploadMedia, gifUrl } from '../lib/media';
@@ -27,7 +28,7 @@ const timeLabel = (iso: string) => {
 
 export default function Social() {
   const { email, member, userId } = useSync();
-  const sub = (useUI((u) => u.sub.social) ?? 'group') as 'group' | 'messages' | 'friends';
+  const sub = (useUI((u) => u.sub.social) ?? 'group') as 'group' | 'challenges' | 'messages' | 'friends';
   const setSub = useUI((u) => u.setSub);
   const loaded = useSocial((s) => s.loaded);
   const error = useSocial((s) => s.error);
@@ -52,10 +53,11 @@ export default function Social() {
   return (
     <div>
       <Header eyebrow="Friends & cheering" title="Social" />
-      <div className="mb-3"><Segmented value={sub} onChange={(v) => setSub('social', v)} options={[{ value: 'group', label: 'Group' }, { value: 'messages', label: 'Messages' }, { value: 'friends', label: 'Friends' }]} /></div>
+      <div className="mb-3"><Segmented value={sub} onChange={(v) => setSub('social', v)} options={[{ value: 'group', label: 'Group' }, { value: 'challenges', label: 'Challenges' }, { value: 'messages', label: 'Messages' }, { value: 'friends', label: 'Friends' }]} /></div>
       {!loaded ? <p className="text-muted">Loading…</p> : error ? <Card><p>Couldn’t reach the group right now. {error}</p><button className="btn-soft btn-sm mt-3" onClick={loadSocial}>Try again</button></Card> : (
         <>
           {sub === 'group' && <Thread peer={null} me={userId!} />}
+          {sub === 'challenges' && <Challenges me={userId!} />}
           {sub === 'messages' && <DMList me={userId!} />}
           {sub === 'friends' && <Friends me={userId!} />}
         </>

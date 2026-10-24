@@ -1,3 +1,4 @@
+import { planSuggestions } from '../lib/coach';
 import { useState } from 'react';
 import { CalendarHeart, CheckCheck, ClipboardCheck, Ruler, Camera, Sparkles } from 'lucide-react';
 import { useStore } from '../lib/store';
@@ -38,6 +39,7 @@ export function CheckinCard({ today }: { today: string }) {
   const showFocus = last && last.focus && daysBetween(last.weekStart, today) <= 14;
   const needs = monday && !s.checkins.some((c) => c.weekStart === monday) && daysBetween(s.settings.startDate, today) >= 3;
   if (!needs && !showFocus) return null;
+  const updates = needs && monday ? planSuggestions(s, monday, today).length : 0;
   return (
     <>
       {needs ? (
@@ -46,7 +48,7 @@ export function CheckinCard({ today }: { today: string }) {
             <span className="w-10 h-10 rounded-full bg-card text-deep grid place-items-center shrink-0"><ClipboardCheck size={19} /></span>
             <div className="flex-1">
               <div className="font-semibold">Your weekly check-in</div>
-              <p className="text-[13px] text-muted">Two minutes to see your trend, celebrate wins, and pick one focus.</p>
+              <p className="text-[13px] text-muted">{updates ? `See your trend and ${updates} suggested plan update${updates === 1 ? '' : 's'} for next week.` : 'Two minutes to see your trend, celebrate wins, and pick one focus.'}</p>
               <button className="btn-primary btn-sm mt-3" onClick={() => setOpen(true)}>Start check-in</button>
             </div>
           </div>

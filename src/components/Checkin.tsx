@@ -6,6 +6,7 @@ import { consumed, dayHabitStats } from '../lib/derived';
 import { nearPeriod } from '../lib/cycle';
 import { Field, Sheet, toast, celebrate } from './ui';
 import { showW } from './WeightSheet';
+import { planSuggestions } from '../lib/coach';
 
 export function weekSummary(s: State, monday: string, today: string) {
   const days = weekDays(monday).filter((d) => d <= today);
@@ -43,20 +44,24 @@ export function CheckinSheet({ monday, today, onClose }: { monday: string; today
   const w = weekSummary(s, monday, today);
   const u = s.settings.weightUnit;
   const st = s.settings;
+  const [sugs] = useState(() => planSuggestions(s, monday, today));
+  const [picked, setPicked] = useState<Record<string, boolean>>(() => Object.fromEntries(sugs.map((x) => [x.id, true])));
 
   const save = () => {
+    const apply = sugs.filter((x) => picked[x.id]);
     s.set((x) => {
+      for (const a of apply) a.apply(x);
       x.checkins = x.checkins.filter((c) => c.weekStart !== monday);
       x.checkins.push({ weekStart: monday, wins, challenge, focus, at: Date.now() });
     });
     if (!ex) celebrate();
-    toast('Check-in saved — see you next week');
+    toast(apply.length ? `Check-in saved and ${apply.length} plan update${apply.length === 1 ? '' : 's'} applied` : 'Check-in saved. See you next week');
     onClose();
   };
 
   const Stat = ({ l, v }: { l: string; v: string }) => <div className="rounded-2xl bg-petal px-3 py-2"><div className="text-[12px] text-muted">{l}</div><div className="font-semibold tabular-nums">{v}</div></div>;
   return (
-    <Sheet open onClose={onClose} title={`Week of ${fmtShort(monday)}`} footer={<button className="btn-primary w-full" onClick={save}>Save check-in</button>}>
+    <Sheet open onClose={onClose} title={`Week of ${fmtShort(monday)}`} footer={<button className="btn-primary w-full" onClick={save}>{sugs.some((x) => picked[x.id]) ? 'Save and update my plan' : 'Save check-in'}</button>}>
       <div className="grid grid-cols-2 gap-2 mb-3">
         <Stat l="Average weight" v={w.avg != null ? showW(w.avg, u) : 'No weigh-ins'} />
         <Stat l="vs last week" v={w.change != null ? `${w.change > 0 ? '+' : ''}${w.change} lb` : '—'} />
@@ -78,8 +83,22 @@ export function CheckinSheet({ monday, today, onClose }: { monday: string; today
             <li>Weigh portions instead of eyeballing them for a few days.</li>
             <li>Add 1,000–2,000 daily steps.</li>
             <li>Check sleep — short sleep raises hunger.</li>
-            <li>If all of that is solid for 2 more weeks, you could lower your target by about 100 calories in Settings. That’s your call — the app never changes it for you.</li>
+            <li>If all of that is solid, your check-in will suggest a small calorie change. You choose whether to apply it.</li>
           </ol>
+        </div>
+      )}
+      {sugs.length > 0 && (
+        <div className="mb-4">
+          <div className="font-semibold mb-1">Your plan for next week</div>
+          <p className="text-[13px] text-muted mb-2">Based on your last few weeks. Untick anything you’d rather keep the same.</p>
+          <div className="space-y-2">
+            {sugs.map((x) => (
+              <label key={x.id} className="flex gap-3 rounded-[16px] border border-line p-3 cursor-pointer">
+                <input type="checkbox" className="w-5 h-5 mt-0.5 shrink-0" checked={!!picked[x.id]} onChange={(e) => setPicked({ ...picked, [x.id]: e.target.checked })} />
+                <div><div className="text-[15px] font-medium">{x.title}</div><div className="text-[13px] text-muted mt-0.5">{x.why}</div></div>
+              </label>
+            ))}
+          </div>
         </div>
       )}
       <Field label="Wins this week"><textarea className="field py-2 min-h-[70px]" value={wins} onChange={(e) => setWins(e.target.value)} placeholder="Walked every workday, tried a new dessert…" /></Field>
