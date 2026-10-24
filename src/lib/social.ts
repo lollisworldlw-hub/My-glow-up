@@ -108,8 +108,8 @@ export async function createInvite(): Promise<string> {
 export async function myInvites() {
   const uid = useSync.getState().userId;
   if (!uid) return [];
-  const { data } = await supabase.from('glowup_invites').select('code,used_by,created_at,used_at').eq('created_by', uid).order('created_at', { ascending: false });
-  return (data ?? []) as { code: string; used_by: string | null; created_at: string; used_at: string | null }[];
+  const { data } = await supabase.from('glowup_invites').select('*').eq('created_by', uid).order('created_at', { ascending: false });
+  return (data ?? []) as { code: string; used_by: string | null; created_at: string; used_at: string | null; uses?: number }[];
 }
 
 export async function leaveGroup() {

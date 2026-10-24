@@ -381,12 +381,12 @@ function Friends({ me }: { me: string }) {
 
       <Card>
         <div className="eyebrow mb-2">Invite a friend</div>
-        <p className="text-[13px] text-muted mb-3">Each code works once. Send it to a friend — they enter it when creating their account.</p>
-        <button className="btn-primary w-full mb-3" onClick={async () => { try { const c = await createInvite(); setCodes(await myInvites()); shareCode(c); } catch (e: any) { toast(e?.message ?? 'Couldn’t create a code'); } }}><UserPlus size={18} />Create invite code</button>
+        <p className="text-[13px] text-muted mb-3">Share your code with as many friends as you like. They enter it when they sign up, or later in Settings → Join a group.</p>
+        <button className="btn-primary w-full mb-3" onClick={async () => { try { const c = await createInvite(); setCodes(await myInvites()); shareCode(c); } catch (e: any) { toast(e?.message ?? 'Couldn’t create a code'); } }}><UserPlus size={18} />{codes.length ? 'Create another code' : 'Create invite code'}</button>
         {codes.map((c) => (
           <div key={c.code} className="flex items-center justify-between py-2 border-t border-line">
-            <div><div className="font-mono font-semibold tracking-wider">{c.code}</div><div className="text-[13px] text-muted">{c.used_by ? `Used by ${members[c.used_by]?.display_name ?? 'a friend'}` : 'Not used yet'}</div></div>
-            {!c.used_by && <button aria-label="Share code" className="btn-soft btn-sm" onClick={() => shareCode(c.code)}><Copy size={15} />Send</button>}
+            <div><div className="font-mono font-semibold tracking-wider">{c.code}</div><div className="text-[13px] text-muted">{(c.uses ?? (c.used_by ? 1 : 0)) > 0 ? `Used ${c.uses ?? 1} time${(c.uses ?? 1) === 1 ? '' : 's'}` : 'Not used yet'}</div></div>
+            <button aria-label="Share code" className="btn-soft btn-sm" onClick={() => shareCode(c.code)}><Copy size={15} />Send</button>
           </div>
         ))}
       </Card>
