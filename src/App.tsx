@@ -178,6 +178,7 @@ export default function App() {
 
   return (
     <div className="min-h-full app-root">
+      <div className="status-cap" aria-hidden />
       <InstallBanner />
       <div className="relative" ref={wrapRef}>
       {tab !== 'home' && <div className="band absolute inset-x-0 top-0" style={{ height: bandH || 'calc(56px + env(safe-area-inset-top))' }} aria-hidden />}

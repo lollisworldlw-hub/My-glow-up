@@ -19,6 +19,7 @@ function Shell({ children, back, title, sub, go, step, wide }: { children: React
   const n = step ? SETUP.indexOf(step) : -1;
   return (
     <div className="min-h-full flex flex-col">
+      <div className="status-cap" aria-hidden />
       <InstallBanner />
       <div className="band on-dark pt-[calc(env(safe-area-inset-top)+14px)] pb-14">
         <div className="mx-auto max-w-[520px] px-6">
@@ -95,6 +96,7 @@ export default function Onboarding() {
 
   if (step === 'welcome') return (
     <div className="min-h-full flex flex-col">
+      <div className="status-cap" aria-hidden />
       <InstallBanner />
       <div className="band on-dark flex-1 min-h-[58vh] flex flex-col justify-end pt-[calc(env(safe-area-inset-top)+40px)] pb-12">
         <div className="mx-auto w-full max-w-[520px] px-7">
