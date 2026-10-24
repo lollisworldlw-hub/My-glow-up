@@ -72,7 +72,7 @@ export default function Home() {
         <div className="text-[13px] text-muted">{fmtLong(today)}</div>
         <h1 className="h-serif text-[34px] leading-[1.08] mt-1">{greeting()}{st.name ? `, ${st.name}` : ''}.</h1>
         <p className="text-[14px] text-muted mt-2 leading-snug">
-          Day {Math.max(1, daysBetween(st.startDate ?? today, today) + 1)}.{p.lost > 0 ? ` Down ${showW(p.lost, st.weightUnit)}.` : ''} {msg}
+          {p.lost > 0 ? `Down ${showW(p.lost, st.weightUnit)}. ` : ''}{msg}
         </p>
       </div>
 
