@@ -17,7 +17,7 @@ import { JoinGroupCard } from '../components/Auth';
 import { useSync } from '../lib/sync';
 import { disablePush, enablePush, isIOS, isStandaloneApp, sendTest } from '../lib/push';
 
-export default function Settings() {
+export default function Settings({ embedded }: { embedded?: boolean }) {
   const s = useStore();
   const st = s.settings;
   const set = (patch: Partial<typeof st>) => s.set((x) => { Object.assign(x.settings, patch); });
@@ -30,7 +30,7 @@ export default function Settings() {
 
   return (
     <div>
-      <Header eyebrow="Make it yours" title="Settings" />
+      {!embedded && <Header eyebrow="Make it yours" title="Settings" />}
       <AdminCard />
       <div className="mt-2"><JoinGroupCard /></div>
 

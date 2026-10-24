@@ -7,7 +7,6 @@ import Home from './screens/Home';
 import Meals from './screens/Meals';
 import Workouts from './screens/Workouts';
 import Progress from './screens/Progress';
-import Settings from './screens/Settings';
 import { Celebration, Toaster, toast } from './components/ui';
 import { WorkoutPlayer } from './components/WorkoutPlayer';
 import { Logo } from './components/Art';
@@ -198,7 +197,7 @@ export default function App() {
           {tab === 'home' && <Home />}
           {tab === 'meals' && <Meals />}
           {tab === 'workouts' && <Workouts />}
-          {tab === 'settings' && <><Progress /><div className="mt-8"><Settings /></div></>}
+          {tab === 'settings' && <Progress />}
           {tab === 'social' && <Social />}
           {tab === 'mind' && <Mind />}
           {tab === 'clean' && <Clean />}

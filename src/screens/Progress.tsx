@@ -9,6 +9,7 @@ import type { MeasureKey, Pose } from '../lib/types';
 import { addDays, fmtDow, fmtShort, fromKey, todayKey, uid, weekDays, weekStart, toKey } from '../lib/date';
 import { changeOver, latest, progress, rollingAverage, sortWeights, weekAverage, lbToKg } from '../lib/weight';
 import { dayHabitStats, habitApplies, habitAuto, habitDone, useToday } from '../lib/derived';
+import Settings from './Settings';
 import { Bar, Card, CheckRow, Empty, Field, Header, NumberInput, SectionTitle, Segmented, Sheet, toast } from '../components/ui';
 import { MILESTONES, WeightSheet, showW, wNum } from '../components/WeightSheet';
 import { deletePhoto, loadPhoto, resizeImage, savePhoto } from '../lib/backup';
@@ -17,18 +18,18 @@ import { CycleView } from '../components/CycleView';
 import { CheckinSheet } from '../components/Checkin';
 import { sortPeriods } from '../lib/cycle';
 
-type Sub = 'weight' | 'body' | 'photos' | 'habits' | 'cycle' | 'milestones';
+type Sub = 'weight' | 'body' | 'photos' | 'habits' | 'cycle' | 'milestones' | 'settings';
 
 export default function Progress() {
   const sub = (useUI((u) => u.sub.progress) ?? 'weight') as Sub;
   const setSub = useUI((u) => u.setSub);
   return (
     <div>
-      <Header eyebrow="Gentle, honest tracking" title="Progress" />
+      <Header eyebrow="Gentle, honest tracking" title={sub === 'settings' ? 'Settings' : 'Progress'} />
       <div className="mb-3">
         <Segmented small value={sub} onChange={(v) => setSub('progress', v)} options={[
           { value: 'weight', label: 'Weight' }, { value: 'body', label: 'Body' }, { value: 'photos', label: 'Photos' },
-          { value: 'habits', label: 'Habits' }, { value: 'cycle', label: 'Cycle' }, { value: 'milestones', label: 'Goals' }]} />
+          { value: 'habits', label: 'Habits' }, { value: 'cycle', label: 'Cycle' }, { value: 'milestones', label: 'Goals' }, { value: 'settings', label: 'Settings' }]} />
       </div>
       {sub === 'weight' && <WeightView />}
       {sub === 'body' && <BodyView />}
@@ -36,6 +37,7 @@ export default function Progress() {
       {sub === 'habits' && <HabitsView />}
       {sub === 'cycle' && <CycleView />}
       {sub === 'milestones' && <MilestonesView />}
+      {sub === 'settings' && <Settings embedded />}
     </div>
   );
 }
