@@ -26,11 +26,15 @@ function defs(id: string, skin: Skin) {
 
 function head(id: string, turned = false) {
   if (turned) return `
-<path d="M14 54 C12 30 28 14 48 14 C68 14 84 30 82 54 C82 78 66 90 48 90 C30 90 14 78 14 54Z" fill="url(#${id}h)" ${W()}/>
-<path d="M60 46 C74 40 92 50 86 70 C82 60 74 56 62 56Z" fill="url(#${id}h)" ${W(3)}/>
-<path d="M15 44 C30 32 66 32 81 44 L80 52 C66 42 30 42 16 52Z" fill="url(#${id}b)" ${W(3)}/>
-<ellipse cx="22" cy="66" rx="6" ry="9" fill="url(#${id}s)" ${W(3)}/>
-<ellipse cx="22" cy="68" rx="3" ry="2" fill="#FF8FA0" opacity=".8"/>`;
+<path d="M10 46 C2 52 4 70 14 74 C16 64 18 56 22 50Z" fill="url(#${id}h)" ${W(3)}/>
+<path d="M18 56 C16 32 32 16 52 16 C72 16 86 30 86 50 C88 56 90 60 87 63 C85 65 84 66 84 68 C84 80 72 90 54 90 C34 90 20 78 18 56Z" fill="url(#${id}s)" ${W()}/>
+<path d="M16 52 C14 28 32 12 52 12 C66 12 78 18 84 30 C70 30 58 34 50 42 C46 50 44 58 36 64 C28 66 20 62 16 52Z" fill="url(#${id}h)" ${W()}/>
+<path d="M17 44 C28 30 48 24 64 26 C72 27 79 30 84 34 L84 42 C78 38 70 35 62 35 C46 35 30 42 19 53Z" fill="url(#${id}b)" ${W(3)}/>
+<path d="M30 36 C40 30 50 28 60 29" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".55" fill="none"/>
+<path d="M62 56 Q69 61 76 56" fill="none" ${W(3.2)}/>
+<path d="M60 51 L74 49" ${W(2.6)}/>
+<ellipse cx="68" cy="68" rx="7" ry="4" fill="#FF6F86" opacity=".7"/>
+<path d="M72 79 Q77 77 80 79" fill="none" ${W(2.6)}/>`;
   return `
 <path d="M70 30 C88 30 92 52 84 66 C80 58 78 46 70 40Z" fill="url(#${id}h)" ${W(3)}/>
 <path d="M14 54 C12 30 28 14 48 14 C68 14 84 30 82 54 C82 78 66 90 48 90 C30 90 14 78 14 54Z" fill="url(#${id}s)" ${W()}/>
@@ -216,7 +220,7 @@ export const STICKERS: { id: string; label: string; face?: Face; icon?: string }
   { id: 'yum', label: 'Yum', face: { eyes: 'happy', mouth: 'tongue', extras: ['blush'] } },
   { id: 'blank', label: 'Blank', face: { eyes: 'dot', mouth: 'flat', extras: ['blush'] } },
   { id: 'picky', label: 'Whatever', face: { eyes: 'half', mouth: 'none', extras: ['pick'] } },
-  { id: 'hmph', label: 'Hmph', face: { eyes: 'dot', mouth: 'flat', turned: true } },
+  { id: 'hmph', label: 'Hmph', face: { eyes: 'dot', mouth: 'flat', turned: true, extras: ['anger'] } },
   { id: 'please', label: 'Pretty please', face: { eyes: 'puppy', mouth: 'o' } },
   { id: 'sweaty', label: 'So hot', face: { skin: 'sun', eyes: 'round', mouth: 'o', extras: ['sweat', 'sweatL'] } },
   { id: 'hahaCry', label: 'Haha cry', face: { eyes: 'happy', mouth: 'laugh', extras: ['tearsSide', 'facepalm'] } },
