@@ -44,7 +44,7 @@ function useTheme() {
       document.documentElement.classList.toggle('dark', dark);
       document.documentElement.dataset.palette = palette;
       const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-      document.querySelector('meta[name=theme-color]')?.setAttribute('content', bg || '#F6F7F4');
+      document.querySelector('meta[name=theme-color]')?.setAttribute('content', bg || '#F2F3F1');
     };
     apply();
     mq.addEventListener('change', apply);
@@ -65,7 +65,7 @@ function useReminders() {
         const key = `move-${now.getHours()}`;
         if (!(s.reminderSeen[today] ?? []).includes(key)) {
           s.set((st) => { st.reminderSeen = { [today]: [...(st.reminderSeen[today] ?? []), key] }; });
-          toast('Stand up & stretch for 2 minutes ♡');
+          toast('Stand up & stretch for 2 minutes');
         }
       }
       const seen = useStore.getState().reminderSeen[today] ?? [];
@@ -78,7 +78,7 @@ function useReminders() {
         st.reminderSeen = { [today]: [...seen, ...due.map((r) => r.id)] };
       });
       for (const r of fresh) {
-        toast(`Reminder: ${r.label} ♡`);
+        toast(`Reminder: ${r.label}`);
         try {
           if (typeof Notification !== 'undefined' && Notification.permission === 'granted')
             navigator.serviceWorker?.ready.then((reg) => reg.showNotification('My Glow-Up', { body: r.label, icon: '/icons/icon-192.png' }));
@@ -111,7 +111,7 @@ export default function App() {
     navigator.serviceWorker?.addEventListener('message', h);
     return () => navigator.serviceWorker?.removeEventListener('message', h);
   }, []);
-  useEffect(() => { try { if (sessionStorage.getItem('glowup-updated')) { sessionStorage.removeItem('glowup-updated'); setTimeout(() => toast('Updated to the newest version ♡'), 800); } } catch { /* */ } }, []);
+  useEffect(() => { try { if (sessionStorage.getItem('glowup-updated')) { sessionStorage.removeItem('glowup-updated'); setTimeout(() => toast('Updated to the newest version'), 800); } } catch { /* */ } }, []);
   useTheme();
   useReminders();
 
@@ -122,7 +122,7 @@ export default function App() {
   }, [hydrated]);
 
   if (!hydrated) {
-    return <div className="h-full grid place-items-center"><div className="h-serif text-[18px] text-deep animate-pulse">My Glow-Up ♡</div></div>;
+    return <div className="h-full grid place-items-center"><div className="h-serif text-[18px] text-deep animate-pulse">My Glow-Up</div></div>;
   }
 
   if (!onboarded) return <><Onboarding /><RecoverySheet /><Toaster /></>;
@@ -133,8 +133,8 @@ export default function App() {
       <header className="sticky top-0 z-30 bg-bg border-b border-line top-safe">
         <div className="mx-auto max-w-[640px] px-4 h-11 flex items-center justify-between">
           <button className="flex items-center gap-2 min-h-[44px]" aria-label="Home" onClick={() => go('home')}>
-            <img src="/icons/icon-192.png" alt="" className={`w-7 h-7 rounded-lg ${tab === 'home' ? 'ring-2 ring-rose' : ''}`} />
-            <span className="h-serif text-[15px] leading-none">My Glow-Up</span>
+            <img src="/icons/icon-192.png" alt="" className="w-7 h-7 rounded-[8px]" />
+            <span className={`text-[15px] font-semibold tracking-[-0.02em] leading-none ${tab === 'home' ? 'text-ink' : 'text-muted'}`}>Glow-Up</span>
           </button>
         </div>
       </header>
@@ -155,17 +155,17 @@ export default function App() {
         </ErrorBoundary>
       </main>
 
-      <nav className="fixed bottom-0 inset-x-0 z-40 bg-card border-t border-line safe-bottom shadow-[0_-4px_16px_-12px_rgba(120,60,90,0.25)]" aria-label="Main">
+      <nav className="fixed bottom-0 inset-x-0 z-40 bg-bg border-t border-line safe-bottom" aria-label="Main">
         <div className="mx-auto max-w-[640px] flex">
           {[...bottom.map((id) => NAV.find((n) => n.id === id)!), MORE].map((n) => {
-            const on = n.id === 'more' ? !bottom.includes(tab) : tab === n.id;
+            const on = n.id === 'more' ? tab !== 'home' && !bottom.includes(tab) : tab === n.id;
             const Icon = n.icon;
             return (
               <button key={n.id} onClick={() => go(n.id)} aria-current={on ? 'page' : undefined}
-                className={`relative flex-1 flex flex-col items-center justify-center gap-1 pt-1.5 pb-1 min-h-[46px] transition ${on ? 'text-deep' : 'text-muted'}`}>
+                className={`relative flex-1 flex flex-col items-center justify-center gap-1 pt-2 pb-1 min-h-[48px] transition-colors ${on ? 'text-ink' : 'text-muted'}`}>
                 {n.id === 'social' && unread > 0 && <span className="absolute top-1.5 left-1/2 ml-2 min-w-[18px] h-[18px] px-1 rounded-full bg-deep text-white text-[11px] grid place-items-center" aria-label={`${unread} unread`}>{unread > 9 ? '9+' : unread}</span>}
-                <span className={`grid place-items-center w-9 h-6 rounded-full transition ${on ? 'bg-petal' : ''}`}><Icon size={18} strokeWidth={on ? 2.2 : 1.7} /></span>
-                <span className={`text-[10px] leading-none ${on ? 'font-semibold' : ''}`}>{n.label}</span>
+                <Icon size={19} strokeWidth={on ? 1.9 : 1.5} />
+                <span className={`text-[10.5px] leading-none ${on ? 'font-medium' : ''}`}>{n.label}</span>
               </button>
             );
           })}

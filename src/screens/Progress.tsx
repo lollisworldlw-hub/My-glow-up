@@ -327,7 +327,7 @@ function HabitsView() {
 
   const toggle = (id: string, date: string) => {
     const h = s.habits.find((x) => x.id === id)!;
-    if (habitAuto(s, h, date) && !s.habitChecks[date]?.[id]) { toast('This one checks itself from your logs ♡'); return; }
+    if (habitAuto(s, h, date) && !s.habitChecks[date]?.[id]) { toast('This one checks itself from your logs'); return; }
     s.set((x) => { x.habitChecks[date] ??= {}; x.habitChecks[date][id] = !x.habitChecks[date][id]; });
   };
 
@@ -478,7 +478,7 @@ function MilestonesView() {
             <div key={m} className={`card p-3 text-center ${hit ? 'bg-petal border-blush' : ''}`}>
               <div className={`mx-auto w-12 h-12 rounded-full grid place-items-center mb-2 ${hit ? 'bg-deep text-white' : 'bg-petal text-blush'}`}><Trophy size={20} /></div>
               <div className="h-serif text-[18px]">{showW(m, u)}</div>
-              <div className="text-[13px] text-muted">{hit ? `Reached ${fmtShort(hit.date)} ♡` : m === s.settings.goalWeight ? 'Your goal' : 'Ahead of you'}</div>
+              <div className="text-[13px] text-muted">{hit ? `Reached ${fmtShort(hit.date)}` : m === s.settings.goalWeight ? 'Your goal' : 'Ahead of you'}</div>
             </div>
           );
         })}

@@ -63,12 +63,12 @@ export default function Onboarding() {
     });
     s.ensureWeek(weekStart(today));
     s.generateGroceries(weekDays(weekStart(today)));
-    toast(`Welcome${name.trim() ? ', ' + name.trim() : ''} ♡`);
+    toast(`Welcome${name.trim() ? ', ' + name.trim() : ''}`);
   };
 
 
   if (step === 'welcome') return (
-    <Shell go={setStep} title="Welcome to My Glow-Up ♡" sub="A gentle planner for meals, movement, mind, and home — made to feel like a wellness journal, not a calorie app.">
+    <Shell go={setStep} title="Welcome to My Glow-Up" sub="A gentle planner for meals, movement, mind, and home — made to feel like a wellness journal, not a calorie app.">
       <div className="grid place-items-center my-8"><img src="/icons/icon-192.png" alt="" className="w-28 h-28 rounded-[28px] shadow-soft" /></div>
       <button className="btn-primary w-full mb-3" onClick={() => setStep('about')}>Create my plan</button>
       <button className="btn-soft w-full" onClick={() => setStep('account')}>I have an account or invite code</button>
@@ -76,7 +76,7 @@ export default function Onboarding() {
       <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={async (e) => {
         const f = e.target.files?.[0]; e.target.value = '';
         if (!f) return;
-        try { const { state, photos } = await parseBackup(await f.text()); await restorePhotos(photos); s.replaceAll({ ...state, session: null, settings: { ...state.settings, onboarded: true } } as any); toast('Backup restored ♡'); }
+        try { const { state, photos } = await parseBackup(await f.text()); await restorePhotos(photos); s.replaceAll({ ...state, session: null, settings: { ...state.settings, onboarded: true } } as any); toast('Backup restored'); }
         catch (err: any) { toast(err?.message ?? 'Couldn’t read that file'); }
       }} />
     </Shell>
@@ -143,7 +143,7 @@ export default function Onboarding() {
             <Field label="Daily protein, at least (g)"><NumberInput value={pMin} onChange={setPMin} ariaLabel="Daily protein" /></Field>
             <p className="text-[13px] text-muted">Based on an estimated {sug.tdee.toLocaleString()} calories burned per day{toLb(goal!) < toLb(weight!) ? ', with a modest deficit for about 0.5–1 lb a week' : ''}. Protein helps you stay full and keep muscle. This isn’t medical advice — check with your doctor if you have health conditions, are pregnant, or are breastfeeding.</p>
           </div>
-          <button className="btn-primary w-full" disabled={!cal || cal < 1000} onClick={finish}>Start my journey ♡</button>
+          <button className="btn-primary w-full" disabled={!cal || cal < 1000} onClick={finish}>Start my journey</button>
         </>
       )}
     </Shell>

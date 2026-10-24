@@ -61,7 +61,7 @@ function HealthSheet({ onClose, connected }: { onClose: () => void; connected: b
                 <li><b>steps</b> → tap the field, choose the variable <b>Health Samples</b></li>
               </ul>
             </li>
-            <li>Tap ▶︎ to run it once and allow Health access. You should see “Saved … steps ♡”.</li>
+            <li>Tap ▶︎ to run it once and allow Health access. You should see “Saved … steps”.</li>
             <li>Make it automatic: <b>Automation</b> tab → <b>+</b> → <b>Time of Day</b> → e.g. <b>9:00 PM, Daily</b> → <b>Run Immediately</b> → Next → pick <b>Glow-Up Steps</b>. Add more times (like noon and 5 PM) for updates through the day.</li>
           </ol>
           <p className="text-[12px] text-muted mt-3">Steps show up in the app within a few minutes of each run. Your key only lets the Shortcut add step counts to your account — nothing else.</p>

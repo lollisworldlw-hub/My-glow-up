@@ -4,7 +4,6 @@ import { useStore } from '../lib/store';
 import { activeElapsed, isDone, pause, phaseElapsed, resume, skip, tick } from '../lib/workouts';
 import type { Session } from '../lib/workouts';
 import { uid } from '../lib/date';
-import { ExerciseArt } from './Art';
 import { Bar, Ring, Sheet, celebrate, toast } from './ui';
 import { useSync } from '../lib/sync';
 import { send } from '../lib/social';
@@ -98,7 +97,7 @@ export function WorkoutPlayer() {
       st.workouts.push({ id: uid(), date: session.date, type: session.workoutId, name, plannedMin: Math.round(session.plannedSec / 60), actualMin, completed, difficulty: diff, reps: session.repLog, levels: session.workoutId === 'strength' ? { ...st.exerciseLevels } : undefined, at: Date.now() });
       st.session = null;
     });
-    if (completed) { celebrate(); toast('Workout saved — so proud of you ♡'); } else toast('Saved as a partial workout');
+    if (completed) { celebrate(); toast('Workout saved — so proud of you'); } else toast('Saved as a partial workout');
   };
 
   return (
@@ -111,7 +110,7 @@ export function WorkoutPlayer() {
 
       {done ? (
         <div className="flex-1 overflow-y-auto px-6 pt-8 text-center">
-          <div className="text-[44px] text-rose">♡</div>
+          <div className="mx-auto w-12 h-12 rounded-full border border-line grid place-items-center text-sage mb-2"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><path d="M20 6 9 17l-5-5"/></svg></div>
           <h2 className="h-serif text-[28px]">Workout complete</h2>
           <p className="text-muted mt-1">{Math.round(active / 60)} minutes of showing up for yourself.</p>
           <div className="mt-6 text-left"><div className="label">How did it feel? (optional)</div>
@@ -121,16 +120,16 @@ export function WorkoutPlayer() {
               </button>))}</div>
           </div>
           <button className="btn-primary w-full mt-6" onClick={() => finish(true)}>Save workout</button>
-          {member && <button className="btn-soft w-full mt-2" onClick={() => { finish(true); send(`Finished my ${name.toLowerCase()}! 💪`, null, 'achievement', { icon: session.workoutId === 'walk' ? '🚶‍♀️' : session.workoutId.startsWith('bike') ? '🚴‍♀️' : '💪' }).then(() => toast('Shared with the group ♡')).catch(() => toast('Saved — couldn’t share right now')); }}>Save & share with friends</button>}
+          {member && <button className="btn-soft w-full mt-2" onClick={() => { finish(true); send(`Finished my ${name.toLowerCase()}! 💪`, null, 'achievement', { icon: session.workoutId === 'walk' ? '🚶‍♀️' : session.workoutId.startsWith('bike') ? '🚴‍♀️' : '💪' }).then(() => toast('Shared with the group')).catch(() => toast('Saved — couldn’t share right now')); }}>Save & share with friends</button>}
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto px-5 flex flex-col items-center pt-4">
           <div className="text-center"><h2 className="h-serif text-[26px] leading-tight">{phase.label}</h2></div>
-          <div className="my-2"><ExerciseArt id={phase.exercise ?? (session.workoutId.startsWith('bike') ? 'bike' : 'walk')} size={110} /></div>
+          <div className="h-6" />
           {phase.kind === 'timed' ? (
-            <Ring pct={(el / phase.seconds) * 100} size={210} stroke={14} color={INTENSITY_COLOR[phase.intensity]}>
+            <Ring pct={(el / phase.seconds) * 100} size={210} stroke={3} color={INTENSITY_COLOR[phase.intensity]}>
               <div>
-                <div className="text-[54px] font-semibold tabular-nums leading-none">{mmss(remaining)}</div>
+                <div className="num text-[54px] leading-none">{mmss(remaining)}</div>
                 <div className="text-[13px] text-muted mt-1 capitalize">{phase.intensity === 'work' ? '' : phase.intensity}</div>
               </div>
             </Ring>
@@ -139,7 +138,7 @@ export function WorkoutPlayer() {
               <div className="text-muted text-[14px]">Tap to count your reps</div>
               <button aria-label="Count a rep" className="mt-2 w-[200px] h-[200px] rounded-full bg-petal border-[10px] border-blush grid place-items-center active:scale-95 transition"
                 onClick={() => save({ ...session, reps: Math.min((phase.reps ?? 12) * 2, session.reps + 1) })}>
-                <div><div className="text-[58px] font-semibold tabular-nums leading-none">{session.reps}</div><div className="text-muted">of {phase.reps}</div></div>
+                <div><div className="num text-[58px] leading-none">{session.reps}</div><div className="text-muted">of {phase.reps}</div></div>
               </button>
               <div className="flex justify-center gap-3 mt-3">
                 <button aria-label="Remove a rep" className="w-11 h-11 rounded-full bg-card border border-line grid place-items-center" onClick={() => save({ ...session, reps: Math.max(0, session.reps - 1) })}><Minus size={18} /></button>

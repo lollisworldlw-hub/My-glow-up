@@ -26,7 +26,7 @@ export function weekSummary(s: State, monday: string, today: string) {
   let pace: { label: string; tone: 'good' | 'gentle' | 'info' } | null = null;
   if (change != null) {
     if (change <= -1.6) pace = { label: 'Faster than planned — make sure you’re eating enough to keep your energy and muscle.', tone: 'info' };
-    else if (change <= -0.5) pace = { label: 'Right on your 0.5–1 lb/week pace ♡', tone: 'good' };
+    else if (change <= -0.5) pace = { label: 'Right on your 0.5–1 lb/week pace', tone: 'good' };
     else if (change < 0) pace = { label: 'Slow and steady — still moving the right way.', tone: 'good' };
     else pace = { label: period ? 'Up a little — very likely water around your period. The trend will settle.' : 'Up or flat this week. One week is noise; the trend over several weeks is what counts.', tone: 'gentle' };
   }
@@ -50,7 +50,7 @@ export function CheckinSheet({ monday, today, onClose }: { monday: string; today
       x.checkins.push({ weekStart: monday, wins, challenge, focus, at: Date.now() });
     });
     if (!ex) celebrate();
-    toast('Check-in saved — see you next week ♡');
+    toast('Check-in saved — see you next week');
     onClose();
   };
 

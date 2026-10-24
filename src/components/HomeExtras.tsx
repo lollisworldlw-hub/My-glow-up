@@ -107,8 +107,8 @@ export function DessertBudget({ today }: { today: string }) {
   const name = des ? itemName(des, s.recipes) : null;
   let msg: string;
   if (!des) msg = room > 120 ? `You have about ${room} calories left — plenty of room for something sweet tonight.` : 'Want something sweet? Pick a dessert — it can fit in your range.';
-  else if (room >= dCal) msg = `You have ${room} calories saved for tonight — your ${name} (${dCal}) fits with ${room - dCal} to spare ♡`;
-  else if (room + (s.settings.calMax - s.settings.calTarget) >= dCal) msg = `Your ${name} (${dCal}) still fits within your flexible range tonight. Enjoy it ♡`;
+  else if (room >= dCal) msg = `You have ${room} calories saved for tonight — your ${name} (${dCal}) fits with ${room - dCal} to spare`;
+  else if (room + (s.settings.calMax - s.settings.calTarget) >= dCal) msg = `Your ${name} (${dCal}) still fits within your flexible range tonight. Enjoy it`;
   else msg = `Tonight a half portion of your ${name} (about ${Math.round(dCal / 2)} cal) keeps you near your range — or enjoy it fully; one day doesn’t change your trend.`;
   return (
     <div className="rounded-3xl border border-blush bg-petal px-3 py-2 flex gap-2 items-start">
@@ -132,7 +132,7 @@ export function LogDayButton({ today }: { today: string }) {
         <Sheet open onClose={() => setOpen(false)} title="Log the whole day?" footer={
           <button className="btn-primary w-full" onClick={() => {
             for (const p of pending) s.logItem(today, p.slot, p.it.id);
-            toast(`Logged ${pending.length} meals ♡`); setOpen(false);
+            toast(`Logged ${pending.length} meals`); setOpen(false);
           }}>Log all {pending.length}</button>}>
           <p className="text-muted text-[14px] mb-3">These will be logged at their planned portions. Ate something differently? Close this and log that one meal instead.</p>
           {pending.map((p) => {

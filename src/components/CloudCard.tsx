@@ -36,7 +36,7 @@ export function AccountForm({ compact, onDone }: { compact?: boolean; onDone?: (
         <Field label="Invite code"><input className="field uppercase" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="GLOW-XXXXXX" /></Field>
         <button className="btn-primary w-full" disabled={busy || !code || !name.trim()} onClick={async () => {
           setBusy(true);
-          try { await joinGroup(code, name.trim()); toast('Welcome to the group ♡'); } catch (e: any) { toast(e?.message ?? 'That code didn’t work'); }
+          try { await joinGroup(code, name.trim()); toast('Welcome to the group'); } catch (e: any) { toast(e?.message ?? 'That code didn’t work'); }
           setBusy(false);
         }}>Join</button>
       </div>
@@ -53,8 +53,8 @@ export function AccountForm({ compact, onDone }: { compact?: boolean; onDone?: (
         rememberJoin(code.trim(), name.trim());
         const r = await signUp(em.trim(), pw);
         if (r.needsConfirm) { setSent(true); setMode('in'); }
-        else toast('Account created ♡');
-      } else { await signIn(em.trim(), pw); toast('Signed in ♡'); }
+        else toast('Account created');
+      } else { await signIn(em.trim(), pw); toast('Signed in'); }
       setPw('');
     } catch (e: any) { toast(e?.message ?? 'That didn’t work — try again'); }
     setBusy(false);
@@ -128,14 +128,14 @@ export function RecoverySheet() {
       <Field label="Email"><input className="field" type="email" inputMode="email" autoComplete="email" value={em} onChange={(e) => setEm(e.target.value)} /></Field>
       <button className="btn-primary w-full" disabled={busy || !em.includes('@')} onClick={async () => {
         setBusy(true);
-        try { await resetPassword(em.trim()); toast('New reset email sent ♡'); setLinkErr(null); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); }
+        try { await resetPassword(em.trim()); toast('New reset email sent'); setLinkErr(null); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); }
         setBusy(false);
       }}>Send a new reset link</button>
     </Sheet>
   );
   if (!recovery) return null;
   return (
-    <Sheet open onClose={() => useSync.setState({ recovery: false })} title={done ? 'Password updated ♡' : 'Set a new password'}>
+    <Sheet open onClose={() => useSync.setState({ recovery: false })} title={done ? 'Password updated' : 'Set a new password'}>
       {done ? (
         <>
           <p className="text-[14px] mb-3">You’re all set. Open My Glow-Up from your Home Screen icon and sign in with your new password.</p>

@@ -43,7 +43,7 @@ function Today() {
     <div className="space-y-2">
       <Card>
         <div className="flex justify-between items-center mb-2">
-          <div><div className="font-semibold">{done.filter((d) => list.some((t) => t.id === d)).length} of {list.length} done</div><div className="text-[13px] text-muted">{mins ? `About ${mins} minutes left` : list.length ? 'All done — enjoy your space ♡' : 'Nothing scheduled today'}</div></div>
+          <div><div className="font-semibold">{done.filter((d) => list.some((t) => t.id === d)).length} of {list.length} done</div><div className="text-[13px] text-muted">{mins ? `About ${mins} minutes left` : list.length ? 'All done — enjoy your space' : 'Nothing scheduled today'}</div></div>
           <Sparkles className="text-rose" />
         </div>
         <Bar pct={list.length ? (done.filter((d) => list.some((t) => t.id === d)).length / list.length) * 100 : 0} color="var(--sage)" />

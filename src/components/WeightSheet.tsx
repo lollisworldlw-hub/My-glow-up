@@ -31,7 +31,7 @@ export function WeightSheet({ onClose, entryId }: { onClose: () => void; entryId
       }
     });
     const crossed = MILESTONES.filter((m) => lbs <= m && before > m);
-    if (crossed.length) { celebrate(); toast(`Milestone reached: ${crossed[crossed.length - 1]} lbs ♡`); }
+    if (crossed.length) { celebrate(); toast(`Milestone reached: ${crossed[crossed.length - 1]} lbs`); }
     else toast('Weigh-in saved');
     onClose();
   };

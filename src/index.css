@@ -1,83 +1,96 @@
-@import '@fontsource/cormorant-garamond/latin-500.css';
-@import '@fontsource/cormorant-garamond/latin-600.css';
-@import '@fontsource/cormorant-garamond/latin-700.css';
-@import '@fontsource/dm-sans/latin-400.css';
-@import '@fontsource/dm-sans/latin-500.css';
-@import '@fontsource/dm-sans/latin-600.css';
+@import '@fontsource/geist/latin-300.css';
+@import '@fontsource/geist/latin-400.css';
+@import '@fontsource/geist/latin-500.css';
+@import '@fontsource/geist/latin-600.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Color themes: sage is the default; pick another in Settings → Look. */
+/* Color themes. Forest ("sage") is the default; pick another in Settings → Look.
+   --rose = accent, --rose-deep = primary/ink accent, --petal = quiet fill, --blush = soft stroke, --gold = milestones. */
 :root, :root[data-palette="sage"] {
-  --bg: #F6F7F4; --card: #FFFFFF; --ink: #26302A; --muted: #68736B;
-  --rose: #7FA088; --rose-deep: #4E7559; --petal: #E7EFE8; --blush: #BCD2C1;
-  --line: #DFE6E0; --sage: #8FB79B; --sage-deep: #3F7552;
+  --bg: #F2F3F1; --card: #FFFFFF; --ink: #151A17; --muted: #6B716D;
+  --rose: #3E6A55; --rose-deep: #1F3B2E; --petal: #EAEDEA; --blush: #C9D3CC;
+  --line: #E1E4E1; --sage: #3E6A55; --sage-deep: #1F3B2E; --gold: #A88A5C;
   color-scheme: light;
 }
 .dark, .dark[data-palette="sage"] {
-  --bg: #151917; --card: #1F2521; --ink: #E9F0EA; --muted: #A3B0A6;
-  --rose: #93B89C; --rose-deep: #A8CBB0; --petal: #2A342D; --blush: #4A6352;
-  --line: #2F3832; --sage: #8FB79B; --sage-deep: #B7D6BF;
+  --bg: #0E1210; --card: #161B18; --ink: #EDF0EE; --muted: #9AA39D;
+  --rose: #7FA891; --rose-deep: #A9C9B5; --petal: #1E2521; --blush: #34403A;
+  --line: #242B27; --sage: #7FA891; --sage-deep: #A9C9B5; --gold: #C9AE80;
+  color-scheme: dark;
+}
+:root[data-palette="noir"] {
+  --bg: #F4F4F3; --card: #FFFFFF; --ink: #121212; --muted: #6E6E6C;
+  --rose: #2B2B2B; --rose-deep: #121212; --petal: #ECECEA; --blush: #CFCFCB;
+  --line: #E3E3E0; --sage: #4F6B5A; --sage-deep: #2F4A3A; --gold: #A88A5C;
+  color-scheme: light;
+}
+.dark[data-palette="noir"] {
+  --bg: #0D0D0D; --card: #161616; --ink: #F1F1EF; --muted: #9C9C98;
+  --rose: #E6E6E2; --rose-deep: #F1F1EF; --petal: #1F1F1F; --blush: #3A3A38;
+  --line: #262626; --sage: #8DAE99; --sage-deep: #B5CFBF; --gold: #C9AE80;
   color-scheme: dark;
 }
 :root[data-palette="ocean"] {
-  --bg: #F5F8FA; --card: #FFFFFF; --ink: #1F2A33; --muted: #64717C;
-  --rose: #6A9CC4; --rose-deep: #2F6690; --petal: #E5EEF5; --blush: #B4CDE0;
-  --line: #DDE5EC; --sage: #8FBF9F; --sage-deep: #3F7A55;
+  --bg: #F1F3F5; --card: #FFFFFF; --ink: #131A21; --muted: #67717B;
+  --rose: #3A5F80; --rose-deep: #1B3550; --petal: #E8EDF2; --blush: #C6D2DE;
+  --line: #E0E5EA; --sage: #3F7A5E; --sage-deep: #2A5A43; --gold: #A88A5C;
   color-scheme: light;
 }
 .dark[data-palette="ocean"] {
-  --bg: #12171C; --card: #1B232B; --ink: #E6EEF5; --muted: #9FAEBB;
-  --rose: #86B4D9; --rose-deep: #9CC4E3; --petal: #22303B; --blush: #3E5A70;
-  --line: #2A3640; --sage: #8FBF9F; --sage-deep: #B5D8C0;
+  --bg: #0D1116; --card: #151B22; --ink: #EBF0F5; --muted: #98A4B0;
+  --rose: #86A8C8; --rose-deep: #AFC6DC; --petal: #1C242D; --blush: #34404D;
+  --line: #222B35; --sage: #84B39A; --sage-deep: #B1D3C0; --gold: #C9AE80;
   color-scheme: dark;
 }
 :root[data-palette="sand"] {
-  --bg: #FAF8F4; --card: #FFFFFF; --ink: #2E2924; --muted: #776D63;
-  --rose: #B5936F; --rose-deep: #8A6A4C; --petal: #F2EBE2; --blush: #DCC8B2;
-  --line: #E9E1D6; --sage: #A4B9A0; --sage-deep: #5F7A5B;
+  --bg: #F3F1EE; --card: #FFFFFF; --ink: #1D1915; --muted: #736A61;
+  --rose: #8C6D4F; --rose-deep: #4A3727; --petal: #ECE7E1; --blush: #D6CABD;
+  --line: #E5DFD8; --sage: #5C7A62; --sage-deep: #3D5A43; --gold: #A88A5C;
   color-scheme: light;
 }
 .dark[data-palette="sand"] {
-  --bg: #191613; --card: #24201C; --ink: #F2ECE4; --muted: #B5A99B;
-  --rose: #CFAE8B; --rose-deep: #DDBF9E; --petal: #332C25; --blush: #5E4E3E;
-  --line: #38302A; --sage: #9DB899; --sage-deep: #B5CFB1;
+  --bg: #12100E; --card: #1B1815; --ink: #F1ECE6; --muted: #A99E92;
+  --rose: #C9A988; --rose-deep: #E0C6A9; --petal: #24201C; --blush: #43392F;
+  --line: #2A2520; --sage: #93B39A; --sage-deep: #B9D2BF; --gold: #C9AE80;
   color-scheme: dark;
 }
 :root[data-palette="lavender"] {
-  --bg: #F8F7FB; --card: #FFFFFF; --ink: #2C2836; --muted: #726C7F;
-  --rose: #9688C9; --rose-deep: #6553A6; --petal: #EDEAF7; --blush: #CCC4EA;
-  --line: #E4E0F0; --sage: #A4B9A0; --sage-deep: #5F7A5B;
+  --bg: #F3F2F4; --card: #FFFFFF; --ink: #1B1720; --muted: #6F6A76;
+  --rose: #5E4B7A; --rose-deep: #36284A; --petal: #ECE9F0; --blush: #CFC7DA;
+  --line: #E4E0E8; --sage: #4F7A5E; --sage-deep: #355A43; --gold: #A88A5C;
   color-scheme: light;
 }
 .dark[data-palette="lavender"] {
-  --bg: #17151D; --card: #211E2A; --ink: #EEEBF6; --muted: #ADA6BE;
-  --rose: #AFA2DE; --rose-deep: #C1B6E8; --petal: #2D2839; --blush: #514A6E;
-  --line: #332E40; --sage: #9DB899; --sage-deep: #B5CFB1;
+  --bg: #100E13; --card: #18151C; --ink: #EFEBF3; --muted: #A49DAD;
+  --rose: #B3A1D0; --rose-deep: #CDBFE3; --petal: #211D27; --blush: #3E3649;
+  --line: #27222D; --sage: #8DB39A; --sage-deep: #B5D1BF; --gold: #C9AE80;
   color-scheme: dark;
 }
 :root[data-palette="rose"] {
-  --bg: #FFF9F7; --card: #FFFFFF; --ink: #392C36; --muted: #7C6F78;
-  --rose: #C87893; --rose-deep: #A6567A; --petal: #F9E8EF; --blush: #E8B7C8;
-  --line: #F0DFE5; --sage: #A4B9A0; --sage-deep: #5F7A5B;
+  --bg: #F4F2F2; --card: #FFFFFF; --ink: #1E1719; --muted: #74696C;
+  --rose: #9C5A6B; --rose-deep: #5A2E3A; --petal: #F0E8EA; --blush: #DCC5CB;
+  --line: #E8DFE1; --sage: #5C7A62; --sage-deep: #3D5A43; --gold: #A88A5C;
   color-scheme: light;
 }
 .dark[data-palette="rose"] {
-  --bg: #1D171C; --card: #29212A; --ink: #F7EBF1; --muted: #BBA9B4;
-  --rose: #E09AB2; --rose-deep: #E8A8BE; --petal: #3A2C36; --blush: #6E4A5C;
-  --line: #3F323C; --sage: #9DB899; --sage-deep: #B5CFB1;
+  --bg: #120F10; --card: #1B1617; --ink: #F3ECEE; --muted: #AB9DA1;
+  --rose: #D49AAA; --rose-deep: #E6BAC6; --petal: #261E20; --blush: #4A3A3F;
+  --line: #2C2426; --sage: #93B39A; --sage-deep: #B9D2BF; --gold: #C9AE80;
   color-scheme: dark;
 }
-.dark .btn-primary { color: #17191A; }
+.dark .btn-primary { color: var(--bg); }
 
 html, body, #root { height: 100%; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, sans-serif;
+  font-feature-settings: 'ss01', 'tnum' 0;
+  letter-spacing: -0.005em;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
@@ -87,18 +100,19 @@ input, select, textarea, button { font: inherit; color: inherit; }
 input, select, textarea { font-size: 16px; } /* prevents iOS zoom */
 
 @layer components {
-  .card { @apply bg-card rounded-2xl border border-line shadow-soft; }
-  .h-serif { @apply font-serif font-semibold tracking-tight; }
-  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-3.5 min-h-[34px] text-[14px] font-medium transition active:scale-[0.97] disabled:opacity-50; }
-  .btn-primary { @apply btn bg-deep text-white; }
-  .btn-soft { @apply btn bg-petal text-deep; }
-  .btn-ghost { @apply btn border border-line text-ink bg-card; }
-  .btn-sm { @apply min-h-[28px] px-2.5 text-[12.5px] gap-1.5; }
-  .chip { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12.5px] font-medium border border-line bg-card; }
-  .chip-on { @apply bg-deep text-white border-deep; }
-  .field { @apply w-full rounded-2xl border border-line bg-card px-3 min-h-[38px] outline-none focus:border-rose focus:ring-2 focus:ring-petal; }
-  .label { @apply block text-[12px] font-medium text-muted mb-0.5; }
-  .eyebrow { @apply text-[10px] font-semibold uppercase tracking-[0.14em] text-muted; }
+  .card { @apply bg-card rounded-[14px] border border-line; }
+  .h-serif { @apply font-sans font-semibold; letter-spacing: -0.025em; }
+  .num { font-weight: 300; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-[10px] px-3.5 min-h-[36px] text-[14px] font-medium transition-colors disabled:opacity-40; }
+  .btn-primary { @apply btn bg-deep text-white hover:opacity-90; }
+  .btn-soft { @apply btn bg-petal text-ink hover:bg-line; }
+  .btn-ghost { @apply btn border border-line text-ink bg-card hover:bg-petal; }
+  .btn-sm { @apply min-h-[30px] px-2.5 text-[13px] gap-1.5 rounded-[8px]; }
+  .chip { @apply inline-flex items-center gap-1 rounded-[8px] px-2.5 py-1 text-[12.5px] font-medium border border-line bg-card text-ink; }
+  .chip-on { @apply bg-ink text-bg border-ink; }
+  .field { @apply w-full rounded-[10px] border border-line bg-card px-3 min-h-[40px] outline-none focus:border-ink; }
+  .label { @apply block text-[12px] font-medium text-muted mb-1; }
+  .eyebrow { @apply text-[12px] font-medium text-muted; letter-spacing: 0; }
 }
 
 .safe-top { padding-top: max(env(safe-area-inset-top), 16px); }
@@ -106,17 +120,15 @@ input, select, textarea { font-size: 16px; } /* prevents iOS zoom */
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 .pb-nav { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
 
-@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-.rise { animation: rise .35s ease both; }
+.rise { }
 @keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-.sheet { animation: sheetUp .32s cubic-bezier(.2,.8,.2,1) both; }
+.sheet { animation: sheetUp .28s cubic-bezier(.2,.8,.2,1) both; }
 .fade { animation: fade .2s ease both; }
 @keyframes floatHeart { 0% { opacity: 0; transform: translateY(0) scale(.6); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-120px) scale(1.1); } }
 .float-heart { animation: floatHeart 2.2s ease-out forwards; }
-@keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
-.pop { animation: pop .3s ease; }
-.ring-anim { transition: stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1); }
+.pop { }
+.ring-anim { transition: stroke-dashoffset 1.1s cubic-bezier(.16,1,.3,1); }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

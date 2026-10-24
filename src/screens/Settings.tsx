@@ -33,7 +33,7 @@ export default function Settings() {
 
       <SectionTitle>Me & my goals</SectionTitle>
       <Card>
-        <Field label="Greeting name"><input className="field" value={st.name} onChange={(e) => set({ name: e.target.value })} placeholder="beautiful" /></Field>
+        <Field label="Greeting name"><input className="field" value={st.name} onChange={(e) => set({ name: e.target.value })} placeholder="Your first name" /></Field>
         <div className="grid grid-cols-2 gap-x-3">
           <Field label={`Starting weight (${kg ? 'kg' : 'lbs'})`}><NumberInput value={wIn(st.startWeight)} onChange={(v) => v && set({ startWeight: wOut(v) })} /></Field>
           <Field label={`Goal weight (${kg ? 'kg' : 'lbs'})`}><NumberInput value={wIn(st.goalWeight)} onChange={(v) => v && set({ goalWeight: wOut(v) })} /></Field>
@@ -107,13 +107,13 @@ export default function Settings() {
         <div className="label">Theme</div>
         <div className="mb-3"><Segmented value={st.theme} onChange={(v) => set({ theme: v })} options={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }, { value: 'system', label: 'Auto' }]} /></div>
         <div className="label">Color</div>
-        <div className="grid grid-cols-5 gap-2 mb-3">
-          {([['sage', 'Sage', '#7FA088', '#E7EFE8'], ['ocean', 'Ocean', '#6A9CC4', '#E5EEF5'], ['sand', 'Sand', '#B5936F', '#F2EBE2'], ['lavender', 'Lavender', '#9688C9', '#EDEAF7'], ['rose', 'Rose', '#C87893', '#F9E8EF']] as const).map(([v, l, c, bg]) => {
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          {([['sage', 'Forest', '#1F3B2E', '#A88A5C'], ['noir', 'Noir', '#121212', '#A88A5C'], ['ocean', 'Midnight', '#1B3550', '#86A8C8'], ['sand', 'Sand', '#4A3727', '#C9A988'], ['lavender', 'Plum', '#36284A', '#B3A1D0'], ['rose', 'Mauve', '#5A2E3A', '#D49AAA']] as const).map(([v, l, c, c2]) => {
             const on = (st.palette ?? 'sage') === v;
             return (
-              <button key={v} aria-pressed={on} onClick={() => set({ palette: v })} className={`rounded-xl py-2 flex flex-col items-center gap-1 border ${on ? 'border-ink' : 'border-line'}`} style={{ background: bg }}>
-                <span className="w-6 h-6 rounded-full" style={{ background: c }} />
-                <span className="text-[11px] text-[#333]">{l}</span>
+              <button key={v} aria-pressed={on} onClick={() => set({ palette: v })} className={`rounded-[10px] p-2 flex items-center gap-2 border text-left ${on ? 'border-ink' : 'border-line'}`}>
+                <span className="w-6 h-6 rounded-full shrink-0 relative overflow-hidden" style={{ background: c }}><span className="absolute right-0 bottom-0 w-3 h-3" style={{ background: c2 }} /></span>
+                <span className="text-[13px]">{l}</span>
               </button>
             );
           })}
@@ -149,7 +149,7 @@ export default function Settings() {
 
       <DataSection onDelete={() => setSheet('delete')} />
 
-      <p className="text-center text-[13px] text-muted mt-8 mb-2">My Glow-Up · private, on-device · made with ♡</p>
+      <p className="text-center text-[13px] text-muted mt-8 mb-2">My Glow-Up · private, on-device · made with</p>
 
       {sheet === 'weight' && <WeightSheet onClose={() => setSheet(null)} />}
       {sheet === 'schedule' && <ScheduleEditor onClose={() => setSheet(null)} />}
@@ -354,7 +354,7 @@ export function NotificationsCard() {
         </div>
       </div>
       {!on ? (
-        <button className="btn-primary w-full" disabled={busy || !member} onClick={async () => { setBusy(true); try { await enablePush(); toast('Notifications on ♡'); } catch (e: any) { toast(e?.message ?? 'Couldn’t turn on notifications'); } setBusy(false); }}><Bell size={16} />Turn on notifications</button>
+        <button className="btn-primary w-full" disabled={busy || !member} onClick={async () => { setBusy(true); try { await enablePush(); toast('Notifications on'); } catch (e: any) { toast(e?.message ?? 'Couldn’t turn on notifications'); } setBusy(false); }}><Bell size={16} />Turn on notifications</button>
       ) : (
         <div className="grid grid-cols-2 gap-2">
           <button className="btn-soft btn-sm" onClick={async () => { try { const n = await sendTest(); toast(n ? 'Test sent — check your notifications' : 'No devices found — try turning notifications off and on'); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); } }}>Send a test</button>
@@ -394,7 +394,7 @@ function DataSection({ onDelete }: { onDelete: () => void }) {
       if (!confirm('Replace everything in the app with this backup?')) return;
       await restorePhotos(photos);
       s.replaceAll({ ...state, session: null } as any);
-      toast('Backup restored ♡');
+      toast('Backup restored');
     } catch (e: any) { toast(e?.message ?? 'Couldn’t read that file'); }
   };
 

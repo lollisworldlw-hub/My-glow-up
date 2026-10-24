@@ -35,7 +35,7 @@ export function CycleView() {
       x.periods.push({ id: uid(), start: date });
       x.cycleDays[date] = { ...(x.cycleDays[date] ?? { symptoms: [] }), flow: x.cycleDays[date]?.flow ?? 'medium' };
     });
-    toast('Period logged ♡');
+    toast('Period logged');
   };
   const end = () => {
     if (!cur) return;

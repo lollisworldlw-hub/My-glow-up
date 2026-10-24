@@ -25,7 +25,7 @@ export function RecipeEditor({ recipeId, slot = 'dinner', onClose }: { recipeId?
   const save = () => {
     if (!r.name.trim()) { toast('Give your recipe a name'); return; }
     s.set((st) => { st.recipes[r.id] = { ...r, name: r.name.trim(), instructions: r.instructions.filter((x) => x.trim()) }; });
-    toast(orig ? 'Recipe updated' : 'Recipe added ♡');
+    toast(orig ? 'Recipe updated' : 'Recipe added');
     onClose();
   };
 

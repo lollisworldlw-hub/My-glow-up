@@ -602,16 +602,16 @@ export const FOOD_SAFETY = [
 ];
 
 export const MOTIVATION = [
-  'Small steps, every day, add up beautifully.',
-  'You don’t have to be perfect to be consistent.',
-  'Nourish, move, rest — that’s the whole plan.',
-  'Progress isn’t always loud. Keep showing up.',
-  'Dessert is part of the plan. Enjoy it.',
-  'Your future self is grateful for today.',
-  'Gentle and steady wins this one.',
-  'Every walk counts. Every meal counts. You count.',
-  'Be proud of the choices you make today.',
-  'A good day doesn’t have to be a perfect day.'
+  'Consistency beats intensity.',
+  'Small, steady choices compound.',
+  'Nourish, move, rest. Repeat.',
+  'Progress is quiet before it is visible.',
+  'Plan the treat. Enjoy it fully.',
+  'Show up for the version of you that’s coming.',
+  'A good day doesn’t need to be a perfect one.',
+  'Every walk counts.',
+  'Discipline is a form of self-respect.',
+  'Gentle and steady wins this one.'
 ];
 
 export const defaultSettings = (today: string): Settings => ({

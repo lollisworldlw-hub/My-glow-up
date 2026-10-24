@@ -52,7 +52,7 @@ export function ShareRecipeSheet({ recipe, onClose }: { recipe: Recipe; onClose:
     try {
       const image = file ? await uploadMedia(file) : undefined;
       await send(note.trim() || `Sharing my recipe: ${recipe.name}`, null, 'recipe', { payload: recipePayload(recipe, s.foods), image });
-      toast('Recipe shared with the group ♡');
+      toast('Recipe shared with the group');
       onClose();
     } catch (e: any) { toast(e?.message ?? 'Couldn’t share right now'); }
     setBusy(false);
@@ -125,7 +125,7 @@ function AddFoodPhoto({ file, date, onClose }: { file: File; date: string; onClo
         sharedAt = Date.now();
       }
       s.set((x) => { x.foodPhotos.push({ id, date, slot, caption: caption.trim(), w, h, sharedAt }); });
-      toast(share ? 'Saved and shared ♡' : 'Saved to today’s food photos');
+      toast(share ? 'Saved and shared' : 'Saved to today’s food photos');
       onClose();
     } catch (e: any) { toast(e?.message ?? 'Couldn’t save that photo'); }
     setBusy(false);
@@ -156,7 +156,7 @@ function FoodPhotoSheet({ id, onClose }: { id: string; onClose: () => void }) {
       const image = await uploadMedia(blob);
       await send(p.caption || `My ${p.slot ? SLOT_LABEL[p.slot].toLowerCase() : 'food'} today`, null, 'photo', { image, slot: p.slot });
       s.set((x) => { const f = x.foodPhotos.find((y) => y.id === id); if (f) f.sharedAt = Date.now(); });
-      toast('Shared with the group ♡');
+      toast('Shared with the group');
       onClose();
     } catch (e: any) { toast(e?.message ?? 'Couldn’t share'); }
     setBusy(false);

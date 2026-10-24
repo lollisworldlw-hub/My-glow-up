@@ -186,7 +186,7 @@ function MealPrep() {
         <div className="h-serif text-[17px] mt-1">{fmtLong(prepDate)}</div>
         <div className="text-[13px] text-muted mb-3 flex items-center gap-1.5"><Clock size={14} />About {mins} min total{left && left < mins ? ` · ${left} min left` : ''} — some steps overlap</div>
         <Bar pct={(checks.length / tasks.length) * 100} color="var(--sage)" />
-        <div className="text-[13px] text-muted mt-1.5">{checks.length} of {tasks.length} steps done{checks.length === tasks.length ? ' — your week is ready ♡' : ''}</div>
+        <div className="text-[13px] text-muted mt-1.5">{checks.length} of {tasks.length} steps done{checks.length === tasks.length ? ' — your week is ready' : ''}</div>
       </Card>
       <div className="space-y-2">
         {tasks.map((t, i) => {

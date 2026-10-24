@@ -49,7 +49,7 @@ export function MealCard({ date, slot, item, compact }: { date: string; slot: Sl
               <div className="text-[13px] text-muted">{recipe?.servingLabel ?? '1 serving'}{fmtServ(item.servings)}</div>
               <MacroLine cal={mac.cal} protein={mac.protein} est={est} />
               {recipe && conflicts(recipe, s.foods, s.settings.diets).length > 0 && <div className="text-[13px] text-deep mt-0.5">Contains {conflicts(recipe, s.foods, s.settings.diets).join(', ').toLowerCase()} — swap?</div>}
-              {logged && <div className="text-[13px] text-sagedeep font-medium mt-0.5">{logged.prelogged ? 'Pre-logged for later ♡' : `Logged · ${logged.cal} cal`}</div>}
+              {logged && <div className="text-[13px] text-sagedeep font-medium mt-0.5">{logged.prelogged ? 'Pre-logged for later' : `Logged · ${logged.cal} cal`}</div>}
             </div>
           </button>
           <CheckCircle on={!!logged && !logged.prelogged} onToggle={toggle} label={`Mark ${itemName(item, s.recipes)} as eaten`} />
@@ -84,7 +84,7 @@ export function LogConfirmSheet({ date, slot, item, onClose }: { date: string; s
         </div>
         <Stepper value={serv} onChange={setServ} format={(v) => `${fmtAmount(v)}×`} />
       </div>
-      <button className="btn-primary w-full mb-3" onClick={() => { s.logItem(date, slot, item.id, serv); toast(serv === item.servings ? 'Logged as planned ♡' : 'Logged your portion ♡'); onClose(); }}>
+      <button className="btn-primary w-full mb-3" onClick={() => { s.logItem(date, slot, item.id, serv); toast(serv === item.servings ? 'Logged as planned' : 'Logged your portion'); onClose(); }}>
         {serv === item.servings ? 'I ate this as planned' : 'Log this portion'}
       </button>
       {slot === 'dessert' && !prelog && (
@@ -142,7 +142,7 @@ export function MealSheet({ itemId, onClose }: { itemId: string; onClose: () => 
         <div className="flex gap-2">
           {logged
             ? <button className="btn-ghost flex-1" onClick={() => { s.unlogItem(item.id); toast('Removed from log'); }}>Unlog</button>
-            : <button className="btn-primary flex-1" onClick={() => { s.logItem(date, slot, item.id); toast('Logged as planned ♡'); }}>Log as eaten</button>}
+            : <button className="btn-primary flex-1" onClick={() => { s.logItem(date, slot, item.id); toast('Logged as planned'); }}>Log as eaten</button>}
           <button className="btn-soft flex-1" onClick={() => setMode('swap')}><ArrowLeftRight size={16} />Swap</button>
         </div>
       }>
@@ -353,7 +353,7 @@ export function LogFoodSheet({ date, onClose, defaultSlot = 'snack' }: { date: s
     else if (tab === 'recipe' && recipe && recMac) s.addLog({ date, slot, name: `${recipe.name}${fmtServ(serv)}`, ...recMac });
     else if (tab === 'quick' && quick.name && quick.cal != null) s.addLog({ date, slot, name: quick.name, cal: Math.round(quick.cal), protein: Math.round(quick.protein ?? 0), carbs: Math.round(quick.carbs ?? 0), fat: Math.round(quick.fat ?? 0) });
     else return;
-    toast('Added to today’s log ♡');
+    toast('Added to today’s log');
     onClose();
   };
   const can = (tab === 'food' && !!foodMac) || (tab === 'recipe' && !!recMac) || (tab === 'quick' && !!quick.name && quick.cal != null);

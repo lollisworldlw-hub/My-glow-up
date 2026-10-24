@@ -192,7 +192,7 @@ export interface Settings {
   weightUnit: 'lb' | 'kg';
   lengthUnit: 'in' | 'cm';
   theme: 'light' | 'dark' | 'system';
-  palette?: 'sage' | 'ocean' | 'sand' | 'lavender' | 'rose';
+  palette?: 'sage' | 'noir' | 'ocean' | 'sand' | 'lavender' | 'rose';
   dislikes: string[];
   autoFillWeeks: boolean;
   sound: boolean;

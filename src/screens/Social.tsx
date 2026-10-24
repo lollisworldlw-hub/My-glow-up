@@ -91,7 +91,7 @@ function RecipeCard({ m, me, mine }: { m: Message; me: string; mine: boolean }) 
   const save = () => {
     const r = importRecipe(s, p, sender?.display_name ?? 'a friend');
     s.set((x) => { x.recipes = r.recipes as any; x.foods = r.foods as any; });
-    toast(r.existed ? 'Already in your recipes' : `Saved “${p.recipe.name}” to your recipes ♡`);
+    toast(r.existed ? 'Already in your recipes' : `Saved “${p.recipe.name}” to your recipes`);
   };
   return (
     <div className="rounded-3xl border border-blush bg-card overflow-hidden shadow-soft w-full">
@@ -248,7 +248,7 @@ export function ShareSheet({ onClose, preselect }: { onClose: () => void; presel
         await send(nums[a.key] && a.withNumbers ? a.withNumbers : a.title, null, 'achievement', { icon: a.icon, key: a.key });
         s.set((x) => { if (!x.shared.includes(a.key)) x.shared.push(a.key); });
       } else await send(custom, null, 'achievement', { icon: '🌟' });
-      toast('Shared with the group ♡');
+      toast('Shared with the group');
       onClose();
     } catch (e: any) { toast(e?.message ?? 'Couldn’t share'); }
   };
@@ -306,7 +306,7 @@ function DMList({ me }: { me: string }) {
         return (
           <button key={o.user_id} className="w-full flex items-center gap-2 px-3 py-2 text-left" onClick={() => setPeer(o.user_id)}>
             <Avatar member={o} size={40} />
-            <span className="flex-1 min-w-0"><span className="block font-medium">{o.display_name}</span><span className="block text-[13px] text-muted truncate">{last ? (last.sender === me ? 'You: ' : '') + last.body : 'Say hi ♡'}</span></span>
+            <span className="flex-1 min-w-0"><span className="block font-medium">{o.display_name}</span><span className="block text-[13px] text-muted truncate">{last ? (last.sender === me ? 'You: ' : '') + last.body : 'Say hi'}</span></span>
             {unread > 0 && <span className="min-w-[22px] h-[22px] px-1.5 rounded-full bg-deep text-white text-[12px] grid place-items-center">{unread}</span>}
           </button>
         );
@@ -327,7 +327,7 @@ function Friends({ me }: { me: string }) {
   const link = (c: string) => `${window.location.origin}/?invite=${c}`;
 
   const shareCode = async (c: string) => {
-    const text = `Join me on My Glow-Up ♡ Your invite code: ${c}\n${link(c)}`;
+    const text = `Join me on My Glow-Up Your invite code: ${c}\n${link(c)}`;
     try { if (navigator.share) { await navigator.share({ title: 'My Glow-Up invite', text }); return; } } catch { return; }
     try { await navigator.clipboard.writeText(text); toast('Invite copied'); } catch { toast(c); }
   };
@@ -345,7 +345,7 @@ function Friends({ me }: { me: string }) {
           <input ref={pfpRef} type="file" accept="image/*" className="hidden" onChange={async (e) => {
             const f = e.target.files?.[0]; e.target.value = '';
             if (!f) return;
-            try { const img = await uploadMedia(f, 480); await updateProfile({ avatar_path: img.path }); toast('Profile photo updated ♡'); }
+            try { const img = await uploadMedia(f, 480); await updateProfile({ avatar_path: img.path }); toast('Profile photo updated'); }
             catch (err: any) { toast(err?.message ?? 'Couldn’t upload'); }
           }} />
         </div>

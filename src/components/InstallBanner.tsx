@@ -30,9 +30,9 @@ export function InstallBanner() {
   const otherIOSBrowser = ios && isInAppBrowser();
 
   return (
-    <div className="bg-deep text-white safe-top" role="region" aria-label="Install the app">
+    <div className="bg-ink text-bg safe-top" role="region" aria-label="Install the app">
       <div className="mx-auto max-w-[640px] px-3 py-2 flex items-start gap-2">
-        <img src="/icons/icon-192.png" alt="" className="w-10 h-10 rounded-xl shrink-0" />
+        <img src="/icons/icon-192.png" alt="" className="w-9 h-9 rounded-[9px] shrink-0" />
         <div className="flex-1 min-w-0 text-[13px] leading-snug">
           <div className="font-semibold text-[14px]">Get the My Glow-Up app</div>
           {canPrompt ? (
@@ -45,12 +45,12 @@ export function InstallBanner() {
             <div>Use your browser menu → <b>Install app</b> or <b>Add to Home screen</b>.</div>
           )}
           {canPrompt && (
-            <button className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white text-deep font-semibold px-4 py-2" onClick={async () => { deferred?.prompt(); await deferred?.userChoice; deferred = null; setCanPrompt(false); setShow(false); }}>
+            <button className="mt-2 inline-flex items-center gap-1.5 rounded-[8px] bg-bg text-ink font-medium px-3 py-1.5" onClick={async () => { deferred?.prompt(); await deferred?.userChoice; deferred = null; setCanPrompt(false); setShow(false); }}>
               <Download size={15} />Install
             </button>
           )}
         </div>
-        <button aria-label="Dismiss" className="w-9 h-9 grid place-items-center rounded-full bg-white/15 shrink-0" onClick={dismiss}><X size={16} /></button>
+        <button aria-label="Dismiss" className="w-8 h-8 grid place-items-center rounded-full bg-white/10 shrink-0" onClick={dismiss}><X size={16} /></button>
       </div>
     </div>
   );

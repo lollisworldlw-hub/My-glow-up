@@ -121,7 +121,7 @@ function MindGoals() {
               <span className="text-[17px] w-10 text-center" aria-hidden>{g.icon}</span>
               <div className="flex-1 min-w-0">
                 <div className="font-medium">{g.name}</div>
-                <div className="text-[13px] text-muted">{count} of {g.perWeek} this week{count >= g.perWeek ? ' ♡' : ''}</div>
+                <div className="text-[13px] text-muted">{count} of {g.perWeek} this week{count >= g.perWeek ? '' : ''}</div>
               </div>
               <button aria-label={`Edit ${g.name}`} className="w-10 h-10 grid place-items-center text-muted" onClick={() => setEdit(g)}><Pencil size={16} /></button>
               <CheckCircle on={doneToday.includes(g.id)} onToggle={() => toggle(g.id)} label={`${g.name} today`} />
@@ -186,7 +186,7 @@ function Breathing() {
   }, [start]);
   const el = start ? (now - start) / 1000 : 0;
   const total = mins * 60;
-  useEffect(() => { if (start && el >= total) { setStart(null); toast('Lovely. Notice how you feel ♡'); } }, [start, el >= total]);
+  useEffect(() => { if (start && el >= total) { setStart(null); toast('Lovely. Notice how you feel'); } }, [start, el >= total]);
   const cyc = el % 16;
   const idx = Math.floor(cyc / 4);
   const within = (cyc % 4) / 4;

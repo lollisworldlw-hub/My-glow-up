@@ -230,7 +230,7 @@ export const useStore = create<Store>()(
           ...current,
           ...p,
           // people who used the app before onboarding existed are already set up
-          settings: { ...init.settings, ...(existing ? { onboarded: true, startWeight: 178, goalWeight: 150, name: 'beautiful' } : {}), ...(p.settings ?? {}) },
+          settings: { ...init.settings, ...(existing ? { onboarded: true, startWeight: 178, goalWeight: 150, name: '' } : {}), ...(p.settings ?? {}) },
           // keep newly added seed foods/recipes available after updates
           foods,
           recipes: { ...init.recipes, ...(p.recipes ?? {}) }
@@ -243,6 +243,7 @@ export const useStore = create<Store>()(
 /** Upgrade data saved by older versions (also applied to cloud copies and imported backups). */
 export function migrate<T extends State>(st: T): T {
   const settings = { ...st.settings } as any;
+  if (settings.name === 'beautiful') settings.name = '';
   let water = st.water;
   if (!settings.waterOz) {
     // water used to be counted in 8 oz glasses

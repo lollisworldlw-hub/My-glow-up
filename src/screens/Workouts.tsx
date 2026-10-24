@@ -6,7 +6,6 @@ import { DOW_NAMES, addDays, fmtDow, fmtShort, todayKey, uid, weekday } from '..
 import { EXERCISES, LEVELS, levelOf, readyToLevelUp, startSession, workoutById } from '../lib/workouts';
 import type { WorkoutLog } from '../lib/types';
 import { Card, Empty, Field, Header, NumberInput, SectionTitle, Segmented, Sheet, toast } from '../components/ui';
-import { ExerciseArt } from '../components/Art';
 import { unlockAudio } from '../components/WorkoutPlayer';
 import { HOME_LABEL } from './Home';
 
@@ -29,7 +28,7 @@ export default function Workouts() {
   const quickDone = (id: WorkoutLog['type']) => {
     const def = workoutById(id, s.settings, s.exerciseLevels);
     s.set((st) => { st.workouts.push({ id: uid(), date: today, type: id, name: def.name, plannedMin: def.plannedMin, actualMin: def.plannedMin, completed: true, at: Date.now() }); });
-    toast('Marked done ♡');
+    toast('Marked done');
   };
 
   const homeId: WorkoutLog['type'] | null = sched.home === 'strength' ? 'strength' : sched.home === 'bike' ? bikeMode : sched.home === 'bike-easy' ? 'bike-easy' : null;
@@ -95,7 +94,7 @@ export default function Workouts() {
           <SectionTitle>Your strength moves</SectionTitle>
           <p className="text-[13px] text-muted -mt-1 mb-3">Each move has 5 levels. When you hit every rep and it feels easy for two workouts in a row, I'll suggest the next level — making moves harder over time is what keeps your muscle while you lose fat.</p>
           <div className="space-y-2">
-            {['squat', 'pushup', 'hinge', 'knee'].map((id) => {
+            {['squat', 'pushup', 'hinge', 'knee'].map((id, idx) => {
               const lv = levelOf(s.exerciseLevels, id);
               const info = LEVELS[id][lv];
               const target = id === 'knee' ? 24 : 12;
@@ -104,7 +103,7 @@ export default function Workouts() {
               return (
                 <div key={id} className={`card p-3 ${ready ? 'border-rose' : ''}`}>
                   <div className="flex gap-2 items-center">
-                    <div className="w-[64px] h-[64px] rounded-2xl bg-petal grid place-items-center shrink-0"><ExerciseArt id={id} size={56} /></div>
+                    <div className="w-9 h-9 rounded-full border border-line grid place-items-center shrink-0 text-[13px] text-muted tabular-nums">{idx + 1}</div>
                     <div className="flex-1 min-w-0">
                       <div className="text-[12px] eyebrow">Level {lv + 1} of {LEVELS[id].length}</div>
                       <div className="font-medium">{info.name}</div>
@@ -115,13 +114,13 @@ export default function Workouts() {
                   {ready && <div className="mt-2 rounded-2xl bg-petal px-3 py-2 text-[13px]">You’ve nailed this twice — ready for <b>{LEVELS[id][lv + 1].name}</b>?</div>}
                   <div className="flex gap-2 mt-2">
                     {lv > 0 && <button className="btn-ghost btn-sm flex-1" onClick={() => s.set((st) => { st.exerciseLevels[id] = lv - 1; })}>Easier</button>}
-                    {lv < LEVELS[id].length - 1 && <button className={`${ready ? 'btn-primary' : 'btn-soft'} btn-sm flex-1`} onClick={() => { s.set((st) => { st.exerciseLevels[id] = lv + 1; }); toast(`Level up: ${LEVELS[id][lv + 1].name} ♡`); }}>Level up</button>}
+                    {lv < LEVELS[id].length - 1 && <button className={`${ready ? 'btn-primary' : 'btn-soft'} btn-sm flex-1`} onClick={() => { s.set((st) => { st.exerciseLevels[id] = lv + 1; }); toast(`Level up: ${LEVELS[id][lv + 1].name}`); }}>Level up</button>}
                   </div>
                 </div>
               );
             })}
             <div className="card p-3 flex gap-2 items-center">
-              <div className="w-[64px] h-[64px] rounded-2xl bg-petal grid place-items-center shrink-0"><ExerciseArt id="march" size={56} /></div>
+              <div className="w-9 h-9 rounded-full border border-line grid place-items-center shrink-0 text-[13px] text-muted tabular-nums">5</div>
               <div><div className="font-medium">{EXERCISES.march.name}</div><div className="text-[13px] text-muted">60 seconds · {EXERCISES.march.how}</div></div>
             </div>
           </div>
@@ -193,7 +192,7 @@ function ManualLog({ onClose }: { onClose: () => void }) {
   return (
     <Sheet open onClose={onClose} title="Log a workout" footer={<button className="btn-primary w-full" disabled={!min} onClick={() => {
       s.set((st) => { st.workouts.push({ id: uid(), date, type, name: names[type], plannedMin: type === 'walk' ? s.settings.walkMinutes : s.settings.workoutMinutes, actualMin: min!, completed: true, difficulty: diff, at: Date.now() }); });
-      toast('Workout logged ♡'); onClose();
+      toast('Workout logged'); onClose();
     }}>Save</button>}>
       <Field label="Type"><select className="field" value={type} onChange={(e) => setType(e.target.value as any)}>{Object.entries(names).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></Field>
       <Field label="Date"><input type="date" className="field" value={date} max={todayKey()} onChange={(e) => e.target.value && setDate(e.target.value)} /></Field>

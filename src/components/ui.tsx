@@ -9,10 +9,9 @@ export function Card({ children, className = '', onClick }: { children: ReactNod
 
 export function Header({ eyebrow, title, right }: { eyebrow?: string; title: string; right?: ReactNode }) {
   return (
-    <div className="flex items-end justify-between gap-2 mb-3 rise">
+    <div className="flex items-end justify-between gap-2 mb-3 pt-1">
       <div className="min-w-0">
-
-        <h1 className="h-serif text-[22px] leading-[1.05]">{title}</h1>
+        <h1 className="h-serif text-[26px] leading-[1.05]">{title}</h1>
       </div>
       {right}
     </div>
@@ -22,7 +21,7 @@ export function Header({ eyebrow, title, right }: { eyebrow?: string; title: str
 export function SectionTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {
   return (
     <div className="flex items-center justify-between mt-3 mb-2">
-      <h2 className="h-serif text-[16px]">{children}</h2>
+      <h2 className="text-[15px] font-semibold tracking-[-0.01em]">{children}</h2>
       {right}
     </div>
   );
@@ -36,10 +35,10 @@ export function CheckCircle({ on, onToggle, label, size = 22 }: { on: boolean; o
       aria-checked={on}
       aria-label={label}
       onClick={(e) => { e.stopPropagation(); onToggle(); }}
-      className={`shrink-0 grid place-items-center rounded-full border-2 transition ${on ? 'bg-sage border-sage text-white pop' : 'border-blush bg-card'}`}
+      className={`shrink-0 grid place-items-center rounded-full border transition-colors ${on ? 'bg-deep border-deep text-bg' : 'border-[1.5px] border-blush bg-card'}`}
       style={{ width: size, height: size, minWidth: size }}
     >
-      {on && <Check size={size * 0.55} strokeWidth={3} />}
+      {on && <Check size={size * 0.55} strokeWidth={2.5} />}
     </button>
   );
 }
@@ -49,7 +48,7 @@ export function CheckRow({ on, onToggle, title, sub, right }: { on: boolean; onT
     <div className="flex items-center gap-2.5 py-1.5 cursor-pointer" onClick={onToggle}>
       <CheckCircle on={on} onToggle={onToggle} label={title} />
       <div className="flex-1 min-w-0">
-        <div className={`text-[14px] ${on ? 'text-muted line-through decoration-blush' : ''}`}>{title}</div>
+        <div className={`text-[14px] ${on ? 'text-muted' : ''}`}>{title}</div>
         {sub && <div className="text-[13px] text-muted">{sub}</div>}
       </div>
       {right}
@@ -57,7 +56,7 @@ export function CheckRow({ on, onToggle, title, sub, right }: { on: boolean; onT
   );
 }
 
-export function Bar({ pct, color = 'var(--rose)', h = 10 }: { pct: number; color?: string; h?: number }) {
+export function Bar({ pct, color = 'var(--rose)', h = 4 }: { pct: number; color?: string; h?: number }) {
   return (
     <div className="w-full rounded-full bg-petal overflow-hidden" style={{ height: h }} role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
       <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.max(0, Math.min(100, pct))}%`, background: color }} />
@@ -65,7 +64,7 @@ export function Bar({ pct, color = 'var(--rose)', h = 10 }: { pct: number; color
   );
 }
 
-export function Ring({ pct, size = 150, stroke = 12, color = 'var(--rose)', ghostPct = 0, children }:
+export function Ring({ pct, size = 150, stroke = 6, color = 'var(--rose)', ghostPct = 0, children }:
   { pct: number; size?: number; stroke?: number; color?: string; ghostPct?: number; children?: ReactNode }) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
@@ -76,7 +75,7 @@ export function Ring({ pct, size = 150, stroke = 12, color = 'var(--rose)', ghos
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
         <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--petal)" strokeWidth={stroke} fill="none" />
-        {ghostPct > 0 && <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--blush)" strokeOpacity={0.55} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off(ghostPct)} className="ring-anim" />}
+        {ghostPct > 0 && <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--blush)" strokeOpacity={0.9} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off(ghostPct)} className="ring-anim" />}
         <circle cx={size / 2} cy={size / 2} r={r} stroke={color} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off(shown)} className="ring-anim" />
       </svg>
       <div className="absolute inset-0 grid place-items-center text-center">{children}</div>
@@ -86,13 +85,17 @@ export function Ring({ pct, size = 150, stroke = 12, color = 'var(--rose)', ghos
 
 export function Segmented<T extends string>({ value, options, onChange, small }: { value: T; options: { value: T; label: string }[]; onChange: (v: T) => void; small?: boolean }) {
   return (
-    <div className="flex gap-0.5 p-0.5 rounded-full bg-petal overflow-x-auto no-scrollbar" role="tablist">
-      {options.map((o) => (
-        <button key={o.value} role="tab" aria-selected={value === o.value} onClick={() => onChange(o.value)}
-          className={`flex-1 whitespace-nowrap rounded-full ${small ? 'px-2.5 min-h-[28px] text-[12px]' : 'px-3 min-h-[32px] text-[13px]'} font-medium transition ${value === o.value ? 'bg-card text-deep shadow-soft' : 'text-muted'}`}>
-          {o.label}
-        </button>
-      ))}
+    <div className="flex gap-4 border-b border-line overflow-x-auto no-scrollbar" role="tablist">
+      {options.map((o) => {
+        const on = value === o.value;
+        return (
+          <button key={o.value} role="tab" aria-selected={on} onClick={() => onChange(o.value)}
+            className={`relative whitespace-nowrap ${small ? 'text-[13px] pb-2 pt-1' : 'text-[14px] pb-2.5 pt-1'} font-medium transition-colors ${on ? 'text-ink' : 'text-muted hover:text-ink'}`}>
+            {o.label}
+            <span className={`absolute left-0 right-0 -bottom-px h-[2px] rounded-full transition-opacity ${on ? 'bg-ink opacity-100' : 'opacity-0'}`} />
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -101,10 +104,10 @@ export function Stepper({ value, onChange, step = 0.25, min = 0.25, max = 10, fo
   { value: number; onChange: (v: number) => void; step?: number; min?: number; max?: number; format?: (v: number) => string }) {
   const clamp = (v: number) => Math.min(max, Math.max(min, Math.round(v / step) * step));
   return (
-    <div className="inline-flex items-center gap-2 rounded-full bg-petal p-1">
-      <button aria-label="Decrease" className="w-9 h-9 rounded-full bg-card grid place-items-center text-deep" onClick={() => onChange(clamp(value - step))}><Minus size={18} /></button>
-      <span className="min-w-[56px] text-center font-semibold tabular-nums">{format(value)}</span>
-      <button aria-label="Increase" className="w-9 h-9 rounded-full bg-card grid place-items-center text-deep" onClick={() => onChange(clamp(value + step))}><Plus size={18} /></button>
+    <div className="inline-flex items-center rounded-[10px] border border-line bg-card">
+      <button aria-label="Decrease" className="w-9 h-9 grid place-items-center text-ink" onClick={() => onChange(clamp(value - step))}><Minus size={16} strokeWidth={1.75} /></button>
+      <span className="min-w-[48px] text-center font-medium tabular-nums border-x border-line leading-9">{format(value)}</span>
+      <button aria-label="Increase" className="w-9 h-9 grid place-items-center text-ink" onClick={() => onChange(clamp(value + step))}><Plus size={16} strokeWidth={1.75} /></button>
     </div>
   );
 }
@@ -121,14 +124,12 @@ export function Sheet({ open, onClose, title, children, footer }: { open: boolea
   if (!open) return null;
   return createPortal(
     <div className="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label={title}>
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px] fade" onClick={onClose} />
-      <div className="absolute inset-x-0 bottom-0 max-h-[90vh] flex flex-col bg-bg rounded-t-[28px] sheet mx-auto max-w-[640px]">
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
-          <div className="w-10" />
-          <div className="w-10 h-1.5 rounded-full bg-blush" />
-          <button aria-label="Close" onClick={onClose} className="w-10 h-10 grid place-items-center rounded-full bg-petal text-deep"><X size={18} /></button>
+      <div className="absolute inset-0 bg-black/40 fade" onClick={onClose} />
+      <div className="absolute inset-x-0 bottom-0 max-h-[90vh] flex flex-col bg-bg rounded-t-[20px] sheet mx-auto max-w-[640px]">
+        <div className="flex items-start justify-between gap-3 px-4 pt-4 pb-2">
+          <h2 className="h-serif text-[19px] leading-tight pt-1.5">{title}</h2>
+          <button aria-label="Close" onClick={onClose} className="w-9 h-9 shrink-0 grid place-items-center rounded-full text-muted hover:bg-petal"><X size={18} strokeWidth={1.75} /></button>
         </div>
-        <h2 className="h-serif text-[17px] px-4 pb-2 leading-tight">{title}</h2>
         <div className="overflow-y-auto px-4 pb-5 flex-1">{children}</div>
         {footer && <div className="px-4 pt-3 pb-4 border-t border-line safe-bottom bg-bg">{footer}</div>}
       </div>
@@ -159,8 +160,8 @@ export function NumberInput({ value, onChange, step = 'any', placeholder, ariaLa
 export function Empty({ icon, title, sub, action }: { icon: ReactNode; title: string; sub?: string; action?: ReactNode }) {
   return (
     <div className="text-center py-8 px-4">
-      <div className="mx-auto w-14 h-14 rounded-full bg-petal text-deep grid place-items-center mb-3">{icon}</div>
-      <div className="h-serif text-[15px]">{title}</div>
+      <div className="mx-auto w-11 h-11 rounded-full border border-line text-muted grid place-items-center mb-3">{icon}</div>
+      <div className="text-[15px] font-semibold">{title}</div>
       {sub && <p className="text-muted text-[14px] mt-1 max-w-[300px] mx-auto">{sub}</p>}
       {action && <div className="mt-3">{action}</div>}
     </div>
@@ -179,24 +180,11 @@ export function Toaster() {
   if (!vis || !msg) return null;
   return (
     <div className="fixed left-0 right-0 z-[75] flex justify-center px-4 pointer-events-none" style={{ bottom: 'calc(68px + env(safe-area-inset-bottom))' }}>
-      <div key={key} className="rise rounded-full bg-ink text-bg px-4 py-2 text-[14px] shadow-soft">{msg}</div>
+      <div key={key} className="fade rounded-[10px] bg-ink text-bg px-4 py-2.5 text-[13.5px] shadow-soft">{msg}</div>
     </div>
   );
 }
 
-// subtle floating hearts celebration
-const useCelebrate = create<{ n: number; fire: () => void }>((set) => ({ n: 0, fire: () => set((s) => ({ n: s.n + 1 })) }));
-export const celebrate = () => useCelebrate.getState().fire();
-export function Celebration() {
-  const n = useCelebrate((s) => s.n);
-  const [on, setOn] = useState(false);
-  useEffect(() => { if (!n) return; setOn(true); const t = setTimeout(() => setOn(false), 2400); return () => clearTimeout(t); }, [n]);
-  if (!on) return null;
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[70]" key={n}>
-      {Array.from({ length: 12 }).map((_, i) => (
-        <span key={i} className="absolute float-heart text-rose" style={{ left: `${8 + i * 7.5}%`, bottom: '22%', animationDelay: `${(i % 4) * 0.15}s`, fontSize: 18 + (i % 3) * 6 }}>♡</span>
-      ))}
-    </div>
-  );
-}
+// celebrations are intentionally quiet: the toast carries the moment
+export const celebrate = () => {};
+export function Celebration() { return null; }

@@ -165,7 +165,7 @@ function Desserts() {
     });
     const it = useStore.getState().plans[today].dessert[0];
     if (it) s.syncLog(it.id);
-    toast(`${s.recipes[id].name} is tonight’s treat ♡`);
+    toast(`${s.recipes[id].name} is tonight’s treat`);
   };
 
   return (
