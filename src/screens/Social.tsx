@@ -208,6 +208,22 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [emo, setEmo] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const taRef = useRef<HTMLTextAreaElement>(null);
+  const [kb, setKb] = useState(0);
+  const composing = focused || emo;
+  useEffect(() => {
+    // hide the bottom menu while typing, like a messaging app
+    document.body.classList.toggle('composing', composing);
+    return () => document.body.classList.remove('composing');
+  }, [composing]);
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const on = () => setKb(Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)));
+    on(); vv.addEventListener('resize', on); vv.addEventListener('scroll', on);
+    return () => { vv.removeEventListener('resize', on); vv.removeEventListener('scroll', on); };
+  }, []);
   const [share, setShare] = useState(false);
   const [del, setDel] = useState<Message | null>(null);
   const end = useRef<HTMLDivElement>(null);
@@ -234,19 +250,12 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
 
   return (
     <>
-      <div className={`space-y-2 ${emo ? 'pb-[300px]' : 'pb-24'}`}>
+      <div className={`space-y-2 ${emo ? 'pb-[330px]' : 'pb-24'}`} onClick={() => emo && setEmo(false)}>
         {msgs.length === 0 && <Empty icon={<Send />} title={peer ? 'Say hi!' : 'Start the conversation'} sub={peer ? 'Only the two of you can see these messages.' : 'Share a win, ask for a recipe, or cheer someone on.'} />}
         {msgs.map((m) => <Bubble key={m.id} m={m} me={me} onLong={() => setDel(m)} />)}
         <div ref={end} />
       </div>
-      <div className="fixed inset-x-0 z-30 px-4 pb-2 pt-5 composer-fade" style={{ bottom: 'var(--nav-h)' }}>
-        {emo && (
-          <div className="mx-auto max-w-[560px] mb-2 rounded-[22px] bg-card shadow-[0_8px_24px_rgba(0,0,0,0.10)] p-2 max-h-[230px] overflow-y-auto">
-            <div className="grid grid-cols-8 gap-0.5">
-              {CHAT_EMOJI.map((e, i) => <button key={i} className="h-10 text-[24px] rounded-[10px] active:bg-petal" onClick={() => setText((t) => t + e)}>{e}</button>)}
-            </div>
-          </div>
-        )}
+      <div className={`fixed inset-x-0 z-40 ${composing ? 'px-2 pt-2 bg-bg border-t border-line' : 'px-4 pb-2 pt-5 composer-fade'}`} style={{ bottom: composing ? kb : 'var(--nav-h)', paddingBottom: composing && !kb ? 'calc(env(safe-area-inset-bottom) + 6px)' : composing ? 6 : undefined }}>
         <div className="mx-auto max-w-[560px] flex gap-0.5 items-end rounded-[22px] bg-card p-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
           {peer === null && <button aria-label="Share an achievement" className="w-8 h-8 shrink-0 rounded-full text-muted grid place-items-center" onClick={() => setShare(true)}><Trophy size={17} strokeWidth={1.7} /></button>}
           {GIPHY_KEY && <button aria-label="Search GIFs" className="h-8 px-1.5 shrink-0 rounded-full text-muted font-semibold text-[12px]" onClick={() => setGifs(true)}>GIF</button>}
@@ -259,12 +268,20 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
             catch (err: any) { toast(err?.message ?? 'Couldn’t send that'); }
             setBusy(false);
           }} />
-          <textarea aria-label="Message" rows={1} className="flex-1 min-w-0 bg-transparent outline-none border-0 px-2 py-[5px] min-h-[32px] max-h-32 resize-none text-[16px] leading-[22px]" placeholder={peer ? 'Message or paste a GIF link' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
+          <textarea ref={taRef} onFocus={() => { setFocused(true); setEmo(false); }} onBlur={() => setFocused(false)} aria-label="Message" rows={1} className="flex-1 min-w-0 bg-transparent outline-none border-0 px-2 py-[5px] min-h-[32px] max-h-32 resize-none text-[16px] leading-[22px]" placeholder={peer ? 'Message or paste a GIF link' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(pointer: fine)').matches) { e.preventDefault(); post(); } }} />
-          <button aria-label="Emoji" className={`w-8 h-8 shrink-0 rounded-full grid place-items-center ${emo ? 'text-ink bg-petal' : 'text-muted'}`} onClick={() => setEmo(!emo)}><Smile size={18} strokeWidth={1.7} /></button>
+          <button aria-label="Emoji" className={`w-8 h-8 shrink-0 rounded-full grid place-items-center ${emo ? 'text-ink bg-petal' : 'text-muted'}`} onMouseDown={(ev) => ev.preventDefault()} onClick={() => { if (emo) { setEmo(false); taRef.current?.focus(); } else { setEmo(true); taRef.current?.blur(); } }}><Smile size={18} strokeWidth={1.7} /></button>
           <button aria-label="Send" disabled={busy || !text.trim()} className="w-8 h-8 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-40" onClick={post}><Send size={15} /></button>
         </div>
+        {emo && (
+          <div className="mx-auto max-w-[560px] mt-2 rounded-[22px] bg-card p-2 h-[260px] overflow-y-auto">
+            <div className="grid grid-cols-8 gap-0.5">
+              {CHAT_EMOJI.map((e, i) => <button key={i} className="h-10 text-[25px] rounded-[10px] active:bg-petal" onMouseDown={(ev) => ev.preventDefault()} onClick={() => setText((t) => t + e)}>{e}</button>)}
+            </div>
+          </div>
+        )}
       </div>
+
       {share && <ShareSheet onClose={() => setShare(false)} />}
       {gifs && <GifPicker onClose={() => setGifs(false)} onPick={async (url) => { setGifs(false); try { await send(url, peer); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); } }} />}
       {del && (

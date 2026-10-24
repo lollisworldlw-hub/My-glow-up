@@ -161,3 +161,6 @@ input, select, textarea { font-size: 16px; } /* prevents iOS zoom */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* while typing in chat, the bottom menu steps aside so the chat bar sits on the keyboard */
+body.composing nav[aria-label="Main"] { display: none; }
