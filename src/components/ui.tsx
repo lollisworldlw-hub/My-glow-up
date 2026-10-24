@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { Check, Minus, Plus, X } from 'lucide-react';
 import { create } from 'zustand';
 import { createPortal } from 'react-dom';
@@ -114,15 +114,19 @@ export function Stepper({ value, onChange, step = 0.25, min = 0.25, max = 10, fo
   );
 }
 
+let openSheets = 0;
 export function Sheet({ open, onClose, title, children, footer }: { open: boolean; onClose: () => void; title: string; children: ReactNode; footer?: ReactNode }) {
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   useEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
+    // count open sheets so page scrolling always comes back once the last one closes
+    openSheets++;
     document.body.style.overflow = 'hidden';
-    const esc = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && closeRef.current();
     window.addEventListener('keydown', esc);
-    return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', esc); };
-  }, [open, onClose]);
+    return () => { openSheets = Math.max(0, openSheets - 1); if (!openSheets) document.body.style.overflow = ''; window.removeEventListener('keydown', esc); };
+  }, [open]);
   if (!open) return null;
   return createPortal(
     <div className="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label={title}>
