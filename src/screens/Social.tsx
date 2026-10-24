@@ -32,6 +32,16 @@ export default function Social() {
   const setSub = useUI((u) => u.setSub);
   const loaded = useSocial((s) => s.loaded);
   const error = useSocial((s) => s.error);
+  const msgs = useSocial((s) => s.messages);
+  const lastRead = useSocial((s) => s.lastRead);
+  const groupUnread = userId ? msgs.filter((m) => m.recipient === null && m.sender !== userId && m.id > (lastRead.group ?? 0)).length : 0;
+  const dmUnread = userId ? msgs.filter((m) => m.recipient === userId && m.id > (lastRead[m.sender] ?? 0)).length : 0;
+  const [stuck, setStuck] = useState(false);
+  useEffect(() => {
+    const on = () => setStuck(window.scrollY > 90);
+    on(); window.addEventListener('scroll', on, { passive: true });
+    return () => window.removeEventListener('scroll', on);
+  }, []);
 
   useEffect(() => { if (email && member) { loadSocial(); startLive(); } }, [email, member]);
 
@@ -53,7 +63,13 @@ export default function Social() {
   return (
     <div>
       <Header eyebrow="Friends & cheering" title="Social" />
-      <div className="mb-7"><Segmented value={sub} onChange={(v) => setSub('social', v)} options={[{ value: 'group', label: 'Group' }, { value: 'challenges', label: 'Challenges' }, { value: 'messages', label: 'Messages' }, { value: 'friends', label: 'Friends' }]} /></div>
+      <div className={`sticky z-20 -mx-3 px-3 mb-7 transition-colors ${stuck ? 'on-dark rounded-b-[22px] pt-2 shadow-[0_8px_20px_rgba(0,0,0,0.12)]' : ''}`} style={{ top: 'env(safe-area-inset-top)', background: stuck ? 'var(--band-2)' : undefined }}>
+        <Segmented value={sub} onChange={(v) => setSub('social', v)} options={[
+          { value: 'group', label: 'Group', dot: groupUnread > 0 && sub !== 'group' },
+          { value: 'challenges', label: 'Challenges' },
+          { value: 'messages', label: 'Messages', dot: dmUnread > 0 },
+          { value: 'friends', label: 'Friends' }]} />
+      </div>
       {!loaded ? <p className="text-muted">Loading…</p> : error ? <Card><p>Couldn’t reach the group right now. {error}</p><button className="btn-soft btn-sm mt-3" onClick={loadSocial}>Try again</button></Card> : (
         <>
           {sub === 'group' && <Thread peer={null} me={userId!} />}

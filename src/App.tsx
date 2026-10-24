@@ -138,7 +138,11 @@ export default function App() {
           el = el.parentElement;
           if (el && el.contains(tabs) && el !== main && el.querySelector('.card, textarea')) break;
         }
-        setBandH(Math.round(tabs.getBoundingClientRect().bottom - top0 + 18));
+        // sticky tabs move while scrolling, so measure from the title above them instead
+        const sticky = tabs.closest('.sticky') as HTMLElement | null;
+        const above = sticky?.previousElementSibling as HTMLElement | null;
+        const bottom = sticky && above ? above.getBoundingClientRect().bottom + tabs.offsetHeight + 4 : tabs.getBoundingClientRect().bottom;
+        setBandH(Math.round(bottom - top0 + 18));
         return;
       }
       if (!card) { setBandH(0); return; }

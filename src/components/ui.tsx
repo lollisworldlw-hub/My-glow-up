@@ -84,7 +84,7 @@ export function Ring({ pct, size = 150, stroke = 6, color = 'var(--rose)', ghost
   );
 }
 
-export function Segmented<T extends string>({ value, options, onChange, small }: { value: T; options: { value: T; label: string }[]; onChange: (v: T) => void; small?: boolean }) {
+export function Segmented<T extends string>({ value, options, onChange, small }: { value: T; options: { value: T; label: string; dot?: boolean }[]; onChange: (v: T) => void; small?: boolean }) {
   return (
     <div className="flex gap-4 border-b border-line overflow-x-auto no-scrollbar" role="tablist">
       {options.map((o) => {
@@ -93,6 +93,7 @@ export function Segmented<T extends string>({ value, options, onChange, small }:
           <button key={o.value} role="tab" aria-selected={on} onClick={() => onChange(o.value)}
             className={`relative whitespace-nowrap ${small ? 'text-[13px] pb-2 pt-1' : 'text-[14px] pb-2.5 pt-1'} font-medium transition-colors ${on ? 'text-ink' : 'text-muted hover:text-ink'}`}>
             {o.label}
+            {o.dot && <span className="absolute -top-0.5 -right-2.5 w-2 h-2 rounded-full bg-[#E5484D]" aria-label="unread" />}
             <span className={`absolute left-0 right-0 -bottom-px h-[2px] rounded-full transition-opacity ${on ? 'bg-ink opacity-100' : 'opacity-0'}`} />
           </button>
         );
