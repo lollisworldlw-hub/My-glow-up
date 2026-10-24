@@ -94,10 +94,12 @@
 .h-serif { font-family: 'Newsreader Variable', Georgia, serif !important; font-weight: 380 !important; letter-spacing: -0.005em !important; }
 .num { font-family: 'Newsreader Variable', Georgia, serif; font-weight: 300; letter-spacing: -0.02em; }
 .app-header { background: transparent; border: 0; }
-nav.bar-bg { background: linear-gradient(to bottom, transparent, var(--bg) 45%); border: 0; }
-:root { --nav-h: calc(64px + max(calc(env(safe-area-inset-bottom) - 20px), 6px)); }
-nav.bar-bg { padding-bottom: max(calc(env(safe-area-inset-bottom) - 20px), 6px) !important; }
-.nav-pill-wrap { margin: 0 12px 0; padding: 6px; background: var(--band-2); border-radius: 32px; box-shadow: 0 14px 30px color-mix(in srgb, var(--band-2) 30%, transparent); }
+:root { --nav-h: calc(66px + env(safe-area-inset-bottom)); }
+nav.bar-bg {
+  background: linear-gradient(170deg, var(--band-1) 0%, var(--band-2) 100%); border: 0; border-radius: 26px 26px 0 0;
+  padding-top: 8px; padding-bottom: calc(env(safe-area-inset-bottom) + 8px) !important; box-shadow: 0 -8px 24px color-mix(in srgb, var(--band-2) 18%, transparent);
+}
+.nav-pill-wrap { margin: 0 10px; padding: 0; background: transparent; }
 .nav-btn { border-radius: 26px; min-height: 46px; color: rgba(238, 241, 236, 0.55); }
 .nav-on { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent) !important; }
 .pb-nav { padding-bottom: calc(var(--nav-h) + 24px) !important; }
