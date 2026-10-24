@@ -189,7 +189,12 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
   const end = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [gifs, setGifs] = useState(false);
-  useEffect(() => { end.current?.scrollIntoView({ block: 'end' }); markRead(peer ?? 'group'); }, [msgs.length]);
+  useEffect(() => {
+    // scroll the page (not the visual viewport) to the newest message; scrollIntoView can shift iOS's fixed bars
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    if (max > 0) window.scrollTo({ top: max });
+    markRead(peer ?? 'group');
+  }, [msgs.length]);
 
   const post = async () => {
     if (!text.trim()) return;
