@@ -126,10 +126,10 @@ export function Sheet({ open, onClose, title, children, footer }: { open: boolea
   return createPortal(
     <div className="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label={title}>
       <div className="absolute inset-0 bg-black/40 fade" onClick={onClose} />
-      <div className="absolute inset-x-0 bottom-0 max-h-[90vh] flex flex-col bg-bg rounded-t-[20px] sheet mx-auto max-w-[640px]">
+      <div className="absolute inset-x-0 bottom-0 flex flex-col bg-bg rounded-t-[20px] sheet mx-auto max-w-[640px]" style={{ maxHeight: 'calc(100dvh - env(safe-area-inset-top) - 16px)' }}>
         <div className="flex items-start justify-between gap-3 px-4 pt-4 pb-2">
           <h2 className="h-serif text-[19px] leading-tight pt-1.5">{title}</h2>
-          <button aria-label="Close" onClick={onClose} className="w-9 h-9 shrink-0 grid place-items-center rounded-full text-muted hover:bg-petal"><X size={18} strokeWidth={1.75} /></button>
+          <button aria-label="Close" onClick={onClose} className="w-10 h-10 -mr-1 shrink-0 grid place-items-center rounded-full bg-petal text-ink"><X size={18} strokeWidth={2} /></button>
         </div>
         <div className="overflow-y-auto px-4 pb-5 flex-1">{children}</div>
         {footer && <div className="px-4 pt-3 pb-4 border-t border-line safe-bottom bg-bg">{footer}</div>}
