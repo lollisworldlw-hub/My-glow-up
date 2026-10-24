@@ -5,7 +5,7 @@ import { SLOTS, SLOT_LABEL } from '../lib/types';
 import { itemMacros } from '../lib/nutrition';
 import { consumed, dayHabitStats, habitAuto, habitDone, planned, useToday } from '../lib/derived';
 import { fmtLong, greeting, weekStart, daysBetween, weekday } from '../lib/date';
-import { MOTIVATION } from '../lib/seed';
+import { dailyQuote } from '../lib/quotes';
 import { latest, progress } from '../lib/weight';
 import { Bar, Card, CheckRow, Ring, SectionTitle, toast } from '../components/ui';
 import { LogFoodSheet, MealCard, SwapSheet } from '../components/MealParts';
@@ -34,8 +34,7 @@ export default function Home() {
   const sched = s.schedule[weekday(today)];
   const water = s.water[today] ?? 0;
   const extras = s.logs.filter((l) => l.date === today && !l.planItemId);
-  const quotes = st.quotes.filter((q) => q.trim()).length ? st.quotes.filter((q) => q.trim()) : MOTIVATION;
-  const msg = quotes[(daysBetween('2026-01-01', today) % quotes.length + quotes.length) % quotes.length];
+  const msg = dailyQuote(st.quoteStyle, daysBetween('2026-01-01', today));
   const loggedIds = new Set(s.logs.filter((l) => l.date === today && l.planItemId).map((l) => l.planItemId));
   const next = (() => {
     for (const slot of SLOTS) for (const item of (day?.[slot] ?? [])) {

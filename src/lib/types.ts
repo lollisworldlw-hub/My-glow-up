@@ -212,6 +212,7 @@ export interface Settings {
   diets: Diet[];
   navTabs: string[];
   quotes: string[];
+  quoteStyle?: 'motivational' | 'whip' | 'soft';
   prepDays: { sunday: number; wednesday: number };
   inviteCode?: string;
 }

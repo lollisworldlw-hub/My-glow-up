@@ -5,7 +5,7 @@ import type { Food, GroceryCategory, HomeWorkoutType, ScheduleDay } from '../lib
 import { GROCERY_CATEGORIES, SLOT_LABEL, DIETS, FOOD_TAGS } from '../lib/types';
 import type { FoodTag } from '../lib/types';
 import { NavEditor } from './More';
-import { MOTIVATION } from '../lib/seed';
+import { QUOTE_STYLES } from '../lib/quotes';
 import { weekStart, addDays as addD } from '../lib/date';
 import { DOW_NAMES, todayKey, uid } from '../lib/date';
 import { clearPhotos, downloadText, exportData, parseBackup, restorePhotos } from '../lib/backup';
@@ -129,17 +129,18 @@ export default function Settings() {
       <SectionTitle>Personal touches</SectionTitle>
       <Card>
         <button className="btn-soft w-full mb-3" onClick={() => setSheet('nav' as any)}>Customize the bottom bar</button>
-        <div className="label">My motivational messages</div>
-        <p className="text-[13px] text-muted mb-2">Shown on Home, one per day. Leave empty to use the built-in ones.</p>
-        {st.quotes.map((q, i) => (
-          <div key={i} className="flex gap-2 mb-2">
-            <input className="field flex-1" value={q} aria-label="Message" onChange={(e) => set({ quotes: st.quotes.map((x, j) => (j === i ? e.target.value : x)) })} />
-            <button aria-label="Remove" className="w-10 h-10 grid place-items-center text-muted" onClick={() => set({ quotes: st.quotes.filter((_, j) => j !== i) })}><Trash2 size={17} /></button>
-          </div>
-        ))}
-        <div className="flex gap-2">
-          <button className="btn-ghost btn-sm flex-1" onClick={() => set({ quotes: [...st.quotes, ''] })}><Plus size={15} />Add message</button>
-          {!st.quotes.length && <button className="btn-ghost btn-sm flex-1" onClick={() => set({ quotes: [...MOTIVATION] })}>Start from built-ins</button>}
+        <div className="label">Daily message style</div>
+        <p className="text-[13px] text-muted mb-2">A new message shows on Home every day.</p>
+        <div className="space-y-2">
+          {QUOTE_STYLES.map((q) => {
+            const on = (st.quoteStyle ?? 'motivational') === q.v;
+            return (
+              <button key={q.v} aria-pressed={on} onClick={() => set({ quoteStyle: q.v })} className={`w-full text-left rounded-[16px] border p-3 ${on ? 'border-ink bg-petal' : 'border-line'}`}>
+                <div className="text-[15px] font-medium">{q.label}</div>
+                <div className="text-[13px] text-muted mt-0.5">“{q.sample}”</div>
+              </button>
+            );
+          })}
         </div>
       </Card>
 
