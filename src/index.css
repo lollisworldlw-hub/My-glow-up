@@ -2,6 +2,10 @@
 @import '@fontsource/geist/latin-400.css';
 @import '@fontsource/geist/latin-500.css';
 @import '@fontsource/geist/latin-600.css';
+@import '@fontsource-variable/newsreader/opsz.css';
+@import '@fontsource/hanken-grotesk/latin-400.css';
+@import '@fontsource/hanken-grotesk/latin-500.css';
+@import '@fontsource/hanken-grotesk/latin-600.css';
 
 @tailwind base;
 @tailwind components;
@@ -81,6 +85,54 @@
   --line: #2C2426; --sage: #93B39A; --sage-deep: #B9D2BF; --gold: #C9AE80;
   color-scheme: dark;
 }
+/* Eucalyptus: the signature look. Deep green, champagne gold, grain and a warm glow. Same in light and dark. */
+:root[data-palette="euca"], .dark[data-palette="euca"] {
+  --bg: #1D2A24; --card: #26352E; --ink: #EEF1EC; --muted: #A2B2A9;
+  --rose: #E6CFA4; --rose-deep: #E6CFA4; --petal: #2E3F37; --blush: #445A4F;
+  --line: rgba(230, 207, 164, 0.14); --sage: #9FC0B0; --sage-deep: #C4DACD; --gold: #E6CFA4;
+  color-scheme: dark;
+}
+:root[data-palette="euca"] body { background: #1A2620; font-family: 'Hanken Grotesk', system-ui, -apple-system, sans-serif; letter-spacing: 0; }
+:root[data-palette="euca"] body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(520px 520px at 105% -8%, rgba(214, 184, 138, 0.30), rgba(214, 184, 138, 0) 62%),
+    radial-gradient(480px 480px at -20% 92%, rgba(122, 156, 138, 0.16), rgba(122, 156, 138, 0) 65%),
+    linear-gradient(170deg, #2F4239 0%, #213029 55%, #1A2620 100%);
+}
+:root[data-palette="euca"] body::after {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .14; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+:root[data-palette="euca"] .card {
+  background: linear-gradient(160deg, rgba(238, 241, 236, 0.085), rgba(238, 241, 236, 0.035));
+  border-color: rgba(230, 207, 164, 0.16); border-radius: 22px;
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+:root[data-palette="euca"] .card-gold { background: linear-gradient(150deg, #E9D5AE, #CDAE7C); color: #23312B; border: 0; }
+:root[data-palette="euca"] .card-gold .text-muted { color: rgba(35, 49, 43, 0.7); }
+:root[data-palette="euca"] .btn-primary, :root[data-palette="euca"] .bg-deep.text-white,
+:root[data-palette="euca"] .bg-deep { color: #1D2A24; }
+:root[data-palette="euca"] .btn-primary { border-radius: 999px; background: linear-gradient(150deg, #EBD8B2, #CDAE7C); }
+:root[data-palette="euca"] .btn-soft { border-radius: 999px; background: rgba(238, 241, 236, 0.08); }
+:root[data-palette="euca"] .btn-ghost { border-radius: 999px; background: transparent; border-color: rgba(238, 241, 236, 0.18); }
+:root[data-palette="euca"] .btn-soft:hover { background: rgba(238, 241, 236, 0.12); }
+:root[data-palette="euca"] .chip { border-radius: 999px; background: rgba(238, 241, 236, 0.06); border-color: rgba(238, 241, 236, 0.12); }
+:root[data-palette="euca"] .chip-on { background: #E6CFA4; color: #1D2A24; border-color: #E6CFA4; }
+:root[data-palette="euca"] .field { background: rgba(0, 0, 0, 0.18); border-color: rgba(238, 241, 236, 0.14); border-radius: 14px; }
+:root[data-palette="euca"] .field:focus { border-color: #E6CFA4; }
+:root[data-palette="euca"] select.field option { background: #26352E; color: #EEF1EC; }
+:root[data-palette="euca"] .h-serif { font-family: 'Newsreader Variable', Georgia, serif; font-weight: 350; letter-spacing: -0.005em; }
+:root[data-palette="euca"] .num { font-family: 'Newsreader Variable', Georgia, serif; font-weight: 300; letter-spacing: -0.02em; }
+:root[data-palette="euca"] .bar-bg { background: color-mix(in srgb, #1D2A24 90%, transparent); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); border-color: transparent; }
+:root[data-palette="euca"] .nav-pill-wrap { margin: 6px 12px 8px; padding: 6px; background: rgba(16, 24, 20, 0.9); border: 1px solid rgba(238, 241, 236, 0.08); border-radius: 30px; }
+:root[data-palette="euca"] .nav-btn { border-radius: 24px; min-height: 46px; padding: 6px 0 5px; }
+:root[data-palette="euca"] .pb-nav { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+:root[data-palette="euca"] nav.bar-bg { background: #17211C; }
+:root[data-palette="euca"] .install-bar { background: #17211C; color: #EEF1EC; border-bottom: 1px solid rgba(230, 207, 164, 0.14); }
+:root[data-palette="euca"] .toast { background: #E6CFA4; color: #1D2A24; border-radius: 999px; padding-left: 18px; padding-right: 18px; }
+:root[data-palette="euca"] .nav-pill { background: rgba(20, 30, 26, 0.92); border: 1px solid rgba(238, 241, 236, 0.10); border-radius: 30px; box-shadow: 0 14px 30px rgba(0,0,0,.3); }
+:root[data-palette="euca"] .nav-on { background: rgba(230, 207, 164, 0.16); color: #E6CFA4 !important; }
 .dark .btn-primary { color: var(--bg); }
 
 html, body, #root { height: 100%; }

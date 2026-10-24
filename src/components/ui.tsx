@@ -74,6 +74,7 @@ export function Ring({ pct, size = 150, stroke = 6, color = 'var(--rose)', ghost
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
+        <defs><linearGradient id="goldRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F0DDB6" /><stop offset="100%" stopColor="#B08A55" /></linearGradient></defs>
         <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--petal)" strokeWidth={stroke} fill="none" />
         {ghostPct > 0 && <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--blush)" strokeOpacity={0.9} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off(ghostPct)} className="ring-anim" />}
         <circle cx={size / 2} cy={size / 2} r={r} stroke={color} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off(shown)} className="ring-anim" />
@@ -179,8 +180,8 @@ export function Toaster() {
   useEffect(() => { if (!msg) return; setVis(true); const t = setTimeout(() => setVis(false), 2400); return () => clearTimeout(t); }, [key, msg]);
   if (!vis || !msg) return null;
   return (
-    <div className="fixed left-0 right-0 z-[75] flex justify-center px-4 pointer-events-none" style={{ bottom: 'calc(68px + env(safe-area-inset-bottom))' }}>
-      <div key={key} className="fade rounded-[10px] bg-ink text-bg px-4 py-2.5 text-[13.5px] shadow-soft">{msg}</div>
+    <div className="fixed left-0 right-0 z-[75] flex justify-center px-4 pointer-events-none" style={{ bottom: 'calc(96px + env(safe-area-inset-bottom))' }}>
+      <div key={key} className="fade toast rounded-[10px] bg-ink text-bg px-4 py-2.5 text-[13.5px] shadow-soft">{msg}</div>
     </div>
   );
 }

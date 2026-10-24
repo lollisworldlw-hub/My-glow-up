@@ -244,6 +244,7 @@ export const useStore = create<Store>()(
 export function migrate<T extends State>(st: T): T {
   const settings = { ...st.settings } as any;
   if (settings.name === 'beautiful') settings.name = '';
+  if (!settings.lookV3) { settings.palette = 'euca'; settings.lookV3 = true; }
   let water = st.water;
   if (!settings.waterOz) {
     // water used to be counted in 8 oz glasses

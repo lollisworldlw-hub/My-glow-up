@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { ChevronRight, Droplet, Footprints, Plus, Scale, Sparkles, Trash2, Bike, Dumbbell, Moon } from 'lucide-react';
+import { Plus, Play, Scale, Sparkles, Trash2 } from 'lucide-react';
 import { useStore } from '../lib/store';
-import { SLOTS } from '../lib/types';
+import { SLOTS, SLOT_LABEL } from '../lib/types';
+import { itemMacros } from '../lib/nutrition';
 import { consumed, dayHabitStats, habitAuto, habitDone, planned, useToday } from '../lib/derived';
 import { fmtLong, greeting, weekStart, daysBetween, weekday } from '../lib/date';
 import { MOTIVATION } from '../lib/seed';
@@ -35,7 +36,16 @@ export default function Home() {
   const extras = s.logs.filter((l) => l.date === today && !l.planItemId);
   const quotes = st.quotes.filter((q) => q.trim()).length ? st.quotes.filter((q) => q.trim()) : MOTIVATION;
   const msg = quotes[(daysBetween('2026-01-01', today) % quotes.length + quotes.length) % quotes.length];
-  const proteinLeft = Math.max(0, st.proteinMin - eaten.protein);
+  const loggedIds = new Set(s.logs.filter((l) => l.date === today && l.planItemId).map((l) => l.planItemId));
+  const next = (() => {
+    for (const slot of SLOTS) for (const item of (day?.[slot] ?? [])) {
+      if (loggedIds.has(item.id)) continue;
+      const r = item.recipeId ? s.recipes[item.recipeId] : undefined;
+      return { slot, item, name: r?.name ?? item.quick?.name ?? 'Meal', cal: itemMacros(item, s.recipes, s.foods).cal };
+    }
+    return null;
+  })();
+  const moveDone = s.workouts.some((w) => w.date === today && w.type !== 'walk' && w.completed);
 
   const toggleHabit = (id: string) => {
     const h = s.habits.find((x) => x.id === id)!;
@@ -45,85 +55,90 @@ export default function Home() {
 
   return (
     <div className="space-y-2">
-      <div className="pt-2 pb-1">
+      <div className="pt-4 pb-3 px-1">
         <div className="text-[13px] text-muted">{fmtLong(today)}</div>
-        <h1 className="h-serif text-[28px] leading-[1.1] mt-0.5">{greeting()}{st.name ? `, ${st.name}` : ''}</h1>
-        <p className="text-[14px] text-muted mt-1.5">{msg}</p>
+        <h1 className="h-serif text-[34px] leading-[1.08] mt-1">{greeting()}{st.name ? `, ${st.name}` : ''}.</h1>
+        <p className="text-[14px] text-muted mt-2 leading-snug">
+          Day {Math.max(1, daysBetween(st.startDate ?? today, today) + 1)}.{p.lost > 0 ? ` Down ${showW(p.lost, st.weightUnit)}.` : ''} {msg}
+        </p>
       </div>
 
-      {/* today: the one big number */}
-      <section className="card p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="text-[13px] text-muted">Calories left today</div>
-            <div className="num text-[64px] leading-[0.95] mt-1">{Math.max(0, Math.round(st.calTarget - eaten.cal)).toLocaleString()}</div>
-            <div className="text-[13px] text-muted mt-2 tabular-nums">{Math.round(eaten.cal).toLocaleString()} eaten of {st.calTarget.toLocaleString()} · planned {Math.round(plan.cal).toLocaleString()}</div>
-          </div>
-          <Ring pct={calPct} ghostPct={(plan.cal / st.calTarget) * 100} size={76} stroke={4}>
-            <span className="text-[12px] text-muted tabular-nums">{Math.round(Math.min(999, calPct))}%</span>
+      {/* hero: gold ring + the three daily numbers */}
+      <section className="card p-5">
+        <div className="flex items-center gap-5">
+          <Ring pct={calPct} ghostPct={(plan.cal / st.calTarget) * 100} size={118} stroke={4} color="url(#goldRing)">
+            <div className="flex flex-col items-center">
+              <span className="num text-[38px] leading-none">{Math.max(0, Math.round(st.calTarget - eaten.cal)).toLocaleString()}</span>
+              <span className="text-[11px] text-muted mt-1">cal left</span>
+            </div>
           </Ring>
-        </div>
-        <div className="grid grid-cols-2 gap-4 mt-4 pt-3 border-t border-line">
-          <div>
-            <div className="flex justify-between text-[13px]"><span className="text-muted">Protein</span><span className="tabular-nums">{Math.round(eaten.protein)}<span className="text-muted"> / {st.proteinMin} g</span></span></div>
-            <div className="mt-2"><Bar pct={(eaten.protein / st.proteinMin) * 100} color="var(--sage)" /></div>
+          <div className="flex-1 min-w-0 space-y-3.5">
+            {[
+              ['Protein', `${Math.round(eaten.protein)} / ${st.proteinMin} g`, (eaten.protein / st.proteinMin) * 100, 'var(--gold)'],
+              ['Water', `${water} / ${st.waterTarget} oz`, (water / st.waterTarget) * 100, 'var(--sage)'],
+              ['Steps', (s.steps[today] ?? 0).toLocaleString(), ((s.steps[today] ?? 0) / st.stepsGoal) * 100, 'var(--ink)']
+            ].map(([l, v, pc, c]) => (
+              <div key={l as string}>
+                <div className="flex justify-between text-[13px]"><span className="text-muted">{l}</span><span className="tabular-nums">{v}</span></div>
+                <div className="mt-1.5"><Bar pct={pc as number} color={c as string} h={3} /></div>
+              </div>
+            ))}
           </div>
-          <div>
-            <div className="flex justify-between text-[13px]"><span className="text-muted">Water</span><span className="tabular-nums">{water}<span className="text-muted"> / {st.waterTarget} oz</span></span></div>
-            <div className="mt-2"><Bar pct={(water / st.waterTarget) * 100} color="var(--rose)" /></div>
-          </div>
         </div>
+        <div className="text-[12px] text-muted mt-4 tabular-nums">{Math.round(eaten.cal).toLocaleString()} eaten of {st.calTarget.toLocaleString()}, {Math.round(plan.cal).toLocaleString()} planned</div>
         <ProteinFixer today={today} />
       </section>
+
+      {/* up next + movement */}
+      <div className="grid grid-cols-2 gap-2">
+        {next ? (
+          <button className="card card-gold p-4 h-[136px] flex flex-col justify-between text-left" onClick={() => s.logItem(today, next.slot, next.item.id)}>
+            <div className="flex justify-between w-full text-[12px] text-muted"><span>{SLOT_LABEL[next.slot]}</span><span className="tabular-nums">{Math.round(next.cal)} cal</span></div>
+            <div>
+              <div className="h-serif text-[20px] leading-[1.15] line-clamp-2">{next.name}</div>
+              <div className="text-[12px] text-muted mt-1">Tap to log</div>
+            </div>
+          </button>
+        ) : (
+          <button className="card card-gold p-4 h-[136px] flex flex-col justify-between text-left" onClick={() => setSheet('log')}>
+            <div className="text-[12px] text-muted">All meals logged</div>
+            <div className="h-serif text-[20px] leading-[1.15]">Log a snack</div>
+          </button>
+        )}
+        <button className="card p-4 h-[136px] flex flex-col justify-between text-left" onClick={() => go('workouts')}>
+          <div className="flex justify-between items-center w-full text-[12px] text-muted"><span>{moveDone ? 'Done today' : 'Movement'}</span><Play size={13} className="text-gold" fill="currentColor" /></div>
+          <div className="h-serif text-[20px] leading-[1.15]">{HOME_LABEL[sched?.home ?? 'rest']}</div>
+        </button>
+      </div>
+
+      {/* water */}
+      <div className="card px-4 py-3 flex items-center justify-between gap-2">
+        <span className="text-[14px]">Add water</span>
+        <div className="flex gap-1.5">
+          {[8, 16, 24].map((oz) => (
+            <button key={oz} className="chip !py-1.5 tabular-nums" aria-label={`Add ${oz} ounces`} onClick={() => s.set((x) => { x.water[today] = (x.water[today] ?? 0) + oz; })}>+{oz}</button>
+          ))}
+          <button disabled={!water} className="chip !py-1.5 text-muted disabled:opacity-40" aria-label="Remove 8 ounces" onClick={() => s.set((x) => { x.water[today] = Math.max(0, (x.water[today] ?? 0) - 8); })}>−8</button>
+        </div>
+      </div>
 
       <CheckinCard today={today} />
       <CycleChip today={today} />
 
       {/* weight */}
       <Card>
-        <div className="flex items-start justify-between">
+        <div className="flex items-end justify-between">
           <div>
             <div className="text-[13px] text-muted">Weight</div>
             <div className="num text-[34px] leading-none mt-1">{showW(cur, st.weightUnit)}</div>
           </div>
-          <button className="btn-ghost btn-sm" onClick={() => setSheet('weight')}><Scale size={15} strokeWidth={1.75} />Log weigh-in</button>
+          <button className="btn-ghost btn-sm" onClick={() => setSheet('weight')}><Scale size={15} strokeWidth={1.75} />Log</button>
         </div>
-        <div className="mt-3"><Bar pct={p.pct} color="var(--gold)" /></div>
+        <div className="mt-3"><Bar pct={p.pct} color="var(--gold)" h={3} /></div>
         <div className="flex justify-between text-[12.5px] text-muted mt-2 tabular-nums">
           <span>{showW(Math.max(0, p.lost), st.weightUnit)} lost</span>
           <span>{showW(p.remaining, st.weightUnit)} to {showW(st.goalWeight, st.weightUnit)}</span>
         </div>
-      </Card>
-
-      {/* water */}
-      <Card className="rise">
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-[14px] font-medium">Add water</div>
-          <div className="text-[13px] text-muted tabular-nums">{water} / {st.waterTarget} oz</div>
-        </div>
-        <div className="grid grid-cols-5 gap-1.5 mt-2.5">
-          {[8, 12, 16, 20].map((oz) => (
-            <button key={oz} className="chip justify-center !py-2 tabular-nums" aria-label={`Add ${oz} ounces`} onClick={() => s.set((x) => { x.water[today] = (x.water[today] ?? 0) + oz; })}>+{oz}</button>
-          ))}
-           <button disabled={!water} className="chip justify-center !py-2 text-muted disabled:opacity-40" aria-label="Remove 8 ounces" onClick={() => s.set((x) => { x.water[today] = Math.max(0, (x.water[today] ?? 0) - 8); })}>−8</button>
-        </div>
-      </Card>
-
-      {/* workout today */}
-      <Card className="rise" onClick={() => go('workouts')}>
-        <div className="eyebrow mb-3">Today’s movement</div>
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-10 h-10 rounded-2xl bg-petal grid place-items-center text-deep"><Footprints size={20} /></div>
-          <div><div className="font-medium">{sched?.walk === 'walk' ? `${st.walkMinutes}-minute brisk lunch walk` : sched?.walk === 'optional' ? 'Optional walk' : 'Recovery day'}</div>
-            <div className="text-[13px] text-muted">{s.workouts.some((w) => w.date === today && w.type === 'walk' && w.completed) ? 'Done' : 'Lunch break'}</div></div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-2xl bg-petal grid place-items-center text-deep">{sched?.home === 'strength' ? <Dumbbell size={20} /> : sched?.home === 'rest' ? <Moon size={20} /> : <Bike size={20} />}</div>
-          <div className="flex-1"><div className="font-medium">{HOME_LABEL[sched?.home ?? 'rest']}</div>
-            <div className="text-[13px] text-muted">{s.workouts.some((w) => w.date === today && w.type !== 'walk' && w.completed) ? 'Done' : sched?.home === 'rest' ? 'Enjoy the rest' : `${st.workoutMinutes} minutes at home`}</div></div>
-          <ChevronRight size={18} strokeWidth={1.5} className="text-muted" />
-        </div>
-        <div className="mt-3 text-[13px] text-muted">Steps today: <b className="text-ink">{(s.steps[today] ?? 0).toLocaleString()}</b> of {st.stepsGoal.toLocaleString()}</div>
       </Card>
 
       {/* checklist */}

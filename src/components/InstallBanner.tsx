@@ -30,7 +30,7 @@ export function InstallBanner() {
   const otherIOSBrowser = ios && isInAppBrowser();
 
   return (
-    <div className="bg-ink text-bg safe-top" role="region" aria-label="Install the app">
+    <div className="bg-ink text-bg safe-top install-bar" role="region" aria-label="Install the app">
       <div className="mx-auto max-w-[640px] px-3 py-2 flex items-start gap-2">
         <img src="/icons/icon-192.png" alt="" className="w-9 h-9 rounded-[9px] shrink-0" />
         <div className="flex-1 min-w-0 text-[13px] leading-snug">

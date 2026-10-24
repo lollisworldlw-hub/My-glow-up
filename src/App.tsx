@@ -36,7 +36,7 @@ function useHydrated() {
 
 function useTheme() {
   const theme = useStore((s) => s.settings.theme);
-  const palette = useStore((s) => s.settings.palette ?? 'sage');
+  const palette = useStore((s) => s.settings.palette ?? 'euca');
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const apply = () => {
@@ -130,11 +130,11 @@ export default function App() {
   return (
     <div className="min-h-full">
       <InstallBanner />
-      <header className="sticky top-0 z-30 bg-bg border-b border-line top-safe">
-        <div className="mx-auto max-w-[640px] px-4 h-11 flex items-center justify-between">
+      <header className="sticky top-0 z-30 bg-bg bar-bg border-b border-line top-safe">
+        <div className="mx-auto max-w-[640px] px-5 h-12 flex items-center justify-between">
           <button className="flex items-center gap-2 min-h-[44px]" aria-label="Home" onClick={() => go('home')}>
-            <img src="/icons/icon-192.png" alt="" className="w-7 h-7 rounded-[8px]" />
-            <span className={`text-[15px] font-semibold tracking-[-0.02em] leading-none ${tab === 'home' ? 'text-ink' : 'text-muted'}`}>Glow-Up</span>
+            <img src="/icons/icon-192.png" alt="" className="w-7 h-7 rounded-full" />
+            <span className={`h-serif text-[19px] leading-none ${tab === 'home' ? 'text-ink' : 'text-muted'}`}>Glow-Up</span>
           </button>
         </div>
       </header>
@@ -155,14 +155,14 @@ export default function App() {
         </ErrorBoundary>
       </main>
 
-      <nav className="fixed bottom-0 inset-x-0 z-40 bg-bg border-t border-line safe-bottom" aria-label="Main">
-        <div className="mx-auto max-w-[640px] flex">
+      <nav className="fixed bottom-0 inset-x-0 z-40 bg-bg bar-bg border-t border-line safe-bottom" aria-label="Main">
+        <div className="mx-auto max-w-[640px] flex nav-pill-wrap">
           {[...bottom.map((id) => NAV.find((n) => n.id === id)!), MORE].map((n) => {
             const on = n.id === 'more' ? tab !== 'home' && !bottom.includes(tab) : tab === n.id;
             const Icon = n.icon;
             return (
               <button key={n.id} onClick={() => go(n.id)} aria-current={on ? 'page' : undefined}
-                className={`relative flex-1 flex flex-col items-center justify-center gap-1 pt-2 pb-1 min-h-[48px] transition-colors ${on ? 'text-ink' : 'text-muted'}`}>
+                className={`relative flex-1 flex flex-col items-center justify-center gap-1 pt-2 pb-1 min-h-[48px] transition-colors nav-btn ${on ? 'text-ink nav-on' : 'text-muted'}`}>
                 {n.id === 'social' && unread > 0 && <span className="absolute top-1.5 left-1/2 ml-2 min-w-[18px] h-[18px] px-1 rounded-full bg-deep text-white text-[11px] grid place-items-center" aria-label={`${unread} unread`}>{unread > 9 ? '9+' : unread}</span>}
                 <Icon size={19} strokeWidth={on ? 1.9 : 1.5} />
                 <span className={`text-[10.5px] leading-none ${on ? 'font-medium' : ''}`}>{n.label}</span>
