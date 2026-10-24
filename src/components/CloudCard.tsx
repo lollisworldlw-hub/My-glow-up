@@ -3,7 +3,7 @@ import { Cloud, CloudOff, LogOut, RefreshCcw } from 'lucide-react';
 import { authLinkError, joinGroup, rememberJoin, resetPassword, signIn, signOut, signUp, syncNow, updatePassword, useSync } from '../lib/sync';
 import { useStore } from '../lib/store';
 import { Card, Field, Sheet, toast } from './ui';
-import { AuthForm } from './Auth';
+import { AuthForm, JoinGroupCard } from './Auth';
 
 const ago = (t: number | null) => {
   if (!t) return 'not yet';
@@ -20,16 +20,16 @@ export function CloudCard() {
   return (
     <Card>
       <div className="flex items-start gap-2 mb-3">
-        {email && member ? <Cloud className="text-deep shrink-0" size={22} /> : <CloudOff className="text-muted shrink-0" size={22} />}
+        {email ? <Cloud className="text-deep shrink-0" size={22} /> : <CloudOff className="text-muted shrink-0" size={22} />}
         <div>
-          <div className="font-semibold">{email && member ? 'Your account & cloud backup' : 'Account & cloud backup'}</div>
-          <p className="text-[13px] text-muted">{email && member
+          <div className="font-semibold">{email ? 'Your account & cloud backup' : 'Account & cloud backup'}</div>
+          <p className="text-[13px] text-muted">{email
             ? `Signed in as ${email}. Last synced ${ago(lastSynced)}${status === 'syncing' ? ' · syncing…' : status === 'offline' ? ' · waiting for internet' : status === 'error' ? ' · will retry' : ''}.`
-            : 'Your account backs up everything except photos to a private cloud space only you can open, and unlocks the Social tab. Sign-up needs an invite code.'}</p>
+            : 'Your account backs up everything except photos to a private cloud space only you can open, and unlocks the Social tab. Sign in or create one to back up your plan.'}</p>
           {status === 'error' && error && <p className="text-[13px] text-deep mt-1">{error}</p>}
         </div>
       </div>
-      {email && member ? (
+      {email ? (
         <div className="grid grid-cols-2 gap-2">
           <button className="btn-soft btn-sm" onClick={async () => { await syncNow(); toast('Synced'); }}><RefreshCcw size={16} />Sync now</button>
           <button className="btn-ghost btn-sm" onClick={() => useSync.setState({ recovery: true })}>Change password</button>

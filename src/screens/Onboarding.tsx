@@ -40,8 +40,7 @@ function Shell({ children, back, title, sub, go, step, wide }: { children: React
 
 function Restoring({ go }: { go: (s: string) => void }) {
   const { status, member, error } = useSync();
-  useEffect(() => { if (status === 'idle' && member) { const t = setTimeout(() => { if (!useStore.getState().settings.onboarded) go('about'); }, 600); return () => clearTimeout(t); } }, [status, member]);
-  if (member === false) return <AuthForm />;
+  useEffect(() => { if (status === 'idle' && member !== null) { const t = setTimeout(() => { if (!useStore.getState().settings.onboarded) go('about'); }, 600); return () => clearTimeout(t); } }, [status, member]);
   if (status === 'error') return (
     <div>
       <ErrorNote msg={`We couldn’t load your plan: ${error ?? 'unknown error'}`} />
@@ -105,7 +104,7 @@ export default function Onboarding() {
         </div>
       </div>
       <div className="mx-auto w-full max-w-[520px] px-5 pt-7 pb-[calc(env(safe-area-inset-bottom)+24px)]">
-        <button className="btn-primary w-full !min-h-[54px] !text-[16px]" onClick={() => setStep('join')}>Join with an invite</button>
+        <button className="btn-primary w-full !min-h-[54px] !text-[16px]" onClick={() => setStep('join')}>Create account</button>
         <button className="btn-ghost w-full !min-h-[54px] !text-[16px] mt-3" onClick={() => setStep('signin')}>Sign in</button>
         <div className="flex justify-center gap-5 mt-5 text-[13px] text-muted">
           <button className="min-h-[40px]" onClick={() => setStep('about')}>Use without an account</button>
@@ -122,7 +121,7 @@ export default function Onboarding() {
   );
 
   if (step === 'join') return (
-    <Shell go={setStep} back="welcome" title="Create your account" sub="You’ll need the invite code a friend sent you.">
+    <Shell go={setStep} back="welcome" title="Create your account" sub="Your plan is backed up and works on any phone. Have an invite code? You can add it now or later.">
       <AuthForm key="join" start="join" onSwitch={setStep} onSignedIn={() => setStep('restoring')} />
     </Shell>
   );

@@ -66,7 +66,8 @@ export function AuthForm({ start = 'join', onSignedIn, onSwitch }: { start?: 'jo
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
-  useEffect(() => { if (signedInAs && member && onSignedIn) onSignedIn(); }, [signedInAs, member]);
+  useEffect(() => { if (signedInAs && member !== null && onSignedIn) onSignedIn(); }, [signedInAs, member]);
+  const [hasCode, setHasCode] = useState(!!inviteFromUrl());
   useEffect(() => setErr(''), [mode]);
 
   const run = async (fn: () => Promise<void>) => {
@@ -100,7 +101,7 @@ export function AuthForm({ start = 'join', onSignedIn, onSwitch }: { start?: 'jo
       <button className="btn-primary w-full !min-h-[50px]" disabled={busy} onClick={() => run(async () => { await signIn(em.trim(), pw); onSignedIn?.(); })}>
         {busy ? 'Checking…' : 'I tapped the link, sign me in'}
       </button>
-      <p className="text-[13px] text-muted mt-4">No email after a few minutes? Check spam, or ask whoever invited you to confirm your account from Admin.</p>
+      <p className="text-[13px] text-muted mt-4">No email after a few minutes? Check spam, or sign in anyway. If it still says not confirmed, ask an admin to confirm you.</p>
     </div>
   );
 
@@ -126,25 +127,31 @@ export function AuthForm({ start = 'join', onSignedIn, onSwitch }: { start?: 'jo
           if (!em.includes('@')) { setErr('Type your email first, then tap “Forgot password”.'); return; }
           run(async () => { await resetPassword(em.trim()); setMode('reset-sent'); });
         }}>Forgot password?</button>
-        <button className="min-h-[44px] font-medium" onClick={() => (onSwitch ? onSwitch('join') : setMode('join'))}>New here? Join</button>
+        <button className="min-h-[44px] font-medium" onClick={() => (onSwitch ? onSwitch('join') : setMode('join'))}>New here? Create account</button>
       </div>
     </div>
   );
 
   // join
+  const needCode = hasCode && !code.trim();
   return (
     <div>
       <ErrorNote msg={err} />
-      <TextField label="Invite code" hint="From the friend who invited you." value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="GLOW-XXXXXX" autoCapitalize="characters" autoCorrect="off" />
-      <TextField label="First name" hint="Friends see this." value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" />
+      <TextField label="First name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" />
       <TextField label="Email" type="email" inputMode="email" autoComplete="email" autoCapitalize="off" value={em} onChange={(e) => setEm(e.target.value)} />
       <PasswordField label="Create a password" value={pw} onChange={setPw} autoComplete="new-password" />
       <p className="text-[12px] text-muted -mt-2 mb-4">At least 8 characters.</p>
-      <button className="btn-primary w-full !min-h-[50px]" disabled={busy || !code.trim() || !name.trim() || !em.includes('@') || pw.length < 8}
+      <label className="flex items-center gap-3 min-h-[44px] mb-2 cursor-pointer select-none">
+        <input type="checkbox" className="w-5 h-5 accent-[var(--band-2)]" checked={hasCode} onChange={(e) => setHasCode(e.target.checked)} />
+        <span className="text-[15px]">I have an invite code</span>
+      </label>
+      {hasCode && <TextField label="Invite code" hint="From the friend who invited you. You’ll join their group." value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="GLOW-XXXXXX" autoCapitalize="characters" autoCorrect="off" />}
+      <button className="btn-primary w-full !min-h-[50px] mt-2" disabled={busy || !name.trim() || !em.includes('@') || pw.length < 8 || needCode}
         onClick={() => run(async () => {
-          rememberJoin(code.trim(), name.trim());
-          const r = await signUp(em.trim(), pw, code.trim(), name.trim());
-          if (!name0) useStore.getState().set((x) => { x.settings.name = name.trim(); });
+          const c = hasCode ? code.trim() : '';
+          if (c) rememberJoin(c, name.trim());
+          const r = await signUp(em.trim(), pw, c, name.trim());
+          useStore.getState().set((x) => { if (!x.settings.name) x.settings.name = name.trim(); });
           if (r.needsConfirm) setMode('check'); else onSignedIn?.();
         })}>
         {busy ? 'Creating your account…' : 'Create account'}
@@ -152,6 +159,31 @@ export function AuthForm({ start = 'join', onSignedIn, onSwitch }: { start?: 'jo
       <div className="text-center mt-3 text-[14px]">
         <button className="min-h-[44px] font-medium" onClick={() => (onSwitch ? onSwitch('signin') : setMode('signin'))}>Already have an account? Sign in</button>
       </div>
+    </div>
+  );
+}
+
+/** For people who made an account first and got an invite code later. */
+export function JoinGroupCard() {
+  const { email, member } = useSync();
+  const name0 = useStore((s) => s.settings.name);
+  const [code, setCode] = useState(inviteFromUrl());
+  const [name, setName] = useState(name0 || '');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  if (!email || member !== false) return null;
+  return (
+    <div className="card p-5">
+      <div className="font-semibold text-[16px]">Join a group</div>
+      <p className="text-[13px] text-muted mt-1 mb-4">Got an invite code from a friend? Enter it to chat, share wins and cheer each other on. Your weight, food and everything else stay private.</p>
+      <ErrorNote msg={err} />
+      <TextField label="Invite code" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="GLOW-XXXXXX" autoCapitalize="characters" autoCorrect="off" />
+      <TextField label="Your name" hint="This is what friends see." value={name} onChange={(e) => setName(e.target.value)} />
+      <button className="btn-primary w-full !min-h-[48px]" disabled={busy || !code.trim() || !name.trim()} onClick={async () => {
+        setErr(''); setBusy(true);
+        try { await joinGroup(code.trim(), name.trim()); } catch (e) { setErr(friendly(e)); }
+        setBusy(false);
+      }}>{busy ? 'Joining…' : 'Join group'}</button>
     </div>
   );
 }

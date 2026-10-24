@@ -14,6 +14,7 @@ import { Card, Field, Header, NumberInput, SectionTitle, Segmented, Sheet, toast
 import { WeightSheet } from '../components/WeightSheet';
 import { CloudCard } from '../components/CloudCard';
 import { AdminCard } from '../components/AdminPanel';
+import { JoinGroupCard } from '../components/Auth';
 import { useSync } from '../lib/sync';
 import { disablePush, enablePush, isIOS, isStandaloneApp, sendTest } from '../lib/push';
 
@@ -32,6 +33,7 @@ export default function Settings() {
     <div>
       <Header eyebrow="Make it yours" title="Settings" />
       <AdminCard />
+      <div className="mt-2"><JoinGroupCard /></div>
 
       <SectionTitle>Me & my goals</SectionTitle>
       <Card>
@@ -402,6 +404,7 @@ function DataSection({ onDelete }: { onDelete: () => void }) {
     <>
       <SectionTitle>Your data</SectionTitle>
       <div className="mb-3"><CloudCard /></div>
+      <div className="mb-3"><JoinGroupCard /></div>
       <Card>
         <div className="flex items-start gap-2 mb-3"><Database className="text-deep shrink-0 mt-0.5" size={20} />
           <p className="text-[13px]">Everything is saved privately on this device (IndexedDB). It can be lost if you clear Safari’s website data, delete the Home Screen app, or switch phones — so download a backup now and then and keep it in Files or iCloud Drive.</p>

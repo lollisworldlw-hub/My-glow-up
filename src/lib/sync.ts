@@ -58,7 +58,7 @@ export async function syncNow(): Promise<void> {
   busy = true;
   useSync.setState({ status: 'syncing', error: null });
   try {
-    if (!(await ensureMember(uid))) { useSync.setState({ status: 'needs-invite' }); return; }
+    await ensureMember(uid); // backup works with or without a group
     if (meta.userId && meta.userId !== uid) meta = { version: 0, lastSynced: null, dirtyAt: Date.now(), userId: uid };
     meta.userId = uid;
     const { data: row, error } = await supabase.from('glowup_state').select('version, data, updated_at').eq('user_id', uid).maybeSingle();
