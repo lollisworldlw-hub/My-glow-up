@@ -51,7 +51,7 @@ export function AccountForm({ compact, onDone }: { compact?: boolean; onDone?: (
     try {
       if (mode === 'up') {
         rememberJoin(code.trim(), name.trim());
-        const r = await signUp(em.trim(), pw);
+        const r = await signUp(em.trim(), pw, code.trim(), name.trim());
         if (r.needsConfirm) { setSent(true); setMode('in'); }
         else toast('Account created');
       } else { await signIn(em.trim(), pw); toast('Signed in'); }

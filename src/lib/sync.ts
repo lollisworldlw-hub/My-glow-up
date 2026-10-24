@@ -138,8 +138,9 @@ export async function startSync() {
   });
 }
 
-export async function signUp(email: string, password: string) {
-  const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
+export async function signUp(email: string, password: string, code = '', name = '') {
+  // The invite code travels with the account, so joining works even if the confirm link opens in another browser.
+  const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin, data: { glowup_code: code, glowup_name: name } } });
   if (error) throw error;
   return { needsConfirm: !data.session };
 }
@@ -174,6 +175,11 @@ export async function ensureMember(uid: string): Promise<boolean> {
   if (data) { useSync.setState({ member: true }); return true; }
   let pending: { code: string; name: string } | null = null;
   try { pending = JSON.parse(localStorage.getItem(PENDING) ?? 'null'); } catch { /* */ }
+  if (!pending?.code) {
+    const { data: u } = await supabase.auth.getUser();
+    const md = u?.user?.user_metadata;
+    if (md?.glowup_code) pending = { code: md.glowup_code, name: md.glowup_name || (u?.user?.email ?? '').split('@')[0] };
+  }
   if (pending?.code) {
     const { error } = await supabase.rpc('glowup_join', { p_code: pending.code, p_name: pending.name });
     if (!error) { localStorage.removeItem(PENDING); useSync.setState({ member: true }); return true; }
