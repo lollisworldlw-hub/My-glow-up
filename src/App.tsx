@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { NAV, MORE, bottomTabs } from './lib/nav';
+import { NAV, bottomTabs } from './lib/nav';
 import { useStore } from './lib/store';
 import { useUI, type Tab } from './lib/ui';
 import { todayKey } from './lib/date';
@@ -7,7 +7,6 @@ import Home from './screens/Home';
 import Meals from './screens/Meals';
 import Workouts from './screens/Workouts';
 import Progress from './screens/Progress';
-import Groceries from './screens/Groceries';
 import Settings from './screens/Settings';
 import { Celebration, Toaster, toast } from './components/ui';
 import { WorkoutPlayer } from './components/WorkoutPlayer';
@@ -19,7 +18,6 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import Social from './screens/Social';
 import Mind from './screens/Mind';
 import Clean from './screens/Clean';
-import More from './screens/More';
 import Onboarding from './screens/Onboarding';
 import { useSocial, unreadCount, loadSocial, startLive } from './lib/social';
 
@@ -189,7 +187,7 @@ export default function App() {
             <Logo size={28} />
             <span className="h-serif text-[19px] leading-none text-ink">Glow-Up</span>
           </button>
-          <button aria-label="Settings" onClick={() => go('settings')} className="w-9 h-9 rounded-full p-[2px]" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--accent-2))' }}>
+          <button aria-label="Your progress and settings" onClick={() => go('settings')} className="w-9 h-9 rounded-full p-[2px]" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--accent-2))' }}>
             <span className="w-full h-full rounded-full grid place-items-center text-[13px] font-semibold text-gold" style={{ background: 'var(--band-2)' }}>{(name || 'G').slice(0, 1).toUpperCase()}</span>
           </button>
         </div>
@@ -200,13 +198,10 @@ export default function App() {
           {tab === 'home' && <Home />}
           {tab === 'meals' && <Meals />}
           {tab === 'workouts' && <Workouts />}
-          {tab === 'progress' && <Progress />}
-          {tab === 'groceries' && <Groceries />}
-          {tab === 'settings' && <Settings />}
+          {tab === 'settings' && <><Progress /><div className="mt-8"><Settings /></div></>}
           {tab === 'social' && <Social />}
           {tab === 'mind' && <Mind />}
           {tab === 'clean' && <Clean />}
-          {tab === 'more' && <More />}
         </div>
         </ErrorBoundary>
       </main>
@@ -214,8 +209,8 @@ export default function App() {
 
       <nav className="fixed bottom-0 inset-x-0 z-40 bg-bg bar-bg border-t border-line safe-bottom" aria-label="Main">
         <div className="mx-auto max-w-[640px] flex nav-pill-wrap">
-          {[...bottom.map((id) => NAV.find((n) => n.id === id)!), MORE].map((n) => {
-            const on = n.id === 'more' ? tab !== 'home' && !bottom.includes(tab) : tab === n.id;
+          {bottom.map((id) => NAV.find((n) => n.id === id)!).map((n) => {
+            const on = tab === n.id;
             const Icon = n.icon;
             return (
               <button key={n.id} onClick={() => go(n.id)} aria-current={on ? 'page' : undefined}

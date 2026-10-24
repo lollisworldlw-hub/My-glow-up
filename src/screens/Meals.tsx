@@ -9,21 +9,23 @@ import { recipeMacros, round } from '../lib/nutrition';
 import { Card, Header, Segmented, Sheet, toast } from '../components/ui';
 import { LogFoodSheet, MealCard, SwapSheet } from '../components/MealParts';
 import { RecipeEditor } from '../components/RecipeEditor';
+import Groceries from './Groceries';
 import { FoodArt } from '../components/Art';
 import { useUI } from '../lib/ui';
 import { FoodPhotos, ShareRecipeSheet, useCanShare } from '../components/ShareParts';
 import { conflicts, dietBadges } from '../lib/diet';
 
 export default function Meals() {
-  const sub = (useUI((u) => u.sub.meals) ?? 'week') as 'week' | 'desserts' | 'recipes';
+  const sub = (useUI((u) => u.sub.meals) ?? 'week') as 'week' | 'desserts' | 'recipes' | 'groceries';
   const setSub = useUI((u) => u.setSub);
   return (
     <div>
       <Header eyebrow="Simple & repeatable" title="Meals" />
-      <div className="mb-3"><Segmented value={sub} onChange={(v) => setSub('meals', v)} options={[{ value: 'week', label: 'Week plan' }, { value: 'desserts', label: 'Desserts' }, { value: 'recipes', label: 'Recipes' }]} /></div>
+      <div className="mb-3"><Segmented value={sub} onChange={(v) => setSub('meals', v)} options={[{ value: 'week', label: 'Week plan' }, { value: 'recipes', label: 'Recipes' }, { value: 'desserts', label: 'Desserts' }, { value: 'groceries', label: 'Groceries' }]} /></div>
       {sub === 'week' && <WeekPlan />}
       {sub === 'desserts' && <Desserts />}
       {sub === 'recipes' && <Recipes />}
+      {sub === 'groceries' && <Groceries embedded />}
     </div>
   );
 }

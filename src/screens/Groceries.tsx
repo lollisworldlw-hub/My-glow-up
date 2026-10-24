@@ -10,12 +10,12 @@ import { FOOD_SAFETY } from '../lib/seed';
 import { Bar, Card, CheckCircle, Empty, Field, Header, NumberInput, Segmented, Sheet, toast } from '../components/ui';
 import { useUI } from '../lib/ui';
 
-export default function Groceries() {
+export default function Groceries({ embedded }: { embedded?: boolean }) {
   const sub = (useUI((u) => u.sub.groceries) ?? 'list') as 'list' | 'prep';
   const setSub = useUI((u) => u.setSub);
   return (
     <div>
-      <Header eyebrow="Shop once, eat well" title="Groceries" />
+      {!embedded && <Header eyebrow="Shop once, eat well" title="Groceries" />}
       <div className="mb-3"><Segmented value={sub} onChange={(v) => setSub('groceries', v)} options={[{ value: 'list', label: 'Shopping list' }, { value: 'prep', label: 'Meal prep' }]} /></div>
       {sub === 'list' ? <GroceryList /> : <MealPrep />}
     </div>

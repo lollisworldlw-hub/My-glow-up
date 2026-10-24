@@ -4,7 +4,6 @@ import { useStore, initialState, stateOnly } from '../lib/store';
 import type { Food, GroceryCategory, HomeWorkoutType, ScheduleDay } from '../lib/types';
 import { GROCERY_CATEGORIES, SLOT_LABEL, DIETS, FOOD_TAGS } from '../lib/types';
 import type { FoodTag } from '../lib/types';
-import { NavEditor } from './More';
 import { QUOTE_STYLES } from '../lib/quotes';
 import { weekStart, addDays as addD } from '../lib/date';
 import { DOW_NAMES, todayKey, uid } from '../lib/date';
@@ -128,7 +127,6 @@ export default function Settings() {
 
       <SectionTitle>Personal touches</SectionTitle>
       <Card>
-        <button className="btn-soft w-full mb-3" onClick={() => setSheet('nav' as any)}>Customize the bottom bar</button>
         <div className="label">Daily message style</div>
         <p className="text-[13px] text-muted mb-2">Home shows a message that fits the time of day and what you still need to do, like water, food or your workout. It changes through the day.</p>
         <div className="space-y-2">
@@ -160,7 +158,6 @@ export default function Settings() {
       {sheet === 'favorites' && <Favorites onClose={() => setSheet(null)} />}
       {sheet === 'reminders' && <Reminders onClose={() => setSheet(null)} />}
       {sheet === 'delete' && <DeleteAll onClose={() => setSheet(null)} />}
-      {(sheet as string) === 'nav' && <NavEditor onClose={() => setSheet(null)} />}
     </div>
   );
 }
