@@ -138,11 +138,13 @@ export default function App() {
           el = el.parentElement;
           if (el && el.contains(tabs) && el !== main && el.querySelector('.card, textarea')) break;
         }
-        // sticky tabs move while scrolling, so measure from the title above them instead
+        // pinned (sticky) title + tabs: size the band from layout, not the current scroll position
         const sticky = tabs.closest('.sticky') as HTMLElement | null;
-        const above = sticky?.previousElementSibling as HTMLElement | null;
-        const bottom = sticky && above ? above.getBoundingClientRect().bottom + tabs.offsetHeight + 4 : tabs.getBoundingClientRect().bottom;
-        setBandH(Math.round(bottom - top0 + 18));
+        if (sticky) {
+          setBandH(Math.round(parseFloat(getComputedStyle(main).paddingTop) + sticky.offsetHeight + 14));
+          return;
+        }
+        setBandH(Math.round(tabs.getBoundingClientRect().bottom - top0 + 18));
         return;
       }
       if (!card) { setBandH(0); return; }
@@ -183,8 +185,8 @@ export default function App() {
       <div className="status-cap" aria-hidden />
       <InstallBanner />
       <div className="relative" ref={wrapRef}>
-      {tab !== 'home' && <div className="band absolute inset-x-0 top-0" style={{ height: bandH || 'calc(56px + env(safe-area-inset-top))' }} aria-hidden />}
-      <header className="absolute inset-x-0 top-0 z-30 app-header top-safe mt-3 on-dark">
+      {tab !== 'home' && <div className={`band inset-x-0 top-0 ${tab === 'social' ? 'fixed z-20' : 'absolute'}`} style={{ height: bandH || 'calc(56px + env(safe-area-inset-top))' }} aria-hidden />}
+      <header className={`${tab === 'social' ? 'fixed' : 'absolute'} inset-x-0 top-0 z-30 app-header top-safe mt-3 on-dark`}>
         <div className="mx-auto max-w-[640px] px-5 h-14 flex items-center justify-between">
           <button className="flex items-center gap-2 min-h-[44px]" aria-label="Home" onClick={() => go('home')}>
             <Logo size={28} />
