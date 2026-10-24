@@ -127,7 +127,22 @@ export default function App() {
     const calc = () => {
       main.querySelectorAll('.auto-dark').forEach((e) => e.classList.remove('on-dark', 'auto-dark'));
       if (tab === 'home') { setBandH(0); return; }
-      const card = main.querySelector('.card') as HTMLElement | null;
+      let card = main.querySelector('.card') as HTMLElement | null;
+      const top0 = wrap.getBoundingClientRect().top;
+      // pages with no box near the top (like the chat): end the band under the tabs instead
+      const tabs = main.querySelector('[role=tablist]') as HTMLElement | null;
+      if (tabs && (!card || card.getBoundingClientRect().top - top0 > 420)) {
+        let el: HTMLElement | null = tabs;
+        while (el && el !== main) {
+          if (!el.classList.contains('on-dark')) el.classList.add('on-dark', 'auto-dark');
+          let sib = el.previousElementSibling as HTMLElement | null;
+          while (sib) { if (!sib.classList.contains('on-dark')) sib.classList.add('on-dark', 'auto-dark'); sib = sib.previousElementSibling as HTMLElement | null; }
+          el = el.parentElement;
+          if (el && el.contains(tabs) && el !== main && el.querySelector('.card, textarea')) break;
+        }
+        setBandH(Math.round(tabs.getBoundingClientRect().bottom - top0 + 18));
+        return;
+      }
       if (!card) { setBandH(0); return; }
       let el: HTMLElement | null = card;
       while (el && el !== main) {

@@ -53,7 +53,7 @@ export default function Social() {
   return (
     <div>
       <Header eyebrow="Friends & cheering" title="Social" />
-      <div className="mb-3"><Segmented value={sub} onChange={(v) => setSub('social', v)} options={[{ value: 'group', label: 'Group' }, { value: 'challenges', label: 'Challenges' }, { value: 'messages', label: 'Messages' }, { value: 'friends', label: 'Friends' }]} /></div>
+      <div className="mb-7"><Segmented value={sub} onChange={(v) => setSub('social', v)} options={[{ value: 'group', label: 'Group' }, { value: 'challenges', label: 'Challenges' }, { value: 'messages', label: 'Messages' }, { value: 'friends', label: 'Friends' }]} /></div>
       {!loaded ? <p className="text-muted">Loading…</p> : error ? <Card><p>Couldn’t reach the group right now. {error}</p><button className="btn-soft btn-sm mt-3" onClick={loadSocial}>Try again</button></Card> : (
         <>
           {sub === 'group' && <Thread peer={null} me={userId!} />}
@@ -205,16 +205,16 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
 
   return (
     <>
-      <div className="space-y-2 pb-16">
+      <div className="space-y-2 pb-24">
         {msgs.length === 0 && <Empty icon={<Send />} title={peer ? 'Say hi!' : 'Start the conversation'} sub={peer ? 'Only the two of you can see these messages.' : 'Share a win, ask for a recipe, or cheer someone on.'} />}
         {msgs.map((m) => <Bubble key={m.id} m={m} me={me} onLong={() => setDel(m)} />)}
         <div ref={end} />
       </div>
-      <div className="fixed inset-x-0 z-30 bg-bg border-t border-line" style={{ bottom: 'var(--nav-h)' }}>
-        <div className="mx-auto max-w-[640px] px-2.5 py-1.5 flex gap-1.5 items-end">
-          {peer === null && <button aria-label="Share an achievement" className="w-9 h-9 shrink-0 rounded-full bg-petal text-deep grid place-items-center" onClick={() => setShare(true)}><Trophy size={19} /></button>}
-          {GIPHY_KEY && <button aria-label="Search GIFs" className="h-9 px-3 shrink-0 rounded-full bg-petal text-deep font-bold text-[13px]" onClick={() => setGifs(true)}>GIF</button>}
-          <button aria-label="Send a photo or GIF" disabled={busy} className="w-9 h-9 shrink-0 rounded-full bg-petal text-deep grid place-items-center" onClick={() => fileRef.current?.click()}><ImagePlus size={19} /></button>
+      <div className="fixed inset-x-0 z-30 px-3 pb-2.5 pt-6 composer-fade" style={{ bottom: 'var(--nav-h)' }}>
+        <div className="mx-auto max-w-[640px] flex gap-1 items-end rounded-[26px] bg-card p-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.10)]">
+          {peer === null && <button aria-label="Share an achievement" className="w-9 h-9 shrink-0 rounded-full text-muted grid place-items-center" onClick={() => setShare(true)}><Trophy size={19} strokeWidth={1.7} /></button>}
+          {GIPHY_KEY && <button aria-label="Search GIFs" className="h-9 px-2 shrink-0 rounded-full text-muted font-semibold text-[13px]" onClick={() => setGifs(true)}>GIF</button>}
+          <button aria-label="Send a photo or GIF" disabled={busy} className="w-9 h-9 shrink-0 rounded-full text-muted grid place-items-center" onClick={() => fileRef.current?.click()}><ImagePlus size={19} strokeWidth={1.7} /></button>
           <input ref={fileRef} type="file" accept="image/*,image/gif" className="hidden" onChange={async (e) => {
             const f = e.target.files?.[0]; e.target.value = '';
             if (!f) return;
@@ -223,9 +223,9 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
             catch (err: any) { toast(err?.message ?? 'Couldn’t send that'); }
             setBusy(false);
           }} />
-          <textarea aria-label="Message" rows={1} className="field py-1.5 min-h-[36px] max-h-32 flex-1 resize-none" placeholder={peer ? 'Message or paste a GIF link' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
+          <textarea aria-label="Message" rows={1} className="flex-1 min-w-0 bg-transparent outline-none border-0 px-2 py-[7px] min-h-[36px] max-h-32 resize-none text-[16px] leading-[22px]" placeholder={peer ? 'Message or paste a GIF link' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(pointer: fine)').matches) { e.preventDefault(); post(); } }} />
-          <button aria-label="Send" disabled={busy || !text.trim()} className="w-9 h-9 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-50" onClick={post}><Send size={18} /></button>
+          <button aria-label="Send" disabled={busy || !text.trim()} className="w-9 h-9 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-40" onClick={post}><Send size={18} /></button>
         </div>
       </div>
       {share && <ShareSheet onClose={() => setShare(false)} />}
