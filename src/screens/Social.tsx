@@ -6,6 +6,7 @@ import { useSocial, loadSocial, startLive, send, removeMessage, toggleReaction, 
 import { computeAchievements, type Achievement } from '../lib/achievements';
 import { useToday } from '../lib/derived';
 import { Challenges } from '../components/Challenges';
+import { STICKERS, stickerSvg } from '../lib/stickers';
 import { Card, Empty, Field, Header, Segmented, Sheet, toast } from '../components/ui';
 import { AccountForm } from '../components/CloudCard';
 import { useMediaUrl, uploadMedia, gifUrl } from '../lib/media';
@@ -174,6 +175,7 @@ function Bubble({ m, me, onLong }: { m: Message; me: string; onLong: () => void 
       {caption && !gif && <div className="px-4 py-2 text-[14px] whitespace-pre-wrap break-words">{caption}</div>}
     </div>
   );
+  else if (m.meta?.sticker) content = <span className="block w-[112px] h-[112px]" role="img" aria-label="Sticker" dangerouslySetInnerHTML={{ __html: stickerSvg(m.meta.sticker, 112) }} />;
   else if (/^\s*(\p{Extended_Pictographic}(\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*\s*){1,3}$/u.test(m.body)) content = <div className="text-[44px] leading-none py-1">{m.body}</div>;
   else content = <div className={`rounded-3xl px-4 py-2 text-left text-[14px] whitespace-pre-wrap break-words ${mine ? 'bg-deep text-white rounded-br-lg' : 'bg-card border border-line rounded-bl-lg'}`}>{m.body}</div>;
 
@@ -208,6 +210,7 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [emo, setEmo] = useState(false);
+  const [panel, setPanel] = useState<'stickers' | 'emoji'>('stickers');
   const [focused, setFocused] = useState(false);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const [kb, setKb] = useState(0);
@@ -274,9 +277,26 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
           <button aria-label="Send" disabled={busy || !text.trim()} className="w-8 h-8 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-40" onClick={post}><Send size={15} /></button>
         </div>
         {emo && (
-          <div className="mx-auto max-w-[560px] mt-2 rounded-[22px] bg-card p-2 h-[260px] overflow-y-auto">
-            <div className="grid grid-cols-8 gap-0.5">
-              {CHAT_EMOJI.map((e, i) => <button key={i} className="h-10 text-[25px] rounded-[10px] active:bg-petal" onMouseDown={(ev) => ev.preventDefault()} onClick={() => setText((t) => t + e)}>{e}</button>)}
+          <div className="mx-auto max-w-[560px] mt-2 rounded-[22px] bg-card overflow-hidden">
+            <div className="flex gap-1 px-2 pt-2">
+              {([['stickers', 'Gym Girl'], ['emoji', 'Emoji']] as const).map(([v, l]) => (
+                <button key={v} onMouseDown={(ev) => ev.preventDefault()} onClick={() => setPanel(v)} className={`px-3 py-1.5 rounded-full text-[13px] font-medium ${panel === v ? 'bg-petal text-ink' : 'text-muted'}`}>{l}</button>
+              ))}
+            </div>
+            <div className="p-2 h-[260px] overflow-y-auto">
+              {panel === 'stickers' ? (
+                <div className="grid grid-cols-5 gap-1">
+                  {STICKERS.map((st) => (
+                    <button key={st.id} aria-label={st.label} className="aspect-square rounded-[14px] active:bg-petal grid place-items-center" onMouseDown={(ev) => ev.preventDefault()}
+                      onClick={async () => { try { await send('Sent a sticker', peer, 'text', { sticker: st.id }); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); } }}
+                      dangerouslySetInnerHTML={{ __html: stickerSvg(st.id, 58) }} />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-8 gap-0.5">
+                  {CHAT_EMOJI.map((e, i) => <button key={i} className="h-10 text-[25px] rounded-[10px] active:bg-petal" onMouseDown={(ev) => ev.preventDefault()} onClick={() => setText((t) => t + e)}>{e}</button>)}
+                </div>
+              )}
             </div>
           </div>
         )}
