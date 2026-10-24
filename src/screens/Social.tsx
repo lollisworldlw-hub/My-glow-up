@@ -45,7 +45,7 @@ export default function Social() {
   const error = useSocial((s) => s.error);
   const msgs = useSocial((s) => s.messages);
   const lastRead = useSocial((s) => s.lastRead);
-  useEffect(() => { window.scrollTo({ top: 0 }); }, [sub]);
+  useEffect(() => { if (sub !== 'group') window.scrollTo({ top: 0 }); }, [sub]);
   const groupUnread = userId ? msgs.filter((m) => m.recipient === null && m.sender !== userId && m.id > (lastRead.group ?? 0)).length : 0;
   const dmUnread = userId ? msgs.filter((m) => m.recipient === userId && m.id > (lastRead[m.sender] ?? 0)).length : 0;
 
@@ -175,7 +175,18 @@ function Bubble({ m, me, onLong }: { m: Message; me: string; onLong: () => void 
       {caption && !gif && <div className="px-4 py-2 text-[14px] whitespace-pre-wrap break-words">{caption}</div>}
     </div>
   );
-  else if (m.meta?.sticker) content = <span className="block w-[112px] h-[112px]" role="img" aria-label="Sticker" dangerouslySetInnerHTML={{ __html: stickerSvg(m.meta.sticker, 112) }} />;
+  else if (m.meta?.sticker || m.meta?.stickers) {
+    const list: string[] = m.meta.stickers ?? [m.meta.sticker];
+    const size = list.length === 1 ? 112 : list.length <= 3 ? 84 : 60;
+    content = (
+      <div className={`flex flex-col gap-1 ${mine ? 'items-end' : 'items-start'}`}>
+        <div className={`flex flex-wrap gap-0.5 ${mine ? 'justify-end' : ''}`}>
+          {list.map((id, i) => <span key={i} role="img" aria-label="Sticker" style={{ width: size, height: size }} dangerouslySetInnerHTML={{ __html: stickerSvg(id, size) }} />)}
+        </div>
+        {m.meta.withText && <div className={`rounded-3xl px-4 py-2 text-[14px] whitespace-pre-wrap break-words ${mine ? 'bg-deep text-white rounded-br-lg' : 'bg-card border border-line rounded-bl-lg'}`}>{m.body}</div>}
+      </div>
+    );
+  }
   else if (/^\s*(\p{Extended_Pictographic}(\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*\s*){1,3}$/u.test(m.body)) content = <div className="text-[44px] leading-none py-1">{m.body}</div>;
   else content = <div className={`rounded-3xl px-4 py-2 text-left text-[14px] whitespace-pre-wrap break-words ${mine ? 'bg-deep text-white rounded-br-lg' : 'bg-card border border-line rounded-bl-lg'}`}>{m.body}</div>;
 
@@ -232,22 +243,29 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
   const end = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [gifs, setGifs] = useState(false);
+  const scrolledOnce = useRef(false);
+  const [picked, setPicked] = useState<string[]>([]);
   useEffect(() => {
     // scroll the page (not the visual viewport) to the newest message; scrollIntoView can shift iOS's fixed bars
     // only scroll when the newest message would be hidden behind the chat bar
-    const el = end.current;
-    if (el) {
-      const limit = window.innerHeight - 160;
-      const over = el.getBoundingClientRect().bottom - limit;
-      if (over > 0) window.scrollBy({ top: over });
-    }
+    const first = !scrolledOnce.current;
+    scrolledOnce.current = true;
+    // wait a frame so images/stickers have their size, then jump to the newest message
+    requestAnimationFrame(() => setTimeout(() => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (max > 0) window.scrollTo({ top: max, behavior: first ? 'auto' : 'smooth' });
+    }, first ? 60 : 0));
     markRead(peer ?? 'group');
   }, [msgs.length]);
 
   const post = async () => {
-    if (!text.trim()) return;
+    if (!text.trim() && !picked.length) return;
     setBusy(true);
-    try { await send(text, peer); setText(''); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); }
+    try {
+      if (picked.length) await send(text.trim() || 'Sent stickers', peer, 'text', { stickers: picked, withText: !!text.trim() });
+      else await send(text, peer);
+      setText(''); setPicked([]);
+    } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); }
     setBusy(false);
   };
 
@@ -259,6 +277,16 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
         <div ref={end} />
       </div>
       <div className={`fixed inset-x-0 z-40 ${composing ? 'px-2 pt-2 bg-bg border-t border-line' : 'px-4 pb-2 pt-5 composer-fade'}`} style={{ bottom: composing ? kb : 'var(--nav-h)', paddingBottom: composing && !kb ? 'calc(env(safe-area-inset-bottom) + 6px)' : composing ? 6 : undefined }}>
+        {picked.length > 0 && (
+          <div className="mx-auto max-w-[560px] mb-1.5 rounded-[18px] bg-card p-1.5 flex gap-1 overflow-x-auto no-scrollbar shadow-[0_6px_18px_rgba(0,0,0,0.06)]">
+            {picked.map((id, i) => (
+              <button key={i} aria-label="Remove sticker" className="relative shrink-0 w-12 h-12" onMouseDown={(ev) => ev.preventDefault()} onClick={() => setPicked(picked.filter((_, j) => j !== i))}>
+                <span className="block w-12 h-12" dangerouslySetInnerHTML={{ __html: stickerSvg(id, 48) }} />
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-ink text-bg text-[10px] leading-4 text-center">×</span>
+              </button>
+            ))}
+          </div>
+        )}
         <div className="mx-auto max-w-[560px] flex gap-0.5 items-end rounded-[22px] bg-card p-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
           {peer === null && <button aria-label="Share an achievement" className="w-8 h-8 shrink-0 rounded-full text-muted grid place-items-center" onClick={() => setShare(true)}><Trophy size={17} strokeWidth={1.7} /></button>}
           {GIPHY_KEY && <button aria-label="Search GIFs" className="h-8 px-1.5 shrink-0 rounded-full text-muted font-semibold text-[12px]" onClick={() => setGifs(true)}>GIF</button>}
@@ -274,7 +302,7 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
           <textarea ref={taRef} onFocus={() => { setFocused(true); setEmo(false); }} onBlur={() => setFocused(false)} aria-label="Message" rows={1} className="flex-1 min-w-0 bg-transparent outline-none border-0 px-2 py-[5px] min-h-[32px] max-h-32 resize-none text-[16px] leading-[22px]" placeholder={peer ? 'Message or paste a GIF link' : 'Message the group'} value={text} onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(pointer: fine)').matches) { e.preventDefault(); post(); } }} />
           <button aria-label="Emoji" className={`w-8 h-8 shrink-0 rounded-full grid place-items-center ${emo ? 'text-ink bg-petal' : 'text-muted'}`} onMouseDown={(ev) => ev.preventDefault()} onClick={() => { if (emo) { setEmo(false); taRef.current?.focus(); } else { setEmo(true); taRef.current?.blur(); } }}><Smile size={18} strokeWidth={1.7} /></button>
-          <button aria-label="Send" disabled={busy || !text.trim()} className="w-8 h-8 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-40" onClick={post}><Send size={15} /></button>
+          <button aria-label="Send" disabled={busy || (!text.trim() && !picked.length)} className="w-8 h-8 shrink-0 rounded-full bg-deep text-white grid place-items-center disabled:opacity-40" onClick={post}><Send size={15} /></button>
         </div>
         {emo && (
           <div className="mx-auto max-w-[560px] mt-2 rounded-[22px] bg-card overflow-hidden">
@@ -288,7 +316,7 @@ function Thread({ peer, me }: { peer: string | null; me: string }) {
                 <div className="grid grid-cols-5 gap-1">
                   {STICKERS.map((st) => (
                     <button key={st.id} aria-label={st.label} className="aspect-square rounded-[14px] active:bg-petal grid place-items-center" onMouseDown={(ev) => ev.preventDefault()}
-                      onClick={async () => { try { await send('Sent a sticker', peer, 'text', { sticker: st.id }); } catch (e: any) { toast(e?.message ?? 'Couldn’t send'); } }}
+                      onClick={() => setPicked((p) => (p.length >= 12 ? p : [...p, st.id]))}
                       dangerouslySetInnerHTML={{ __html: stickerSvg(st.id, 58) }} />
                   ))}
                 </div>
