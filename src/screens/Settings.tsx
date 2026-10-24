@@ -403,10 +403,7 @@ function DataSection({ onDelete }: { onDelete: () => void }) {
       <SectionTitle>Account</SectionTitle>
       <div className="mb-3"><CloudCard /></div>
       <div className="mb-3"><JoinGroupCard /></div>
-      <Card>
-        <button className="btn-ghost btn-sm w-full" onClick={doExport}><Download size={16} />Download a copy of my data</button>
-        <button className="btn-ghost btn-sm w-full mt-2 text-deep" onClick={onDelete}><Trash2 size={16} />Delete data…</button>
-      </Card>
+      <div className="text-center"><button className="text-[13px] text-muted min-h-[40px] px-3" onClick={onDelete}>Clear or delete my data</button></div>
     </>
   );
 }
